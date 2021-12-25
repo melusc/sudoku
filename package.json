@@ -1,0 +1,13 @@
+{
+  "name": "@lusc/sudoku",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "repository": "https://github.com/melusc/sudoku",
+  "author": "lusc",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@lusc/tsconfig": "^1.0.0",
+    "typescript": "^4.5.4"
+  }
+}
