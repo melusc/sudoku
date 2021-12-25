@@ -1,6 +1,6 @@
 {
 	"name": "@lusc/sudoku",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"main": "dist/index.js",
 	"repository": "https://github.com/melusc/sudoku",
 	"author": "lusc",
