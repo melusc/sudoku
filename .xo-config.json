@@ -4,6 +4,25 @@
 		"indent": "off",
 		"@typescript-eslint/naming-convention": "off",
 		"no-mixed-spaces-and-tabs": "off",
-		"capitalized-comments": "off"
-	}
+		"capitalized-comments": "off",
+		"no-bitwise": "off",
+		"node/prefer-global/process": "off",
+		"@typescript-eslint/quotes": [
+			"error",
+			"single",
+			{
+				"avoidEscape": true
+			}
+		]
+	},
+	"overrides": [
+		{
+			"env": ["es2020", "node"],
+			"files": ["./test/**/*"],
+			"rules": {
+				"max-nested-callbacks": "off",
+				"no-mixed-operators": "off"
+			}
+		}
+	]
 }
