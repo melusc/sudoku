@@ -6,6 +6,9 @@
 	"author": "lusc",
 	"license": "MIT",
 	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
 	"ava": {
 		"files": [
 			"test/*.test.ts"
