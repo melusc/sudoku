@@ -1,0 +1,9 @@
+{
+	"rules": {
+		"@typescript-eslint/indent": "off",
+		"indent": "off",
+		"@typescript-eslint/naming-convention": "off",
+		"no-mixed-spaces-and-tabs": "off",
+		"capitalized-comments": "off"
+	}
+}

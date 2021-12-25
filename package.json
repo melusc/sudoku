@@ -6,8 +6,14 @@
   "author": "lusc",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "fmt": "prettier -w . && xo --fix",
+    "build": "tsc"
+  },
   "devDependencies": {
     "@lusc/tsconfig": "^1.0.0",
-    "typescript": "^4.5.4"
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4",
+    "xo": "^0.47.0"
   }
 }
