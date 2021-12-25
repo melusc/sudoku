@@ -14,7 +14,7 @@
 	"engines": {
 		"node": "^12.20.0 || ^14.13.1 || >=16.0.0"
 	},
-	"exports": "./dist/lib/index.js",
+	"main": "./dist/lib/index.js",
 	"type": "module",
 	"ava": {
 		"files": [
