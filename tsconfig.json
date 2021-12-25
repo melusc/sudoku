@@ -1,3 +1,6 @@
 {
-  "extends": "@lusc/tsconfig"
+	"extends": "@lusc/tsconfig",
+	"compilerOptions": {
+		"outDir": "./dist/test"
+	}
 }

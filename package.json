@@ -1,19 +1,32 @@
 {
-  "name": "@lusc/sudoku",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "repository": "https://github.com/melusc/sudoku",
-  "author": "lusc",
-  "license": "MIT",
-  "private": false,
-  "scripts": {
-    "fmt": "prettier -w . && xo --fix",
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "@lusc/tsconfig": "^1.0.0",
-    "prettier": "^2.5.1",
-    "typescript": "^4.5.4",
-    "xo": "^0.47.0"
-  }
+	"name": "@lusc/sudoku",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"repository": "https://github.com/melusc/sudoku",
+	"author": "lusc",
+	"license": "MIT",
+	"private": false,
+	"ava": {
+		"files": [
+			"test/*.test.ts"
+		],
+		"typescript": {
+			"compile": false,
+			"rewritePaths": {
+				"test/": "dist/test/test/"
+			}
+		}
+	},
+	"scripts": {
+		"fmt": "prettier -w . && xo --fix",
+		"build": "tsc"
+	},
+	"devDependencies": {
+		"@ava/typescript": "^3.0.1",
+		"@lusc/tsconfig": "^1.0.0",
+		"ava": "^4.0.0-rc.1",
+		"prettier": "^2.5.1",
+		"typescript": "^4.5.4",
+		"xo": "^0.47.0"
+	}
 }
