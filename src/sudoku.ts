@@ -1,6 +1,6 @@
 import {ReadonlyDeep} from 'type-fest';
 
-import {Cell, type Cells} from './cell.js';
+import {Cell, generateEmptyCellPossibles, type Cells} from './cell.js';
 import * as plugins from './plugins/plugins.js';
 
 type NumberOnlySudoku = Array<Array<number | undefined>>;
@@ -240,22 +240,22 @@ export class Sudoku {
 			for (let index = 0; index < 9; ++index) {
 				const structure = this[key](index);
 
-				const dict = new Map<string, number>();
+				const requiredNumbers = generateEmptyCellPossibles();
 
 				for (const cell of structure) {
 					if (cell.content === undefined) {
 						// eslint-disable-next-line max-depth
 						for (const possible of cell.possible) {
-							dict.set(possible, (dict.get(possible) ?? 0) + 1);
+							requiredNumbers.delete(possible);
 						}
 					} else {
-						dict.set(cell.content, (dict.get(cell.content) ?? 0) + 1);
+						requiredNumbers.delete(cell.content);
 					}
 				}
 
-				if (dict.size !== 9) {
+				if (requiredNumbers.size > 0) {
 					if (process.env['NODE_ENV'] !== 'test') {
-						console.error('dict.size !== 9', dict);
+						console.error('dict.size > 0: %o', requiredNumbers);
 					}
 
 					return false;

@@ -3,13 +3,13 @@ const uniqueId = (prefix = '') => `${prefix}${counter++}`;
 
 export type Cells = Cell[];
 
-const emptyCellPossibles = (): Set<string> =>
+export const generateEmptyCellPossibles = (): Set<string> =>
 	new Set(Array.from({length: 9}, (_v, index) => `${index + 1}`));
 
 export class Cell {
 	content: string | undefined;
 
-	possible = emptyCellPossibles();
+	possible = generateEmptyCellPossibles();
 
 	key = uniqueId('cell-');
 
@@ -44,7 +44,7 @@ export class Cell {
 	clear = (): this => {
 		this.content = undefined;
 
-		this.possible = emptyCellPossibles();
+		this.possible = generateEmptyCellPossibles();
 
 		return this;
 	};
