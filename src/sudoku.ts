@@ -219,7 +219,7 @@ export class Sudoku {
 		}
 
 		for (const structure of this.eachStructure()) {
-			this._validateByStructure(structure);
+			this._setValiditiesByStructure(structure);
 		}
 
 		for (const [index, cell] of this.cells.entries()) {
@@ -261,26 +261,24 @@ export class Sudoku {
 		return this.cellsIndividuallyValidByStructure();
 	};
 
-	_validateByStructure = (structure: Cells): this => {
-		const found = new Map<string, number>();
-		for (const {content} of structure) {
+	_setValiditiesByStructure = (structure: Cells): this => {
+		const found = new Map<string, Cell>();
+
+		// For every content add the cell to `found`
+		// If a second cell is found, that means that there are duplicates
+		// so both are invalid
+
+		for (const cell of structure) {
+			const {content} = cell;
+
 			if (typeof content === 'string') {
-				found.set(content, (found.get(content) ?? 0) + 1);
-			}
-		}
+				const previousCell = found.get(content);
 
-		for (const [key, amount] of found) {
-			if (amount === 1) {
-				continue;
-			}
-
-			for (const [index, cell] of structure.entries()) {
-				if (cell.content === key) {
-					if (process.env['NODE_ENV'] !== 'test') {
-						console.error('cell.content === key', [index, cell]);
-					}
-
+				if (previousCell) {
+					previousCell.valid = false;
 					cell.valid = false;
+				} else {
+					found.set(content, cell);
 				}
 			}
 		}
