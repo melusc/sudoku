@@ -32,15 +32,16 @@
 	},
 	"scripts": {
 		"fmt": "prettier -w . && xo --fix",
-		"build": "tsc",
-		"test": "yarn run build-tests && yarn ava",
-		"build-tests": "tsc --project test.tsconfig.json"
+		"build": "del-cli ./dist/lib/** && tsc",
+		"test": "yarn run ava",
+		"pretest": "del-cli ./dist/test/** && tsc --project test.tsconfig.json"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
 		"@lusc/tsconfig": "^1.0.0",
 		"@types/node": "^17.0.4",
 		"ava": "^4.0.0-rc.1",
+		"del-cli": "^4.0.1",
 		"prettier": "^2.5.1",
 		"typescript": "^4.5.4",
 		"xo": "^0.47.0"
