@@ -34,7 +34,7 @@
 		"fmt": "prettier -w . && xo --fix",
 		"build": "del-cli ./dist/lib/** && tsc",
 		"test": "yarn run ava",
-		"pretest": "del-cli ./dist/test/** && tsc --project test.tsconfig.json"
+		"pretest": "del-cli ./dist/test/** && tsc --project test/tsconfig.json"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
