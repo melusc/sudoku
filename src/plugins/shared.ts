@@ -26,10 +26,8 @@ export const makeVisitor
 	(sudoku: Sudoku): boolean => {
 		let anyChanged = false;
 
-		for (const key of getterFunctionNames) {
-			for (let i = 0; i < 9; ++i) {
-				anyChanged = cb(sudoku[key](i)) || anyChanged;
-			}
+		for (const structure of sudoku.eachStructure()) {
+			anyChanged = cb(structure) || anyChanged;
 		}
 
 		return anyChanged;

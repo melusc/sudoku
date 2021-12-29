@@ -205,19 +205,21 @@ export class Sudoku {
 		return this;
 	};
 
+	* eachStructure(): Iterable<Cells> {
+		for (let i = 0; i < 9; ++i) {
+			for (const structureGetter of [this.getCol, this.getRow, this.getBlock]) {
+				yield structureGetter(i);
+			}
+		}
+	}
+
 	cellsIndividuallyValidByStructure = (): boolean => {
 		for (const cell of this.cells) {
 			cell.valid = undefined;
 		}
 
-		for (let index = 0; index < 9; ++index) {
-			for (const structure of [
-				this.getCol(index),
-				this.getRow(index),
-				this.getBlock(index),
-			]) {
-				this._validateByStructure(structure);
-			}
+		for (const structure of this.eachStructure()) {
+			this._validateByStructure(structure);
 		}
 
 		for (const [index, cell] of this.cells.entries()) {
@@ -234,32 +236,25 @@ export class Sudoku {
 	};
 
 	isValid = (): boolean => {
-		const keys = ['getRow', 'getBlock', 'getCol'] as const;
+		for (const structure of this.eachStructure()) {
+			const requiredNumbers = generateEmptyCellPossibles();
 
-		for (const key of keys) {
-			for (let index = 0; index < 9; ++index) {
-				const structure = this[key](index);
-
-				const requiredNumbers = generateEmptyCellPossibles();
-
-				for (const cell of structure) {
-					if (cell.content === undefined) {
-						// eslint-disable-next-line max-depth
-						for (const possible of cell.possible) {
-							requiredNumbers.delete(possible);
-						}
-					} else {
-						requiredNumbers.delete(cell.content);
+			for (const cell of structure) {
+				if (cell.content === undefined) {
+					for (const possible of cell.possible) {
+						requiredNumbers.delete(possible);
 					}
+				} else {
+					requiredNumbers.delete(cell.content);
+				}
+			}
+
+			if (requiredNumbers.size > 0) {
+				if (process.env['NODE_ENV'] !== 'test') {
+					console.error('dict.size > 0: %o', requiredNumbers);
 				}
 
-				if (requiredNumbers.size > 0) {
-					if (process.env['NODE_ENV'] !== 'test') {
-						console.error('dict.size > 0: %o', requiredNumbers);
-					}
-
-					return false;
-				}
+				return false;
 			}
 		}
 
