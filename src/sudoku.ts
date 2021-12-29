@@ -21,6 +21,12 @@ export const inRangeIncl = (low: number, high: number, n: number): void => {
 	}
 };
 
+enum SolveTypes {
+	changed,
+	unchanged,
+	error,
+}
+
 export class Sudoku {
 	#subscriptions: Set<SubscriptionCallback> = new Set();
 
@@ -127,6 +133,41 @@ export class Sudoku {
 
 	getCells = (): Cells => [...this.cells];
 
+	#singleSolve = (): SolveTypes => {
+		let anyChanged = false;
+
+		for (const plugin of this.#plugins) {
+			try {
+				anyChanged = plugin(this) || anyChanged;
+			} catch (error: unknown) {
+				if (process.env['NODE_ENV'] !== 'test') {
+					console.error(error, this.cells);
+				}
+
+				return SolveTypes.error;
+			}
+		}
+
+		for (const [index, cell] of this.cells.entries()) {
+			if (cell.content !== undefined) {
+				continue;
+			}
+
+			if (cell.possible.size === 1) {
+				// We know that the set has one item
+				cell.setContent(cell.possible.values().next().value as string);
+			} else if (cell.possible.size === 0) {
+				if (process.env['NODE_ENV'] !== 'test') {
+					console.error('cell.possible.size === 0', [index, cell]);
+				}
+
+				return SolveTypes.error;
+			}
+		}
+
+		return anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
+	};
+
 	solve = (): this => {
 		if (!this.isValid()) {
 			this.#dispatch('error');
@@ -139,48 +180,15 @@ export class Sudoku {
 			}
 		}
 
-		let anyChanged: boolean;
-		let sudokuIsValid = true;
+		let shouldContinue: SolveTypes;
 
 		do {
-			anyChanged = false;
+			shouldContinue = this.#singleSolve();
+		} while (shouldContinue === SolveTypes.changed);
 
-			for (const plugin of this.#plugins) {
-				try {
-					anyChanged = plugin(this) || anyChanged;
-				} catch (error: unknown) {
-					if (process.env['NODE_ENV'] !== 'test') {
-						console.error(error, this.cells);
-					}
-
-					sudokuIsValid = false;
-					break;
-				}
-			}
-
-			for (const [index, cell] of this.cells.entries()) {
-				if (cell.content !== undefined) {
-					continue;
-				}
-
-				if (cell.possible.size === 1) {
-					// We know that the set has one item
-					cell.setContent(cell.possible.values().next().value as string);
-				} else if (cell.possible.size === 0) {
-					if (process.env['NODE_ENV'] !== 'test') {
-						console.error('cell.possible.size === 0', [index, cell]);
-					}
-
-					sudokuIsValid = false;
-
-					break;
-				}
-			}
-
-			sudokuIsValid &&= this.isValid();
-		} while (anyChanged && sudokuIsValid);
-
-		this.#dispatch(sudokuIsValid ? 'finish' : 'error');
+		this.#dispatch(
+			shouldContinue === SolveTypes.unchanged ? 'finish' : 'error',
+		);
 
 		return this;
 	};
