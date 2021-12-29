@@ -1,5 +1,5 @@
 let counter = 0;
-const uniqueId = (prefix = '') => `${prefix}${counter++}`;
+const uniqueId = (prefix = ''): string => `${prefix}${counter++}`;
 
 export type Cells = Cell[];
 
