@@ -9,8 +9,6 @@ export const bitCount = (n: number): number => {
 	return (((n + (n >> 4)) & 0xF_0F_0F_0F) * 0x1_01_01_01) >> 24;
 };
 
-export const getterFunctionNames = ['getRow', 'getCol', 'getBlock'] as const;
-
 export const bitIndex = (n: number): number => {
 	const index = Math.log2(n);
 
