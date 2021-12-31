@@ -39,7 +39,7 @@
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
 		"@lusc/tsconfig": "^1.0.0",
-		"@types/node": "^17.0.4",
+		"@types/node": "^17.0.5",
 		"ava": "^4.0.0-rc.1",
 		"del-cli": "^4.0.1",
 		"prettier": "^2.5.1",
