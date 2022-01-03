@@ -223,7 +223,7 @@ export class Sudoku {
 
 	cellsIndividuallyValidByStructure = (): boolean => {
 		for (const cell of this.cells) {
-			cell.valid = undefined;
+			cell.customValid = true;
 		}
 
 		for (const structure of this.eachStructure()) {
@@ -283,8 +283,8 @@ export class Sudoku {
 				const previousCell = found.get(content);
 
 				if (previousCell) {
-					previousCell.valid = false;
-					cell.valid = false;
+					previousCell.customValid = false;
+					cell.customValid = false;
 				} else {
 					found.set(content, cell);
 				}

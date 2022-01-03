@@ -13,7 +13,7 @@ export class Cell {
 
 	key = uniqueId('cell-');
 
-	private customValid = true;
+	customValid = true;
 
 	get valid(): boolean {
 		return (
@@ -22,10 +22,6 @@ export class Cell {
 				? this.possible.size > 0
 				: /^[1-9]$/.test(this.content))
 		);
-	}
-
-	set valid(validity: boolean | undefined) {
-		this.customValid = validity ?? true;
 	}
 
 	setContent = (content: string): this => {
