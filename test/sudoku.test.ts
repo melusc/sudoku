@@ -531,3 +531,6 @@ test('inRangeIncl', t => {
 		inRangeIncl(0, 80, 4);
 	});
 });
+
+// TODO: https://www.sudokuonline.io/tips/sudoku-swordfish-strategy
+// https://www.sudokuonline.io/media/post-images/2020/06/19/sudoku-swordfish-row-patern-example.jpg
