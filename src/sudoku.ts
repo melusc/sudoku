@@ -30,7 +30,7 @@ enum SolveTypes {
 export class Sudoku {
 	#subscriptions: Set<SubscriptionCallback> = new Set();
 
-	#plugins = Object.values(plugins);
+	#plugins: Array<(sudoku: Sudoku) => boolean> = Object.values(plugins);
 
 	private readonly cells: Cells;
 
