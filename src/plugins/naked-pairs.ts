@@ -9,22 +9,22 @@ import {bitCount, makeVisitor} from './shared.js';
 const genericNakedPairsSolver = (structure: ReadonlyCells): boolean => {
 	let anyChanged = false;
 
-	const summary = new Map<number, number>();
+	const summary = new Map<number, bigint>();
 
 	for (const [index, cell] of structure.entries()) {
 		if (cell.content === undefined) {
-			let key = 0;
+			let key = 0n;
 			for (const number of cell.possible) {
-				key |= 2 ** (Number(number) - 1);
+				key |= 2n ** (BigInt(number) - 1n);
 			}
 
 			summary.set(index, key);
 		} else {
-			summary.set(index, 2 ** (Number(cell.content) - 1));
+			summary.set(index, 2n ** (BigInt(cell.content) - 1n));
 		}
 	}
 
-	const equalKeys: Array<[numbers: number, indices: number[]]> = [];
+	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
 	for (const [index, numbers] of summary) {
 		let exactMatchFound = false;
 		for (let i = 0; i < equalKeys.length; ++i) {
@@ -46,12 +46,12 @@ const genericNakedPairsSolver = (structure: ReadonlyCells): boolean => {
 	}
 
 	for (const [key, indices] of equalKeys) {
-		if (bitCount(key) !== indices.length || indices.length > 8) {
+		if (bitCount(key) !== BigInt(indices.length) || indices.length > 8) {
 			continue;
 		}
 
-		for (let number = 0; number <= Math.log2(key); ++number) {
-			if ((key & (1 << number)) === 0) {
+		for (let number = 0; number < 9; ++number) {
+			if ((key & (1n << BigInt(number))) === 0n) {
 				continue;
 			}
 

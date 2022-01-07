@@ -19,14 +19,16 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 	// Iterating through each cell and
 	// doing `currentValue | 2 ** index`
 	// This is a lot better than comparing arrays of indexes
-	const summary = new Map<string, number>();
+	const summary = new Map<string, bigint>();
 
 	for (let index = 0; index < 9; ++index) {
-		const {content, possible} = structure[index]!; // It's [0,8]
+		const {content, possible} = structure[index]!;
+
+		const pow = 2n ** BigInt(index);
 
 		if (content === undefined) {
 			for (const number of possible) {
-				summary.set(number, (summary.get(number) ?? 0) | (2 ** index));
+				summary.set(number, (summary.get(number) ?? 0n) | pow);
 			}
 		} else {
 			/*
@@ -44,11 +46,11 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
           (here cell at index 0), incorrectly resulting in two cells with 3
         */
 
-			summary.set(content, (summary.get(content) ?? 0) | (2 ** index));
+			summary.set(content, (summary.get(content) ?? 0n) | pow);
 		}
 	}
 
-	const equalIndexes: Array<[number, string[]]> = [];
+	const equalIndexes: Array<[bigint, string[]]> = [];
 
 	for (const [number, key] of summary) {
 		if (bitCount(key) > 8) {
@@ -86,8 +88,8 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 			continue;
 		}
 
-		for (let index = 0; index <= Math.log2(key); ++index) {
-			if ((key & (2 ** index)) === 0) {
+		for (let index = 0; index < 9; ++index) {
+			if ((key & (1n << BigInt(index))) === 0n) {
 				continue;
 			}
 

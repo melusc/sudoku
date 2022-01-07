@@ -39,35 +39,35 @@ export const pointingArrows = (sudoku: Sudoku): boolean => {
       If one of the sections has only one bit,
       that is a pointing arrow
     */
-		const summary = new Map<string, number>();
+		const summary = new Map<string, bigint>();
 
 		for (const [index, {content, possible}] of block.entries()) {
-			const row = Math.trunc(index / 3);
-			const col = index % 3;
+			const row = BigInt(Math.trunc(index / 3));
+			const col = BigInt(index % 3);
 
-			const key = (2 ** col) | (2 ** (row + 3));
+			const key = (1n << col) | (1n << (row + 3n));
 
 			if (content === undefined) {
 				for (const number of possible) {
-					summary.set(number, (summary.get(number) ?? 0) | key);
+					summary.set(number, (summary.get(number) ?? 0n) | key);
 				}
 			} else {
-				summary.set(content, (summary.get(content) ?? 0) | key);
+				summary.set(content, (summary.get(content) ?? 0n) | key);
 			}
 		}
 
 		for (const [number, key] of summary) {
-			const colSection = key & 0b111; // & 7
-			const rowSection = (key >> 3) & 0b111;
+			const colSection = key & 0b111n; // & 7
+			const rowSection = (key >> 3n) & 0b111n;
 
-			if (bitCount(colSection) === 1 && bitCount(rowSection) > 1) {
+			if (bitCount(colSection) === 1n && bitCount(rowSection) > 1) {
 				anyChanged
 					= clearSection(
 						sudoku.getCol(blockColIndex + bitIndex(colSection)),
 						blockRowIndex,
 						number,
 					) || anyChanged;
-			} else if (bitCount(rowSection) === 1 && bitCount(colSection) > 1) {
+			} else if (bitCount(rowSection) === 1n && bitCount(colSection) > 1) {
 				anyChanged
 					= clearSection(
 						sudoku.getRow(blockRowIndex + bitIndex(rowSection)),
