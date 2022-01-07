@@ -1,2 +1,2 @@
 export {type SubscriptionCallback, Sudoku} from './sudoku.js';
-export {type Cells, Cell} from './cell.js';
+export {type Cells, type ReadonlyCells, Cell} from './cell.js';

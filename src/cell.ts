@@ -2,6 +2,7 @@ let counter = 0;
 const uniqueId = (prefix = ''): string => `${prefix}${counter++}`;
 
 export type Cells = Cell[];
+export type ReadonlyCells = readonly Cell[];
 
 export const generateEmptyCellPossibles = (): Set<string> =>
 	new Set(Array.from({length: 9}, (_v, index) => `${index + 1}`));
@@ -24,7 +25,8 @@ export class Cell {
 		);
 	}
 
-	setContent = (content: string): this => {
+	setContent = (content: string | number): this => {
+		content = String(content);
 		content = content.trim();
 
 		if (content) {

@@ -1,6 +1,11 @@
 import {ReadonlyDeep} from 'type-fest';
 
-import {Cell, generateEmptyCellPossibles, type Cells} from './cell.js';
+import {
+	Cell,
+	generateEmptyCellPossibles,
+	type Cells,
+	type ReadonlyCells,
+} from './cell.js';
 import * as plugins from './plugins/plugins.js';
 
 type NumberOnlySudoku = Array<Array<number | undefined>>;
@@ -32,7 +37,11 @@ export class Sudoku {
 
 	#plugins: Array<(sudoku: Sudoku) => boolean> = Object.values(plugins);
 
-	private readonly cells: Cells;
+	#cachedCols = new Map<number, ReadonlyCells>();
+	#cachedRows = new Map<number, ReadonlyCells>();
+	#cachedBlocks = new Map<number, ReadonlyCells>();
+
+	private readonly cells: ReadonlyCells;
 
 	constructor(array?: ReadonlyDeep<NumberOnlySudoku>) {
 		this.cells = Array.from({length: 81}, () => new Cell());
@@ -40,17 +49,16 @@ export class Sudoku {
 		if (array) {
 			for (const [rowIndex, row] of array.entries()) {
 				for (const [colIndex, cell] of row.entries()) {
-					if (typeof cell === 'number') {
-						const rowIndex_ = rowIndex * 9; // Because of prettier and eslint's no-mixed-operators
-
-						this.setContent(rowIndex_ + colIndex, `${cell}`);
+					if (cell !== undefined) {
+						// prettier-ignore
+						this.setContent((rowIndex * 9) + colIndex, cell);
 					}
 				}
 			}
 		}
 	}
 
-	setContent = (index: number, content: string): this => {
+	setContent = (index: number, content: string | number): this => {
 		inRangeIncl(0, 80, index);
 
 		const cell = this.cells[index]!; // It's [0,80]
@@ -70,7 +78,9 @@ export class Sudoku {
 	};
 
 	clearCell = (index: number): this => {
-		this.getCell(index).clear(); // Validate index there
+		const cell = this.getCell(index);
+		cell.customValid = true;
+		cell.clear();
 
 		this.cellsIndividuallyValidByStructure();
 
@@ -80,13 +90,20 @@ export class Sudoku {
 	clearAllCells = (): this => {
 		for (const cell of this.cells) {
 			cell.clear();
+			cell.customValid = true;
 		}
 
 		return this.#dispatch('change');
 	};
 
-	getCol = (col: number): Cells => {
+	getCol = (col: number): ReadonlyCells => {
 		inRangeIncl(0, 8, col);
+
+		const cachedCols = this.#cachedCols;
+
+		if (cachedCols.has(col)) {
+			return cachedCols.get(col)!;
+		}
 
 		const result: Cells = [];
 
@@ -94,19 +111,34 @@ export class Sudoku {
 			result.push(this.cells[index]!);
 		}
 
+		cachedCols.set(col, result);
+
 		return result;
 	};
 
-	getRow = (row: number): Cells => {
+	getRow = (row: number): ReadonlyCells => {
 		inRangeIncl(0, 8, row);
 
-		row *= 9;
+		const cachedRows = this.#cachedRows;
 
-		return this.cells.slice(row, row + 9);
+		if (cachedRows.has(row)) {
+			return cachedRows.get(row)!;
+		}
+
+		// prettier-ignore
+		const result = this.cells.slice(row * 9, (row * 9) + 9);
+
+		cachedRows.set(row, result);
+		return result;
 	};
 
-	getBlock = (index: number): Cells => {
+	getBlock = (index: number): ReadonlyCells => {
 		inRangeIncl(0, 8, index);
+
+		const cachedBlocks = this.#cachedBlocks;
+		if (cachedBlocks.has(index)) {
+			return cachedBlocks.get(index)!;
+		}
 
 		const colOffset = (index % 3) * 3;
 		const rowOffset = Math.floor(index / 3) * 3;
@@ -114,13 +146,13 @@ export class Sudoku {
 		const result = [];
 
 		for (let index_ = 0; index_ < 9; ++index_) {
-			let row = rowOffset + Math.floor(index_ / 3);
+			const row = (rowOffset + Math.floor(index_ / 3)) * 9;
 			const col = colOffset + (index_ % 3);
-
-			row *= 9;
 
 			result.push(this.getCell(row + col));
 		}
+
+		cachedBlocks.set(index, result);
 
 		return result;
 	};
@@ -131,7 +163,7 @@ export class Sudoku {
 		return this.cells[index]!; // It's [0,80]
 	};
 
-	getCells = (): Cells => [...this.cells];
+	getCells = (): ReadonlyCells => this.cells;
 
 	#singleSolve = (): SolveTypes => {
 		let anyChanged = false;
@@ -213,7 +245,7 @@ export class Sudoku {
 		return this;
 	};
 
-	* eachStructure(): Iterable<Cells> {
+	* eachStructure(): Iterable<ReadonlyCells> {
 		for (let i = 0; i < 9; ++i) {
 			for (const structureGetter of [this.getCol, this.getRow, this.getBlock]) {
 				yield structureGetter(i);
@@ -269,7 +301,7 @@ export class Sudoku {
 		return this.cellsIndividuallyValidByStructure();
 	};
 
-	_setValiditiesByStructure = (structure: Cells): this => {
+	_setValiditiesByStructure = (structure: ReadonlyCells): this => {
 		const found = new Map<string, Cell>();
 
 		// For every content add the cell to `found`
