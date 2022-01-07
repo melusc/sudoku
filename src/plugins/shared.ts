@@ -1,4 +1,4 @@
-import type {Cells} from '../cell.js';
+import type {ReadonlyCells} from '../cell.js';
 import type {Sudoku} from '../sudoku.js';
 
 // Stolen shamelessly from
@@ -20,7 +20,7 @@ export const bitIndex = (n: number): number => {
 };
 
 export const makeVisitor
-	= (cb: (structure: Cells) => boolean) =>
+	= (cb: (structure: ReadonlyCells) => boolean) =>
 	(sudoku: Sudoku): boolean => {
 		let anyChanged = false;
 

@@ -1,9 +1,9 @@
-import type {Cells} from '../cell.js';
+import type {ReadonlyCells} from '../cell.js';
 import type {Sudoku} from '../sudoku.js';
 import {bitCount, bitIndex} from './shared.js';
 
 const clearSection = (
-	structure: Cells,
+	structure: ReadonlyCells,
 	blockIndex: number,
 	numberToRemove: string,
 ): boolean => {

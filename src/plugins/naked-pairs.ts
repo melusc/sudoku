@@ -2,11 +2,11 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import type {Cells} from '../cell.js';
+import type {ReadonlyCells} from '../cell.js';
 
 import {bitCount, makeVisitor} from './shared.js';
 
-const genericNakedPairsSolver = (structure: Cells): boolean => {
+const genericNakedPairsSolver = (structure: ReadonlyCells): boolean => {
 	let anyChanged = false;
 
 	const summary = new Map<number, number>();

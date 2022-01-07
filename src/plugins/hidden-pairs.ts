@@ -2,11 +2,11 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import type {Cells} from '../cell.js';
+import type {ReadonlyCells} from '../cell.js';
 
 import {bitCount, makeVisitor} from './shared.js';
 
-const genericHiddenPairsSolver = (structure: Cells): boolean => {
+const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 	let anyChanged = false;
 
 	// Getting all the indexes of a number
