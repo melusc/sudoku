@@ -11,10 +11,7 @@ test('bitCount', t => {
 	];
 
 	for (const n of [...smallNumbers, ...bigNumbers]) {
-		t.is(
-			bitCount(n),
-			BigInt(n.toString(2).replace(/0+/g, '').length),
-		);
+		t.is(bitCount(n), BigInt(n.toString(2).replace(/0+/g, '').length));
 	}
 });
 
