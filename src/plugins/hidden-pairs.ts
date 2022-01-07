@@ -19,7 +19,7 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 	// Iterating through each cell and
 	// doing `currentValue | 2 ** index`
 	// This is a lot better than comparing arrays of indexes
-	const summary = new Map<string, bigint>();
+	const summary = new Map<number, bigint>();
 
 	for (let index = 0; index < 9; ++index) {
 		const {content, possible} = structure[index]!;
@@ -50,7 +50,7 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 		}
 	}
 
-	const equalIndexes: Array<[bigint, string[]]> = [];
+	const equalIndexes: Array<[bigint, number[]]> = [];
 
 	for (const [number, key] of summary) {
 		if (bitCount(key) > 8) {

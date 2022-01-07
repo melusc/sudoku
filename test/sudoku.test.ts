@@ -9,7 +9,7 @@ test('Sudoku#setContent', t => {
 	const s = new Sudoku();
 	s.setContent(0, '4');
 
-	t.is(s.getContent(0), '4');
+	t.is(s.getContent(0), 4);
 });
 
 test('Sudoku#getContent', t => {
@@ -17,13 +17,17 @@ test('Sudoku#getContent', t => {
 	t.is(s.getContent(8 * 9 + 8), undefined);
 
 	s.setContent(8 * 9 + 8, '4');
-	t.is(s.getContent(8 * 9 + 8), '4');
+	t.is(s.getContent(8 * 9 + 8), 4);
+
+	s.setContent(8 * 9 + 8, 'A');
+	t.is(s.getContent(8 * 9 + 8), undefined);
+	t.is(s.getCell(8 * 9 + 8).possible.size, 9);
 });
 
 test('Sudoku#clearCell', t => {
 	const s = new Sudoku();
 	s.setContent(6 * 9 + 6, '4');
-	t.is(s.getContent(6 * 9 + 6), '4');
+	t.is(s.getContent(6 * 9 + 6), 4);
 	s.clearCell(6 * 9 + 6);
 	t.is(s.getContent(6 * 9 + 6), undefined);
 });
@@ -34,9 +38,9 @@ test('Sudoku#clearAllCells', t => {
 		.setContent(1 * 9 + 1, '5')
 		.setContent(2 * 9 + 4, '3');
 
-	t.is(s.getContent(6 * 9 + 6), '4');
-	t.is(s.getContent(1 * 9 + 1), '5');
-	t.is(s.getContent(2 * 9 + 4), '3');
+	t.is(s.getContent(6 * 9 + 6), 4);
+	t.is(s.getContent(1 * 9 + 1), 5);
+	t.is(s.getContent(2 * 9 + 4), 3);
 
 	s.clearAllCells();
 
@@ -56,10 +60,10 @@ test('Sudoku#getCol', t => {
 		[
 			undefined,
 			undefined,
-			'2',
+			2,
 			undefined,
 			undefined,
-			'4',
+			4,
 			undefined,
 			undefined,
 			undefined,
@@ -77,17 +81,7 @@ test('Sudoku#getRow', t => {
 
 	t.deepEqual(
 		row.map(cell => cell.content),
-		[
-			undefined,
-			undefined,
-			'4',
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			'7',
-			'3',
-		],
+		[undefined, undefined, 4, undefined, undefined, undefined, undefined, 7, 3],
 	);
 });
 
@@ -126,21 +120,18 @@ test('Sudoku#getCells', t => {
 		.setContent(1 * 9 + 1, '4')
 		.setContent(5 * 9 + 7, '2');
 
-	t.is(sudoku.getCell(0).content, '2');
-	t.is(sudoku.getCell(1 * 9 + 1).content, '4');
-	t.is(sudoku.getCell(5 * 9 + 7).content, '2');
+	t.is(sudoku.getCell(0).content, 2);
+	t.is(sudoku.getCell(1 * 9 + 1).content, 4);
+	t.is(sudoku.getCell(5 * 9 + 7).content, 2);
 
 	// ====
 
 	const firstRow = Array.from({length: 9}, (_v, index) => index + 1);
-	s = new Sudoku([firstRow]);
+	s = new Sudoku([firstRow.map(content => String(content))]);
 
 	const cells2 = s.getCells();
 
-	t.deepEqual(
-		cells2.map(cell => cell.content).slice(0, 9),
-		firstRow.map(cell => `${cell}`),
-	);
+	t.deepEqual(cells2.map(cell => cell.content).slice(0, 9), firstRow);
 });
 
 test('Sudoku#getBlock', t => {
@@ -163,7 +154,7 @@ test('Sudoku#getBlock', t => {
 	const block2 = s.getBlock(0);
 
 	for (const [index, element] of block2.entries()) {
-		t.is(element.content, `${index + 1}`);
+		t.is(element.content, index + 1);
 	}
 });
 
@@ -173,22 +164,22 @@ test('Sudoku#solve easy', async t => {
 
 	const _ = undefined;
 	const s = new Sudoku([
-		[_, 1, _, 3, 8, _, _, 5, 2],
-		[_, 6, 5, _, _, _, _, 8, 9],
-		[_, _, _, 5, _, 9],
-		[_, _, _, 4, 1, _, 8],
-		[2, 3, _, _, _, _, _, 4, 6],
-		[_, _, 8, _, 3, 7],
-		[_, _, _, 1, _, 8],
-		[6, 5, _, _, _, _, 2, 3],
-		[7, 8, _, _, 5, 3, _, 1],
+		[_, '1', _, '3', '8', _, _, '5', '2'],
+		[_, '6', '5', _, _, _, _, '8', '9'],
+		[_, _, _, '5', _, '9'],
+		[_, _, _, '4', '1', _, '8'],
+		['2', '3', _, _, _, _, _, '4', '6'],
+		[_, _, '8', _, '3', '7'],
+		[_, _, _, '1', _, '8'],
+		['6', '5', _, _, _, _, '2', '3'],
+		['7', '8', _, _, '5', '3', _, '1'],
 	]);
 
 	// Return this so if subscribe is ever async
 	// it still works
 	return new Promise<void>(resolve => {
 		s.subscribe((_s, type) => {
-			t.true(type === 'finish'); // Get typescript checking
+			t.is(type, 'finish');
 
 			resolve();
 		});
@@ -198,15 +189,15 @@ test('Sudoku#solve easy', async t => {
 		t.deepEqual(
 			s.getCells().map(cell => cell.content),
 			[
-				['9', '1', '4', '3', '8', '6', '7', '5', '2'],
-				['3', '6', '5', '7', '2', '1', '4', '8', '9'],
-				['8', '7', '2', '5', '4', '9', '3', '6', '1'],
-				['5', '9', '6', '4', '1', '2', '8', '7', '3'],
-				['2', '3', '7', '8', '9', '5', '1', '4', '6'],
-				['1', '4', '8', '6', '3', '7', '9', '2', '5'],
-				['4', '2', '3', '1', '6', '8', '5', '9', '7'],
-				['6', '5', '1', '9', '7', '4', '2', '3', '8'],
-				['7', '8', '9', '2', '5', '3', '6', '1', '4'],
+				[9, 1, 4, 3, 8, 6, 7, 5, 2],
+				[3, 6, 5, 7, 2, 1, 4, 8, 9],
+				[8, 7, 2, 5, 4, 9, 3, 6, 1],
+				[5, 9, 6, 4, 1, 2, 8, 7, 3],
+				[2, 3, 7, 8, 9, 5, 1, 4, 6],
+				[1, 4, 8, 6, 3, 7, 9, 2, 5],
+				[4, 2, 3, 1, 6, 8, 5, 9, 7],
+				[6, 5, 1, 9, 7, 4, 2, 3, 8],
+				[7, 8, 9, 2, 5, 3, 6, 1, 4],
 			].flat(),
 		);
 
@@ -221,22 +212,22 @@ test('Sudoku#solve evil', async t => {
 	const _ = undefined;
 
 	const s = new Sudoku([
-		[6, _, 4, _, _, _, _, _, 3],
-		[_, _, _, _, 3, 7, 8],
-		[_, _, _, 5, _, _, 7],
-		[8, 9, _, 1],
-		[3, _, _, _, _, _, _, _, 2],
-		[_, _, _, _, _, 3, _, 1, 9],
-		[_, _, 5, _, _, 9],
-		[_, _, 1, 8, 6],
-		[9, _, _, _, _, _, 4, _, 8],
+		['6', _, '4', _, _, _, _, _, '3'],
+		[_, _, _, _, '3', '7', '8'],
+		[_, _, _, '5', _, _, '7'],
+		['8', '9', _, '1'],
+		['3', _, _, _, _, _, _, _, '2'],
+		[_, _, _, _, _, '3', _, '1', '9'],
+		[_, _, '5', _, _, '9'],
+		[_, _, '1', '8', '6'],
+		['9', _, _, _, _, _, '4', _, '8'],
 	]);
 
 	// Return this so if subscribe is ever async
 	// it still works
 	return new Promise<void>(resolve => {
 		s.subscribe((_s, type) => {
-			t.true(type === 'finish'); // Get typescript checking
+			t.is(type, 'finish');
 
 			resolve();
 		});
@@ -246,15 +237,15 @@ test('Sudoku#solve evil', async t => {
 		t.deepEqual(
 			s.getCells().map(cell => cell.content),
 			[
-				['6', '7', '4', '9', '2', '8', '1', '5', '3'],
-				['1', '5', '9', '6', '3', '7', '8', '2', '4'],
-				['2', '3', '8', '5', '4', '1', '7', '9', '6'],
-				['8', '9', '6', '1', '5', '2', '3', '4', '7'],
-				['3', '1', '7', '4', '9', '6', '5', '8', '2'],
-				['5', '4', '2', '7', '8', '3', '6', '1', '9'],
-				['4', '8', '5', '3', '7', '9', '2', '6', '1'],
-				['7', '2', '1', '8', '6', '4', '9', '3', '5'],
-				['9', '6', '3', '2', '1', '5', '4', '7', '8'],
+				[6, 7, 4, 9, 2, 8, 1, 5, 3],
+				[1, 5, 9, 6, 3, 7, 8, 2, 4],
+				[2, 3, 8, 5, 4, 1, 7, 9, 6],
+				[8, 9, 6, 1, 5, 2, 3, 4, 7],
+				[3, 1, 7, 4, 9, 6, 5, 8, 2],
+				[5, 4, 2, 7, 8, 3, 6, 1, 9],
+				[4, 8, 5, 3, 7, 9, 2, 6, 1],
+				[7, 2, 1, 8, 6, 4, 9, 3, 5],
+				[9, 6, 3, 2, 1, 5, 4, 7, 8],
 			].flat(),
 		);
 
@@ -269,22 +260,22 @@ test('Sudoku#solve expert', async t => {
 	const _ = undefined;
 
 	const s = new Sudoku([
-		[_, _, _, _, _, 4, _, _, 2],
-		[_, 6, _, 2, _, _, _, 3],
-		[_, 8, _, _, _, 3, 5, _, 9],
-		[_, 4, _, _, _, _, 1],
-		[1, _, _, 7, _, 5],
-		[5, _, 3],
-		[_, 9, _, 3],
-		[_, _, 4, _, 6, 1],
-		[_, _, 5, _, _, _, 7],
+		[_, _, _, _, _, '4', _, _, '2'],
+		[_, '6', _, '2', _, _, _, '3'],
+		[_, '8', _, _, _, '3', '5', _, '9'],
+		[_, '4', _, _, _, _, '1'],
+		['1', _, _, '7', _, '5'],
+		['5', _, '3'],
+		[_, '9', _, '3'],
+		[_, _, '4', _, '6', '1'],
+		[_, _, '5', _, _, _, '7'],
 	]);
 
 	// Return this so if subscribe is ever async
 	// it still works
 	return new Promise<void>(resolve => {
 		s.subscribe((_s, type) => {
-			t.true(type === 'finish'); // Get typescript checking
+			t.is(type, 'finish');
 
 			resolve();
 		});
@@ -294,15 +285,15 @@ test('Sudoku#solve expert', async t => {
 		t.deepEqual(
 			s.getCells().map(cell => cell.content),
 			[
-				['3', '5', '1', '9', '8', '4', '6', '7', '2'],
-				['4', '6', '9', '2', '5', '7', '8', '3', '1'],
-				['2', '8', '7', '6', '1', '3', '5', '4', '9'],
-				['9', '4', '6', '8', '3', '2', '1', '5', '7'],
-				['1', '2', '8', '7', '4', '5', '3', '9', '6'],
-				['5', '7', '3', '1', '9', '6', '2', '8', '4'],
-				['6', '9', '2', '3', '7', '8', '4', '1', '5'],
-				['7', '3', '4', '5', '6', '1', '9', '2', '8'],
-				['8', '1', '5', '4', '2', '9', '7', '6', '3'],
+				[3, 5, 1, 9, 8, 4, 6, 7, 2],
+				[4, 6, 9, 2, 5, 7, 8, 3, 1],
+				[2, 8, 7, 6, 1, 3, 5, 4, 9],
+				[9, 4, 6, 8, 3, 2, 1, 5, 7],
+				[1, 2, 8, 7, 4, 5, 3, 9, 6],
+				[5, 7, 3, 1, 9, 6, 2, 8, 4],
+				[6, 9, 2, 3, 7, 8, 4, 1, 5],
+				[7, 3, 4, 5, 6, 1, 9, 2, 8],
+				[8, 1, 5, 4, 2, 9, 7, 6, 3],
 			].flat(),
 		);
 
@@ -320,13 +311,13 @@ test('Sudoku#solve: It should realise that invalid1 is invalid', async t => {
 		// Here both 5 and 6 would have to be in the middle/middle cell
 		// which is not possible, since only one number can be in each cell
 		[],
-		[_, _, _, 6],
-		[_, _, _, 5],
-		[_, _, _, _, _, _, 5, 6],
+		[_, _, _, '6'],
+		[_, _, _, '5'],
+		[_, _, _, _, _, _, '5', '6'],
 		[],
-		[_, 6, 5],
-		[_, _, _, _, _, 5],
-		[_, _, _, _, _, 6],
+		[_, '6', '5'],
+		[_, _, _, _, _, '5'],
+		[_, _, _, _, _, '6'],
 	]);
 
 	return new Promise<void>(resolve => {
@@ -352,15 +343,15 @@ test('Sudoku#solve: It should realise that invalid2 is invalid', async t => {
 		// Here 1,2,3 have to be in the third column of the middle/middle block
 		// And 4,5,6 have to be in the first row of the middle/middle block
 		// Since those two overlap this is an invalid sudoku
-		[_, _, _, _, 1],
-		[_, _, _, _, 2],
-		[_, _, _, _, 3],
+		[_, _, _, _, '1'],
+		[_, _, _, _, '2'],
+		[_, _, _, _, '3'],
 		[],
-		[4, 5, 6],
-		[_, _, _, _, _, _, 4, 5, 6],
-		[_, _, _, 1],
-		[_, _, _, 2],
-		[_, _, _, 3],
+		['4', '5', '6'],
+		[_, _, _, _, _, _, '4', '5', '6'],
+		[_, _, _, '1'],
+		[_, _, _, '2'],
+		[_, _, _, '3'],
 	]);
 
 	return new Promise<void>(resolve => {
@@ -387,8 +378,8 @@ test('Sudoku#subscribe', async t => {
 		// 2 tests only, because callback should only fire once
 
 		const callback = (sudoku: Sudoku): void => {
-			t.is(sudoku.getCell(3 * 9 + 2).content, '2');
-			t.is(sudoku.getCell(4 * 9 + 1).content, '4');
+			t.is(sudoku.getCell(3 * 9 + 2).content, 2);
+			t.is(sudoku.getCell(4 * 9 + 1).content, 4);
 
 			resolve();
 		};
@@ -414,13 +405,13 @@ test('Sudoku#unsubscribe', async t => {
 		// Callback2 will not and as such fire four times
 
 		const callback1 = (): void => {
-			t.is(s.getContent(3 * 9 + 2), '2');
+			t.is(s.getContent(3 * 9 + 2), 2);
 		};
 
 		const callback2 = (): void => {
-			t.is(s.getContent(3 * 9 + 2), '2');
+			t.is(s.getContent(3 * 9 + 2), 2);
 
-			if (s.getContent(4 * 9 + 1) === '4') {
+			if (s.getContent(4 * 9 + 1) === 4) {
 				resolve();
 			}
 		};
@@ -444,7 +435,8 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 
 	s = new Sudoku();
 	s.setContent(2, 'Hello there');
-	t.false(
+	t.is(s.getContent(2), undefined);
+	t.true(
 		s.cellsIndividuallyValidByStructure(),
 		'A sudoku with an invalid cell should return false',
 	);
@@ -497,7 +489,7 @@ test('Sudoku#isSolved', t => {
 	// ====
 
 	s = new Sudoku(
-		Array.from({length: 9}, () => Array.from({length: 9}, () => 2)),
+		Array.from({length: 9}, () => Array.from({length: 9}, () => '2')),
 	);
 	t.false(
 		s.isSolved(),

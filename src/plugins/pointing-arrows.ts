@@ -5,7 +5,7 @@ import {bitCount, bitIndex} from './shared.js';
 const clearSection = (
 	structure: ReadonlyCells,
 	blockIndex: number,
-	numberToRemove: string,
+	numberToRemove: number,
 ): boolean => {
 	let anyChanged = false;
 
@@ -39,7 +39,7 @@ export const pointingArrows = (sudoku: Sudoku): boolean => {
       If one of the sections has only one bit,
       that is a pointing arrow
     */
-		const summary = new Map<string, bigint>();
+		const summary = new Map<number, bigint>();
 
 		for (const [index, {content, possible}] of block.entries()) {
 			const row = BigInt(Math.trunc(index / 3));

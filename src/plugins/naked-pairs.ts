@@ -55,13 +55,11 @@ const genericNakedPairsSolver = (structure: ReadonlyCells): boolean => {
 				continue;
 			}
 
-			const numberString = `${number + 1}`;
-
 			for (const [index, {possible}] of structure.entries()) {
-				if (!indices.includes(index) && possible.has(numberString)) {
+				if (!indices.includes(index) && possible.has(number + 1)) {
 					anyChanged ||= true;
 
-					possible.delete(numberString);
+					possible.delete(number + 1);
 				}
 			}
 		}

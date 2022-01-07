@@ -1,8 +1,8 @@
 import {Sudoku} from '../../src/sudoku.js';
 
 export type ComparableCell = {
-	possible: Set<string>;
-	content: string | undefined;
+	possible: Set<number>;
+	content: number | undefined;
 };
 
 export const getComparableCells = (sudoku: Sudoku): ComparableCell[] =>

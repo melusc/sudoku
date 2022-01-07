@@ -8,7 +8,7 @@ import {
 } from './cell.js';
 import * as plugins from './plugins/plugins.js';
 
-type NumberOnlySudoku = Array<Array<number | undefined>>;
+type NumberOnlySudoku = Array<Array<string | undefined>>;
 
 type DispatchTypes = 'change' | 'error' | 'finish';
 export type SubscriptionCallback = (
@@ -58,22 +58,27 @@ export class Sudoku {
 		}
 	}
 
-	setContent = (index: number, content: string | number): this => {
+	setContent = (index: number, content: string): this => {
 		inRangeIncl(0, 80, index);
 
-		const cell = this.cells[index]!; // It's [0,80]
+		const cell = this.cells[index]!;
 
-		cell.setContent(content);
+		const parsed = Number.parseInt(String(content), 10);
+
+		if (Number.isNaN(parsed)) {
+			cell.clear();
+		} else {
+			cell.setContent(parsed);
+		}
 
 		this.cellsIndividuallyValidByStructure();
 
 		return this.#dispatch('change');
 	};
 
-	getContent = (index: number): string | undefined => {
+	getContent = (index: number): number | undefined => {
 		inRangeIncl(0, 80, index);
 
-		// It's [0,80]
 		return this.cells[index]!.content;
 	};
 
@@ -187,7 +192,7 @@ export class Sudoku {
 
 			if (cell.possible.size === 1) {
 				// We know that the set has one item
-				cell.setContent(cell.possible.values().next().value as string);
+				cell.setContent(cell.possible.values().next().value as number);
 			} else if (cell.possible.size === 0) {
 				if (process.env['NODE_ENV'] !== 'test') {
 					console.error('cell.possible.size === 0', [index, cell]);
@@ -302,7 +307,7 @@ export class Sudoku {
 	};
 
 	_setValiditiesByStructure = (structure: ReadonlyCells): this => {
-		const found = new Map<string, Cell>();
+		const found = new Map<number, Cell>();
 
 		// For every content add the cell to `found`
 		// If a second cell is found, that means that there are duplicates
@@ -311,7 +316,7 @@ export class Sudoku {
 		for (const cell of structure) {
 			const {content} = cell;
 
-			if (typeof content === 'string') {
+			if (content !== undefined) {
 				const previousCell = found.get(content);
 
 				if (previousCell) {
