@@ -6,7 +6,7 @@ type GetterName = 'getRow' | 'getCol';
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */
 
 const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
-	const indexedCells = new Map<number, Map<string, number>>();
+	const indexedCells = new Map<number, Map<string, bigint>>();
 
 	/*
 		Index all cell possibles
@@ -16,26 +16,26 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 	*/
 	for (let i = 0; i < 9; ++i) {
 		const structure = sudoku[getterName](i);
-		const currentIndex = new Map<string, number>();
+		const currentIndex = new Map<string, bigint>();
 		indexedCells.set(i, currentIndex);
 
 		for (const [index, {possible}] of structure.entries()) {
 			for (const number of possible) {
 				currentIndex.set(
 					number,
-					(currentIndex.get(number) ?? 0) | (2 ** index),
+					(currentIndex.get(number) ?? 0n) | (1n << BigInt(index)),
 				);
 			}
 		}
 	}
 
-	const merged = new Map<string, Array<[key: number, indices: number[]]>>();
+	const merged = new Map<string, Array<[key: bigint, indices: number[]]>>();
 
 	for (const [index, indexed] of indexedCells) {
 		for (const [number, key] of indexed) {
 			// A completely empty sudoku will be a 9x9 swordfish
 			// but that is not helpful since nothing can be removed
-			if (bitCount(key) === 9) {
+			if (bitCount(key) === 9n) {
 				continue;
 			}
 
@@ -62,7 +62,7 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 	let anyChanged = false;
 	for (const [number, indexed] of merged) {
 		for (const [key, indices] of indexed) {
-			if (bitCount(key) !== indices.length) {
+			if (bitCount(key) !== BigInt(indices.length)) {
 				continue;
 			}
 
@@ -75,7 +75,7 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 
 				// Cell-index in row/col
 				for (let cellIndex = 0; cellIndex < 9; ++cellIndex) {
-					if ((key & (2 ** cellIndex)) === 0) {
+					if ((key & (1n << BigInt(cellIndex))) === 0n) {
 						continue;
 					}
 
