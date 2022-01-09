@@ -1,12 +1,13 @@
 import type {Sudoku} from '../sudoku.js';
 import {bitCount} from './shared.js';
 
-type GetterName = 'getRow' | 'getCol';
-
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */
 
-const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
-	const indexedCells = new Map<number, Map<string, bigint>>();
+const swordfishByType = (
+	sudoku: Sudoku,
+	getterName: 'getRow' | 'getCol',
+): void => {
+	const indexedCells = new Map<number, Map<number, bigint>>();
 
 	/*
 		Index all cell possibles
@@ -14,28 +15,40 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 		add the index of the number:
 		number[`row index`][`cell possible number`] |= `index in row`
 	*/
-	for (let i = 0; i < 9; ++i) {
+	for (let i = 0; i < sudoku.size; ++i) {
 		const structure = sudoku[getterName](i);
-		const currentIndex = new Map<string, bigint>();
+		const currentIndex = new Map<number, bigint>();
+		const foundContent = new Set<number>();
 		indexedCells.set(i, currentIndex);
 
-		for (const [index, {possible}] of structure.entries()) {
-			for (const number of possible) {
-				currentIndex.set(
-					number,
-					(currentIndex.get(number) ?? 0n) | (1n << BigInt(index)),
-				);
+		for (const [index, {possible, content}] of structure.entries()) {
+			if (content === undefined) {
+				for (const number of possible) {
+					// Ignore numbers that already exist as "content"
+					// These numbers will be removed from "possible" soon, anyway
+					if (foundContent.has(number)) {
+						continue;
+					}
+
+					currentIndex.set(
+						number,
+						(currentIndex.get(number) ?? 0n) | (1n << BigInt(index)),
+					);
+				}
+			} else {
+				foundContent.add(content);
+				currentIndex.delete(content);
 			}
 		}
 	}
 
-	const merged = new Map<string, Array<[key: bigint, indices: number[]]>>();
+	const merged = new Map<number, Array<[key: bigint, indices: number[]]>>();
 
 	for (const [index, indexed] of indexedCells) {
 		for (const [number, key] of indexed) {
-			// A completely empty sudoku will be a 9x9 swordfish
+			// A completely empty sudoku will be a NxN swordfish
 			// but that is not helpful since nothing can be removed
-			if (bitCount(key) === 9n) {
+			if (bitCount(key) === BigInt(sudoku.size)) {
 				continue;
 			}
 
@@ -46,12 +59,12 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 			const array = merged.get(number)!;
 
 			for (let i = 0, l = array.length; i < l; ++i) {
-				const item = array[i]!;
+				const [currentKey, indices] = array[i]!;
 
-				if ((item[0] & key) === key) {
-					item[1].push(index);
+				if ((currentKey & key) === key) {
+					indices.push(index);
 				} else {
-					array.push([item[0] | key, [...item[1], Number(index)]]);
+					array.push([currentKey | key, [...indices, Number(index)]]);
 				}
 			}
 
@@ -59,14 +72,13 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 		}
 	}
 
-	let anyChanged = false;
 	for (const [number, indexed] of merged) {
 		for (const [key, indices] of indexed) {
 			if (bitCount(key) !== BigInt(indices.length)) {
 				continue;
 			}
 
-			for (let structIndex = 0; structIndex < 9; ++structIndex) {
+			for (let structIndex = 0; structIndex < sudoku.size; ++structIndex) {
 				if (indices.includes(structIndex)) {
 					continue;
 				}
@@ -74,26 +86,19 @@ const swordfishByType = (sudoku: Sudoku, getterName: GetterName): boolean => {
 				const struct = sudoku[getterName](structIndex);
 
 				// Cell-index in row/col
-				for (let cellIndex = 0; cellIndex < 9; ++cellIndex) {
+				for (let cellIndex = 0; cellIndex < sudoku.size; ++cellIndex) {
 					if ((key & (1n << BigInt(cellIndex))) === 0n) {
 						continue;
 					}
 
-					const {possible} = struct[cellIndex]!;
-					anyChanged ||= possible.has(number);
-					possible.delete(number);
+					sudoku.removePossible(struct[cellIndex]!, number);
 				}
 			}
 		}
 	}
-
-	return anyChanged;
 };
 
-export const swordfish = (sudoku: Sudoku): boolean => {
-	let anyChanged = false;
-	anyChanged = swordfishByType(sudoku, 'getRow') || anyChanged;
-	anyChanged = swordfishByType(sudoku, 'getCol') || anyChanged;
-
-	return anyChanged;
+export const swordfish = (sudoku: Sudoku): void => {
+	swordfishByType(sudoku, 'getRow');
+	swordfishByType(sudoku, 'getCol');
 };
