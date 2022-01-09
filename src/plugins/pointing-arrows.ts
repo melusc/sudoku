@@ -4,33 +4,29 @@ import {bitCount, bitIndex} from './shared.js';
 
 const clearSection = (
 	structure: ReadonlyCells,
+	sudoku: Sudoku,
 	blockIndex: number,
 	numberToRemove: number,
-): boolean => {
-	let anyChanged = false;
+): void => {
+	const {blockWidth} = sudoku;
 
 	for (const [index, cell] of structure.entries()) {
-		if (index >= blockIndex && index < blockIndex + 3) {
+		if (index >= blockIndex && index < blockIndex + blockWidth) {
 			continue;
 		}
 
-		if (cell.possible.has(numberToRemove)) {
-			anyChanged = true;
-
-			cell.possible.delete(numberToRemove);
-		}
+		sudoku.removePossible(cell, numberToRemove);
 	}
-
-	return anyChanged;
 };
 
-export const pointingArrows = (sudoku: Sudoku): boolean => {
-	let anyChanged = false;
+export const pointingArrows = (sudoku: Sudoku): void => {
+	const {size, blockWidth} = sudoku;
+	const blockWidthBigInt = BigInt(blockWidth);
 
-	for (let blockIndex = 0; blockIndex < 9; ++blockIndex) {
+	for (let blockIndex = 0; blockIndex < size; ++blockIndex) {
 		const block = sudoku.getBlock(blockIndex);
-		const blockRowIndex = Math.trunc(blockIndex / 3) * 3;
-		const blockColIndex = (blockIndex % 3) * 3;
+		const blockRowIndex = Math.trunc(blockIndex / blockWidth) * blockWidth;
+		const blockColIndex = (blockIndex % blockWidth) * blockWidth;
 
 		/*
       The first three bits are for cols
@@ -42,10 +38,10 @@ export const pointingArrows = (sudoku: Sudoku): boolean => {
 		const summary = new Map<number, bigint>();
 
 		for (const [index, {content, possible}] of block.entries()) {
-			const row = BigInt(Math.trunc(index / 3));
-			const col = BigInt(index % 3);
+			const row = BigInt(Math.trunc(index / blockWidth));
+			const col = BigInt(index % blockWidth);
 
-			const key = (1n << col) | (1n << (row + 3n));
+			const key = (1n << col) | (1n << (row + blockWidthBigInt));
 
 			if (content === undefined) {
 				for (const number of possible) {
@@ -56,27 +52,26 @@ export const pointingArrows = (sudoku: Sudoku): boolean => {
 			}
 		}
 
+		const rowOffset = (1n << blockWidthBigInt) - 1n;
 		for (const [number, key] of summary) {
-			const colSection = key & 0b111n; // & 7
-			const rowSection = (key >> 3n) & 0b111n;
+			const colSection = key & rowOffset;
+			const rowSection = (key >> blockWidthBigInt) & rowOffset;
 
 			if (bitCount(colSection) === 1n && bitCount(rowSection) > 1) {
-				anyChanged
-					= clearSection(
-						sudoku.getCol(blockColIndex + bitIndex(colSection)),
-						blockRowIndex,
-						number,
-					) || anyChanged;
+				clearSection(
+					sudoku.getCol(blockColIndex + bitIndex(colSection)),
+					sudoku,
+					blockRowIndex,
+					number,
+				);
 			} else if (bitCount(rowSection) === 1n && bitCount(colSection) > 1) {
-				anyChanged
-					= clearSection(
-						sudoku.getRow(blockRowIndex + bitIndex(rowSection)),
-						blockColIndex,
-						number,
-					) || anyChanged;
+				clearSection(
+					sudoku.getRow(blockRowIndex + bitIndex(rowSection)),
+					sudoku,
+					blockColIndex,
+					number,
+				);
 			}
 		}
 	}
-
-	return anyChanged;
 };

@@ -4,14 +4,14 @@ import {Sudoku} from '../../src/sudoku.js';
 
 import {nakedPairs} from '../../src/plugins/naked-pairs.js';
 
-import {getComparableCells, _} from './helpers.js';
+import {getComparableCells} from './helpers.js';
 
 test('nakedPairs should not change an empty sudoku.', t => {
 	const originalSudoku = new Sudoku();
 	const modifiedSudoku = new Sudoku();
 
-	const anyChanged = nakedPairs(modifiedSudoku);
-	t.false(anyChanged);
+	nakedPairs(modifiedSudoku);
+	t.false(modifiedSudoku.anyChanged);
 
 	t.deepEqual(
 		getComparableCells(modifiedSudoku),
@@ -44,7 +44,8 @@ test('nakedPairs should correctly find the pairs of "1" and "6".', t => {
 		}
 	}
 
-	t.true(nakedPairs(s));
+	nakedPairs(s);
+	t.true(s.anyChanged);
 
 	t.deepEqual([...s.getCell(2 * 9).possible], [7, 8]);
 });
@@ -70,96 +71,12 @@ test('nakedPairs should not change anything upon finding ("1", "2", "5") across 
 		row[index]!.possible = new Set(possibles[index]);
 	}
 
-	t.false(nakedPairs(s));
+	nakedPairs(s);
+	t.false(s.anyChanged);
 
 	for (let index = 0; index < 9; ++index) {
 		t.deepEqual([...row[index]!.possible], possibles[index]!);
 	}
-});
-
-// Copied from remove-duplicates
-
-test('nakedPairs should solve [[1, 2, 3], [4, 5, 6], [_, 8, 9] (block) correctly.', t => {
-	const s = new Sudoku([
-		['1', '2', '3'],
-		['4', '5', '6'],
-		[_, '8', '9'],
-	]);
-
-	nakedPairs(s);
-
-	const cell = s.getCell(2 * 9);
-
-	t.deepEqual(cell.possible, new Set([7]));
-});
-
-test('nakedPairs should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (block).', t => {
-	const sudoku = new Sudoku([
-		['1', '2', '3'],
-		[_, _, '6'],
-		['7', '8', '9'],
-	]);
-
-	nakedPairs(sudoku);
-
-	const cell1 = sudoku.getCell(1 * 9);
-	const cell2 = sudoku.getCell(1 * 9 + 1);
-
-	t.deepEqual(cell1.possible, new Set([4, 5]));
-
-	t.deepEqual(cell2.possible, new Set([4, 5]));
-});
-
-test('nakedPairs should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.', t => {
-	const sudoku = new Sudoku(
-		[_, '2', '5', '3', '8', '9', '4', '7', '6'].map(item => [item]),
-	);
-
-	nakedPairs(sudoku);
-
-	const cell = sudoku.getCell(0);
-
-	t.deepEqual(cell.possible, new Set([1]));
-});
-
-test('nakedPairs should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', t => {
-	const sudoku = new Sudoku(
-		[_, '5', '4', '3', '2', '7', '1', '8', _].map(item => [item]),
-	);
-
-	nakedPairs(sudoku);
-
-	const cell1 = sudoku.getCell(0);
-	const cell2 = sudoku.getCell(8 * 9);
-
-	t.deepEqual(cell1.possible, new Set([6, 9]));
-
-	t.deepEqual(cell2.possible, new Set([6, 9]));
-});
-
-test('nakedPairs should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.', t => {
-	const sudoku = new Sudoku([['1', '2', '3', _, '5', '6', '7', '8', '9']]);
-
-	nakedPairs(sudoku);
-
-	const cell = sudoku.getCell(3);
-
-	t.is(cell.possible.size, 1);
-
-	t.deepEqual(cell.possible, new Set([4]));
-});
-
-test('nakedPairs should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', t => {
-	const sudoku = new Sudoku([['5', '7', '8', '1', '2', _, '3', _, '6']]);
-
-	nakedPairs(sudoku);
-
-	const cell1 = sudoku.getCell(5);
-	const cell2 = sudoku.getCell(7);
-
-	t.deepEqual(cell1.possible, new Set([4, 9]));
-
-	t.deepEqual(cell2.possible, new Set([4, 9]));
 });
 
 test('nakedPairs should find an incomplete naked pair', t => {

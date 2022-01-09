@@ -29,14 +29,11 @@ export const bitIndex = (n: bigint): number => {
 	return n.toString(2).length - 1;
 };
 
+export type VisitorFn = (structure: ReadonlyCells, sudoku: Sudoku) => void;
 export const makeVisitor
-	= (cb: (structure: ReadonlyCells) => boolean) =>
-	(sudoku: Sudoku): boolean => {
-		let anyChanged = false;
-
+	= (cb: VisitorFn): ((sudoku: Sudoku) => void) =>
+	(sudoku: Sudoku): void => {
 		for (const structure of sudoku.eachStructure()) {
-			anyChanged = cb(structure) || anyChanged;
+			cb(structure, sudoku);
 		}
-
-		return anyChanged;
 	};

@@ -10,7 +10,8 @@ test('pointingArrows should not change an empty sudoku.', t => {
 
 	const unchanged = getComparableCells(s);
 
-	t.false(pointingArrows(s));
+	pointingArrows(s);
+	t.false(s.anyChanged);
 
 	t.deepEqual(getComparableCells(s), unchanged);
 });
@@ -44,13 +45,16 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 		}
 	}
 
-	t.true(pointingArrows(s));
+	pointingArrows(s);
+	t.true(s.anyChanged);
 
 	t.deepEqual([...s.getCell(9).possible], [2, 4, 5, 6]);
 
 	t.deepEqual([...s.getCell(10).possible], [2, 4, 5]);
 
-	t.deepEqual([...s.getCell(11).possible], [6]);
+	const cell11 = s.getCell(11);
+	t.is(cell11.content, 6);
+	t.is(cell11.possible.size, 0);
 });
 
 test('pointingArrows should find a pointing arrow of 2s.', t => {
@@ -92,7 +96,8 @@ test('pointingArrows should find a pointing arrow of 2s.', t => {
 		}
 	}
 
-	t.true(pointingArrows(s));
+	pointingArrows(s);
+	t.true(s.anyChanged);
 
 	t.deepEqual([...s.getCell(1).possible], [3, 4, 8, 9]);
 });

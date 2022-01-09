@@ -57,7 +57,9 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 
 	hiddenPairs(s);
 
-	t.deepEqual(s.getCell(1 * 9).possible, new Set([1]));
+	const cell = s.getCell(1 * 9);
+	t.is(cell.content, 1);
+	t.is(cell.possible.size, 0);
 });
 
 test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", t => {
@@ -114,11 +116,12 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	}
 
 	hiddenPairs(s);
+	t.true(s.anyChanged);
 
 	t.deepEqual(
 		block.map(({possible}) => [...possible]),
 		[
-			[7, 8, 9],
+			[7, 8],
 			[7, 8, 9],
 			[1, 2, 3, 4, 5, 6],
 			[1, 2, 3, 4, 5, 6],
