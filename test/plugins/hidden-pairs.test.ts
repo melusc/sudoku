@@ -7,16 +7,16 @@ import {getComparableCells} from './helpers.js';
 
 test('hiddenPairs should find the hidden pairs ("3", "4", "9").', t => {
 	const s = new Sudoku();
-	const possibles: string[][] = [
-		['3', '4', '6', '8', '9'], // #1
-		['1', '5', '7', '8'],
-		['1', '2', '5', '7'],
-		['1', '3', '4', '5', '7', '8', '9'], // #2
-		['5', '7', '8'],
-		['2', '3', '4', '5', '6', '9'], // #3
-		['1', '6', '7', '8'],
-		['1', '6', '7', '8'],
-		['2', '5', '6', '8'],
+	const possibles: number[][] = [
+		[3, 4, 6, 8, 9], // #1
+		[1, 5, 7, 8],
+		[1, 2, 5, 7],
+		[1, 3, 4, 5, 7, 8, 9], // #2
+		[5, 7, 8],
+		[2, 3, 4, 5, 6, 9], // #3
+		[1, 6, 7, 8],
+		[1, 6, 7, 8],
+		[2, 5, 6, 8],
 	];
 
 	for (const [index, possible] of possibles.entries()) {
@@ -25,7 +25,7 @@ test('hiddenPairs should find the hidden pairs ("3", "4", "9").', t => {
 
 	hiddenPairs(s);
 
-	const wantedSet = new Set(['3', '4', '9']);
+	const wantedSet = new Set([3, 4, 9]);
 
 	t.deepEqual(s.getCell(4 * 9).possible, wantedSet);
 
@@ -38,15 +38,15 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 	const s = new Sudoku();
 
 	const possibles = [
-		['2', '3', '5', '7', '9'],
-		['3', '5', '6', '8'],
-		['3', '4'],
-		['1', '4', '2'], // Only cell that can have a "1"
-		['3', '4', '6', '7', '9'],
-		['2', '4', '5', '6', '9'],
-		['4', '5', '8', '9'],
-		['2', '5', '7', '9'],
-		['2', '6', '8', '9'],
+		[2, 3, 5, 7, 9],
+		[3, 5, 6, 8],
+		[3, 4],
+		[1, 4, 2], // Only cell that can have a "1"
+		[3, 4, 6, 7, 9],
+		[2, 4, 5, 6, 9],
+		[4, 5, 8, 9],
+		[2, 5, 7, 9],
+		[2, 6, 8, 9],
 	];
 
 	const block = s.getBlock(0);
@@ -57,7 +57,9 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 
 	hiddenPairs(s);
 
-	t.deepEqual(s.getCell(1 * 9).possible, new Set(['1']));
+	const cell = s.getCell(1 * 9);
+	t.is(cell.content, 1);
+	t.is(cell.possible.size, 0);
 });
 
 test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", t => {
@@ -66,15 +68,15 @@ test("hiddenPairs should not modify any cells if there aren't any hidden pairs."
 
 	// Two cells can have a "1"
 	const possibles = [
-		['2', '3', '5', '7', '9'],
-		['3', '5', '6', '8'],
-		['1', '3', '4'],
-		['1', '4', '2'],
-		['3', '4', '6', '7', '9'],
-		['2', '4', '5', '6', '9'],
-		['4', '5', '8', '9'],
-		['2', '5', '7', '9'],
-		['2', '6', '8', '9'],
+		[2, 3, 5, 7, 9],
+		[3, 5, 6, 8],
+		[1, 3, 4],
+		[1, 4, 2],
+		[3, 4, 6, 7, 9],
+		[2, 4, 5, 6, 9],
+		[4, 5, 8, 9],
+		[2, 5, 7, 9],
+		[2, 6, 8, 9],
 	];
 
 	const block1 = s.getBlock(0);
@@ -96,15 +98,15 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	// The hidden pair is [7, 8, 9]
 
 	const possibles = [
-		['1', '2', '3', '4', '5', '6', '7', '8'], // #1, missing 9, though
-		['1', '2', '3', '4', '5', '6', '7', '8', '9'], // #2
-		['1', '2', '3', '4', '5', '6'],
-		['1', '2', '3', '4', '5', '6'],
-		['1', '2', '3', '4', '5', '6', '7', '8', '9'], // #3
-		['1', '2', '3', '4', '5', '6'],
-		['1', '2', '3', '4', '5', '6'],
-		['1', '2', '3', '4', '5', '6'],
-		['1', '2', '3', '4', '5', '6'],
+		[1, 2, 3, 4, 5, 6, 7, 8], // #1, missing 9, though
+		[1, 2, 3, 4, 5, 6, 7, 8, 9], // #2
+		[1, 2, 3, 4, 5, 6],
+		[1, 2, 3, 4, 5, 6],
+		[1, 2, 3, 4, 5, 6, 7, 8, 9], // #3
+		[1, 2, 3, 4, 5, 6],
+		[1, 2, 3, 4, 5, 6],
+		[1, 2, 3, 4, 5, 6],
+		[1, 2, 3, 4, 5, 6],
 	];
 
 	const block = s.getBlock(0);
@@ -114,19 +116,20 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	}
 
 	hiddenPairs(s);
+	t.true(s.anyChanged);
 
 	t.deepEqual(
 		block.map(({possible}) => [...possible]),
 		[
-			['7', '8', '9'],
-			['7', '8', '9'],
-			['1', '2', '3', '4', '5', '6'],
-			['1', '2', '3', '4', '5', '6'],
-			['7', '8', '9'],
-			['1', '2', '3', '4', '5', '6'],
-			['1', '2', '3', '4', '5', '6'],
-			['1', '2', '3', '4', '5', '6'],
-			['1', '2', '3', '4', '5', '6'],
+			[7, 8],
+			[7, 8, 9],
+			[1, 2, 3, 4, 5, 6],
+			[1, 2, 3, 4, 5, 6],
+			[7, 8, 9],
+			[1, 2, 3, 4, 5, 6],
+			[1, 2, 3, 4, 5, 6],
+			[1, 2, 3, 4, 5, 6],
+			[1, 2, 3, 4, 5, 6],
 		],
 	);
 });

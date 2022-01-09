@@ -2,13 +2,9 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import type {ReadonlyCells} from '../cell.js';
+import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 
-import {bitCount, makeVisitor} from './shared.js';
-
-const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
-	let anyChanged = false;
-
+const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// Getting all the indexes of a number
 	// works like this:
 	// If 7 is in cells (0, 4, 6)
@@ -17,14 +13,12 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 	//                                ^ for 4
 	//                              ^ for 6
 	// Iterating through each cell and
-	// doing `currentValue | 2 ** index`
+	// doing `currentValue | 1 << index`
 	// This is a lot better than comparing arrays of indexes
-	const summary = new Map<string, bigint>();
+	const summary = new Map<number, bigint>();
 
-	for (let index = 0; index < 9; ++index) {
-		const {content, possible} = structure[index]!;
-
-		const pow = 2n ** BigInt(index);
+	for (const [index, {content, possible}] of structure.entries()) {
+		const pow = 1n << BigInt(index);
 
 		if (content === undefined) {
 			for (const number of possible) {
@@ -50,10 +44,11 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 		}
 	}
 
-	const equalIndexes: Array<[bigint, string[]]> = [];
+	const equalIndexes: Array<[bigint, number[]]> = [];
+	const size = BigInt(sudoku.size);
 
 	for (const [number, key] of summary) {
-		if (bitCount(key) > 8) {
+		if (bitCount(key) === size) {
 			continue;
 		}
 
@@ -76,34 +71,31 @@ const genericHiddenPairsSolver = (structure: ReadonlyCells): boolean => {
 	}
 
 	for (const [key, numbers] of equalIndexes) {
-		if (bitCount(key) < numbers.length) {
+		const bitCountKey = bitCount(key);
+		const numberLength = BigInt(numbers.length);
+
+		if (bitCountKey < numberLength) {
 			throw new Error(
 				`bitCount was smaller than allowed: ${key.toString(2)}; ${numbers.join(
 					',',
-				)}`,
+				)} (hidden-pairs)`,
 			);
 		}
 
-		if (bitCount(key) > numbers.length) {
+		if (bitCountKey > numberLength) {
 			continue;
 		}
 
-		for (let index = 0; index < 9; ++index) {
+		for (let index = 0; index < sudoku.size; ++index) {
 			if ((key & (1n << BigInt(index))) === 0n) {
 				continue;
 			}
 
-			const cell = structure[index]!; // It's certainly [0,8]
+			const cell = structure[index]!;
 
-			if (cell.possible.size > numbers.length) {
-				anyChanged = true;
-
-				cell.possible = new Set(numbers);
-			}
+			sudoku.overridePossibles(cell, new Set(numbers));
 		}
 	}
-
-	return anyChanged;
 };
 
 export const hiddenPairs = makeVisitor(genericHiddenPairsSolver);

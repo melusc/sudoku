@@ -7,10 +7,7 @@ test('Cell should be a class', t => {
 
 	t.is(c.content, undefined);
 
-	t.deepEqual(
-		c.possible,
-		new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9']),
-	);
+	t.deepEqual(c.possible, new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
 });
 
 test('Cell#setContent', t => {
@@ -19,27 +16,27 @@ test('Cell#setContent', t => {
 	t.is(c.content, undefined);
 	t.is(c.possible.size, 9);
 
-	c.setContent('1');
+	c.setContent(1);
 
-	t.is(c.content, '1');
+	t.is(c.content, 1);
 	t.is(c.possible.size, 0);
 });
 
 test('Cell#setValidity', t => {
 	let c = new Cell();
-	c.setContent('0');
+	c.setContent(0);
 	t.false(c.valid, '"0" is not valid');
 
 	// ====
 
 	c = new Cell();
-	c.setContent('1');
+	c.setContent(1);
 	t.true(c.valid, '"1" is valid');
 });
 
 test('Cell#clear', t => {
 	let c = new Cell();
-	c.setContent('https://bit.ly/3u6XnPl').clear();
+	c.setContent(3).clear();
 	t.is(
 		c.content,
 		undefined,
@@ -54,7 +51,7 @@ test('Cell#clear', t => {
 
 	// ====
 	c = new Cell();
-	c.setContent('1').clear();
+	c.setContent(1).clear();
 	t.is(
 		c.content,
 		undefined,

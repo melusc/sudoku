@@ -3,12 +3,12 @@ import type {Sudoku} from '../sudoku.js';
 
 // From https://stackoverflow.com/q/43122082/13249743
 const bitCount32 = (n: bigint): bigint => {
-  n -= ((n >> 1n) & 0x55_55_55_55n);
-  n = (n & 0x33_33_33_33n) + ((n >> 2n) & 0x33_33_33_33n);
-  n = (n + (n >> 4n)) & 0x0F_0F_0F_0Fn;
-  n += (n >> 8n);
-  n += (n >> 16n);
-  return n & 0x3Fn;
+	n -= (n >> 1n) & 0x55_55_55_55n;
+	n = (n & 0x33_33_33_33n) + ((n >> 2n) & 0x33_33_33_33n);
+	n = (n + (n >> 4n)) & 0x0F_0F_0F_0Fn;
+	n += n >> 8n;
+	n += n >> 16n;
+	return n & 0x3Fn;
 };
 
 export const bitCount = (n: bigint): bigint => {
@@ -29,14 +29,11 @@ export const bitIndex = (n: bigint): number => {
 	return n.toString(2).length - 1;
 };
 
+export type VisitorFn = (structure: ReadonlyCells, sudoku: Sudoku) => void;
 export const makeVisitor
-	= (cb: (structure: ReadonlyCells) => boolean) =>
-	(sudoku: Sudoku): boolean => {
-		let anyChanged = false;
-
+	= (cb: VisitorFn): ((sudoku: Sudoku) => void) =>
+	(sudoku: Sudoku): void => {
 		for (const structure of sudoku.eachStructure()) {
-			anyChanged = cb(structure) || anyChanged;
+			cb(structure, sudoku);
 		}
-
-		return anyChanged;
 	};

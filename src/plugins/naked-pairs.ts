@@ -2,72 +2,68 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import type {ReadonlyCells} from '../cell.js';
+import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 
-import {bitCount, makeVisitor} from './shared.js';
-
-const genericNakedPairsSolver = (structure: ReadonlyCells): boolean => {
-	let anyChanged = false;
-
-	const summary = new Map<number, bigint>();
-
-	for (const [index, cell] of structure.entries()) {
-		if (cell.content === undefined) {
-			let key = 0n;
-			for (const number of cell.possible) {
-				key |= 2n ** (BigInt(number) - 1n);
-			}
-
-			summary.set(index, key);
-		} else {
-			summary.set(index, 2n ** (BigInt(cell.content) - 1n));
-		}
-	}
-
+const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
-	for (const [index, numbers] of summary) {
+
+	for (const [index, {content, possible}] of structure.entries()) {
+		if (content !== undefined) {
+			continue;
+		}
+
+		let key = 0n;
+		for (const number of possible) {
+			key |= 1n << BigInt(number - 1);
+		}
+
 		let exactMatchFound = false;
-		for (let i = 0; i < equalKeys.length; ++i) {
+
+		for (let i = 0, l = equalKeys.length; i < l; ++i) {
 			const [numbersMask, indices] = equalKeys[i]!;
 
-			if ((numbers & numbersMask) === numbers) {
+			if ((key & numbersMask) === key) {
 				indices.push(index);
 
-				exactMatchFound ||= numbers === numbersMask;
+				exactMatchFound ||= key === numbersMask;
 			} else {
-				equalKeys.splice(i, 0, [numbersMask | numbers, [...indices, index]]);
-				++i;
+				equalKeys.push([numbersMask | key, [...indices, index]]);
 			}
 		}
 
 		if (!exactMatchFound) {
-			equalKeys.push([numbers, [index]]);
+			equalKeys.push([key, [index]]);
 		}
 	}
 
 	for (const [key, indices] of equalKeys) {
-		if (bitCount(key) !== BigInt(indices.length) || indices.length > 8) {
+		if (bitCount(key) < indices.length) {
+			throw new Error(
+				`bitCount was smaller than allowed: ${key.toString(2)}; ${
+					indices.length
+				} (naked-pairs)`,
+			);
+		}
+
+		if (
+			indices.length === sudoku.size
+			|| bitCount(key) > BigInt(indices.length)
+		) {
 			continue;
 		}
 
-		for (let number = 0; number < 9; ++number) {
+		for (let number = 0; number < sudoku.size; ++number) {
 			if ((key & (1n << BigInt(number))) === 0n) {
 				continue;
 			}
 
-			const numberString = `${number + 1}`;
-
-			for (const [index, {possible}] of structure.entries()) {
-				if (!indices.includes(index) && possible.has(numberString)) {
-					anyChanged ||= true;
-
-					possible.delete(numberString);
+			for (const [index, cell] of structure.entries()) {
+				if (!indices.includes(index)) {
+					sudoku.removePossible(cell, number + 1);
 				}
 			}
 		}
 	}
-
-	return anyChanged;
 };
 
 export const nakedPairs = makeVisitor(genericNakedPairsSolver);
