@@ -200,7 +200,9 @@ export class Sudoku {
 		}
 
 		if (cell.possible.size === 0) {
-			throw new Error('Unexpected empty cell possibles');
+			throw new Error(
+				`Unexpected empty cell possibles in cell #${this.#cells.indexOf(cell)}`,
+			);
 		}
 
 		if (cell.possible.size === 1) {
