@@ -31,6 +31,7 @@
 		}
 	},
 	"scripts": {
+		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && xo --fix",
 		"build": "del-cli ./dist/lib/** && tsc",
 		"test": "yarn run ava",
