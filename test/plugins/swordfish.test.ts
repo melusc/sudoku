@@ -16,10 +16,7 @@ const makeCheck
 	};
 
 test('regular swordfish #1', t => {
-	const s = new Sudoku();
-	const check = makeCheck(s, t);
-
-	const layout: Array<Array<number | number[]>> = [
+	const s = Sudoku.fromPrefilled([
 		[4, [1, 6], 2, [1, 7], 5, 3, 8, 9, [1, 7, 6]],
 		[[1, 7], 8, 3, 4, 9, 6, [1, 7], 2, 5],
 		// ^                     ^
@@ -32,18 +29,8 @@ test('regular swordfish #1', t => {
 		[5, 4, 6, 3, 7, 9, 2, 1, 8],
 		[8, 2, 1, 5, 6, 4, 9, 7, 3],
 		[9, 3, 7, 8, 2, 1, 6, 5, 4],
-	];
-
-	for (const [rowIndex, row] of layout.entries()) {
-		const sRow = s.getRow(rowIndex);
-		for (const [colIndex, cell] of row.entries()) {
-			if (Array.isArray(cell)) {
-				sRow[colIndex]!.possible = new Set(cell);
-			} else {
-				sRow[colIndex]!.setContent(cell);
-			}
-		}
-	}
+	]);
+	const check = makeCheck(s, t);
 
 	swordfish(s);
 	t.true(s.anyChanged);
@@ -62,10 +49,7 @@ test('regular swordfish #1', t => {
 });
 
 test('regular swordfish #2', t => {
-	const s = new Sudoku();
-	const check = makeCheck(s, t);
-
-	const layout: Array<Array<number | number[]>> = [
+	const s = Sudoku.fromPrefilled([
 		[[5, 6], [3, 5, 6], 2, [3, 4], 8, 1, [4, 5], 9, 7],
 		[7, [3, 5], 1, 6, 9, [3, 4], 2, [4, 5], 8],
 		[9, 8, 4, 5, 2, 7, 6, 3, 1],
@@ -75,18 +59,8 @@ test('regular swordfish #2', t => {
 		[[1, 6], [6, 9], 3, 8, 7, [4, 5], [4, 5], [1, 2], [2, 9]],
 		[2, [4, 5], 8, [3, 4], 1, 9, 7, 6, [3, 5]],
 		[[1, 5], [4, 5, 9], 7, 2, 6, [3, 4, 5], 8, [1, 4, 5], [3, 5, 9]],
-	];
-
-	for (const [rowIndex, row] of layout.entries()) {
-		const sRow = s.getRow(rowIndex);
-		for (const [colIndex, cell] of row.entries()) {
-			if (Array.isArray(cell)) {
-				sRow[colIndex]!.possible = new Set(cell);
-			} else {
-				sRow[colIndex]!.setContent(cell);
-			}
-		}
-	}
+	]);
+	const check = makeCheck(s, t);
 
 	swordfish(s);
 	t.true(s.anyChanged);
@@ -111,10 +85,7 @@ test('regular swordfish #2', t => {
 });
 
 test('Swordfish with little intersecting', t => {
-	const s = new Sudoku();
-	const check = makeCheck(s, t);
-
-	const layout: Array<Array<number | number[]>> = [
+	const s = Sudoku.fromPrefilled([
 		[[1], 3, 3, [1], 3, 3, 3, 3, 3],
 		// ^         ^
 		[3, [1], [1], 3, 3, 3, 3, 3, 3],
@@ -126,18 +97,9 @@ test('Swordfish with little intersecting', t => {
 		[[1, 2], [1, 2], [1, 2], [1, 2], 3, 3, 3, [1, 2], 3],
 		// ^      ^       ^       ^ remove all     ^ leave this
 		...Array.from({length: 4}, () => Array.from({length: 9}, () => 3)),
-	];
+	]);
 
-	for (const [rowIndex, row] of layout.entries()) {
-		const sRow = s.getRow(rowIndex);
-		for (const [colIndex, cell] of row.entries()) {
-			if (Array.isArray(cell)) {
-				sRow[colIndex]!.possible = new Set(cell);
-			} else {
-				sRow[colIndex]!.setContent(cell);
-			}
-		}
-	}
+	const check = makeCheck(s, t);
 
 	swordfish(s);
 	t.true(s.anyChanged);

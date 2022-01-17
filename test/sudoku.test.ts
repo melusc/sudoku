@@ -127,7 +127,7 @@ test('Sudoku#getCells', t => {
 	// ====
 
 	const firstRow = Array.from({length: 9}, (_v, index) => index + 1);
-	s = new Sudoku([firstRow.map(content => String(content))]);
+	s = Sudoku.fromPrefilled([firstRow.map(content => String(content))]);
 
 	const cells2 = s.getCells();
 
@@ -162,7 +162,7 @@ test('Sudoku#solve easy', t => {
 	t.plan(3);
 
 	const _ = undefined;
-	const s = new Sudoku([
+	const s = Sudoku.fromPrefilled([
 		[_, '1', _, '3', '8', _, _, '5', '2'],
 		[_, '6', '5', _, _, _, _, '8', '9'],
 		[_, _, _, '5', _, '9'],
@@ -203,7 +203,7 @@ test('Sudoku#solve evil', t => {
 
 	const _ = undefined;
 
-	const s = new Sudoku([
+	const s = Sudoku.fromPrefilled([
 		['6', _, '4', _, _, _, _, _, '3'],
 		[_, _, _, _, '3', '7', '8'],
 		[_, _, _, '5', _, _, '7'],
@@ -244,7 +244,7 @@ test('Sudoku#solve expert', t => {
 
 	const _ = undefined;
 
-	const s = new Sudoku([
+	const s = Sudoku.fromPrefilled([
 		[_, _, _, _, _, '4', _, _, '2'],
 		[_, '6', _, '2', _, _, _, '3'],
 		[_, '8', _, _, _, '3', '5', _, '9'],
@@ -287,7 +287,7 @@ test('Sudoku#solve tough 16x16', t => {
 
 	// https://puzzlemadness.co.uk/16by16giantsudoku/tough/2022/1/7
 	// (https://i.imgur.com/SClE7Yf.png)
-	const s = new Sudoku(
+	const s = Sudoku.fromPrefilled(
 		[
 			[_, 11, _, 4, _, _, 5, _, _, _, 3, _, _, 16, 8],
 			[1, 10, _, _, 14, 12, _, _, _, _, _, 15, 9, _, 3, 13],
@@ -345,7 +345,7 @@ test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 
 	const _ = undefined;
 
-	const s = new Sudoku([
+	const s = Sudoku.fromPrefilled([
 		// Here both 5 and 6 would have to be in the middle/middle cell
 		// which is not possible, since only one number can be in each cell
 		[],
@@ -372,14 +372,14 @@ test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
 
 	const _ = undefined;
 
-	const s = new Sudoku([
+	const s = Sudoku.fromPrefilled([
 		// Here 1,2,3 have to be in the third column of the middle/middle block
 		// And 4,5,6 have to be in the first row of the middle/middle block
 		// Since those two overlap this is an invalid sudoku
 		[_, _, _, _, '1'],
 		[_, _, _, _, '2'],
 		[_, _, _, _, '3'],
-		[],
+		_,
 		['4', '5', '6'],
 		[_, _, _, _, _, _, '4', '5', '6'],
 		[_, _, _, '1'],
@@ -490,9 +490,8 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 });
 
 test('Sudoku#overridePossibles new set equal old set', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1, 2, 3]);
 	sudoku.overridePossibles(cell0, new Set([1, 2, 3]));
 
 	t.false(sudoku.anyChanged);
@@ -500,9 +499,8 @@ test('Sudoku#overridePossibles new set equal old set', t => {
 });
 
 test('Sudoku#overridePossibles old set is subset of new set', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1, 2]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1, 2]);
 	sudoku.overridePossibles(cell0, new Set([1, 2, 3]));
 
 	t.false(sudoku.anyChanged);
@@ -510,9 +508,8 @@ test('Sudoku#overridePossibles old set is subset of new set', t => {
 });
 
 test('Sudoku#overridePossibles new set is subset of old set', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1, 2, 3]);
 	sudoku.overridePossibles(cell0, new Set([1, 2]));
 
 	t.true(sudoku.anyChanged);
@@ -520,9 +517,8 @@ test('Sudoku#overridePossibles new set is subset of old set', t => {
 });
 
 test('Sudoku#removePossible toRemove is not in old set', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1, 2, 3]);
 	sudoku.removePossible(cell0, 4);
 
 	t.false(sudoku.anyChanged);
@@ -530,9 +526,8 @@ test('Sudoku#removePossible toRemove is not in old set', t => {
 });
 
 test('Sudoku#removePossible toRemove is in old set', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1, 2, 3]);
 	sudoku.removePossible(cell0, 3);
 
 	t.true(sudoku.anyChanged);
@@ -541,9 +536,8 @@ test('Sudoku#removePossible toRemove is in old set', t => {
 
 // Using overridePossibles would also be possible
 test('Sudoku#removePossible possible is empty afterwards', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1]);
 
 	t.throws(() => {
 		sudoku.removePossible(cell0, 1);
@@ -551,9 +545,8 @@ test('Sudoku#removePossible possible is empty afterwards', t => {
 });
 
 test('Sudoku#removePossible one possible afterwards', t => {
-	const sudoku = new Sudoku();
+	const sudoku = Sudoku.fromPrefilled([[[1, 2]]]);
 	const cell0 = sudoku.getCell(0);
-	cell0.possible = new Set([1, 2]);
 
 	sudoku.removePossible(cell0, 1);
 	t.true(sudoku.anyChanged);
@@ -574,7 +567,7 @@ test('Sudoku#isSolved', t => {
 
 	// ====
 
-	s = new Sudoku(
+	s = Sudoku.fromPrefilled(
 		Array.from({length: 9}, () => Array.from({length: 9}, () => '2')),
 	);
 	t.false(

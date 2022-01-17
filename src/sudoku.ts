@@ -1,5 +1,3 @@
-import {ReadonlyDeep} from 'type-fest';
-
 import {
 	Cell,
 	type Cells,
@@ -8,7 +6,9 @@ import {
 } from './cell.js';
 import * as plugins from './plugins/plugins.js';
 
-type NumberOnlySudoku = Array<Array<string | number | undefined>>;
+type PrefilledSudoku = ReadonlyArray<
+	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
+>;
 
 type DispatchTypes = 'change' | 'error' | 'finish';
 export type SubscriptionCallback = (
@@ -48,10 +48,37 @@ const makeStructureCacher = <T = unknown, R = unknown>(
 	};
 };
 
+// Because Array.isArray on its own won't narrow it down otherwise
+const isReadonlyArray = (arg0: any): arg0 is readonly any[] =>
+	Array.isArray(arg0);
+
 export class Sudoku {
 	static readonly alphabet: readonly string[] = [
 		...'1234567890abcdefghijklmnopqrstuvwxyz',
 	];
+
+	static fromPrefilled = (cells: PrefilledSudoku, size = 9): Sudoku => {
+		const s = new Sudoku(size);
+
+		for (const [rowIndex, row] of cells.entries()) {
+			if (!row) {
+				continue;
+			}
+
+			for (const [colIndex, content] of row.entries()) {
+				// prettier-ignore
+				const cellIndex = (rowIndex * size) + colIndex;
+				const cell = s.getCell(cellIndex);
+				if (isReadonlyArray(content)) {
+					cell.possible = new Set(content);
+				} else if (content !== undefined) {
+					s.setContent(cellIndex, content);
+				}
+			}
+		}
+
+		return s;
+	};
 
 	readonly #subscriptions: Set<SubscriptionCallback> = new Set();
 
@@ -68,7 +95,7 @@ export class Sudoku {
 
 	readonly #cells: ReadonlyCells;
 
-	constructor(array?: ReadonlyDeep<NumberOnlySudoku>, readonly size = 9) {
+	constructor(readonly size = 9) {
 		const blockWidth = Math.sqrt(size);
 
 		if (!Number.isInteger(blockWidth)) {
@@ -80,17 +107,6 @@ export class Sudoku {
 		const amountCells = size ** 2;
 		this.amountCells = amountCells;
 		this.#cells = Array.from({length: amountCells}, () => new Cell(size));
-
-		if (array) {
-			for (const [rowIndex, row] of array.entries()) {
-				for (const [colIndex, cell] of row.entries()) {
-					if (cell !== undefined) {
-						// prettier-ignore
-						this.setContent((rowIndex * size) + colIndex, cell);
-					}
-				}
-			}
-		}
 	}
 
 	setContent = (index: number, content: string | number): this => {

@@ -17,9 +17,7 @@ test('pointingArrows should not change an empty sudoku.', t => {
 });
 
 test('pointingArrows should find a pointing arrow of 3s.', t => {
-	const s = new Sudoku();
-
-	const layout: Array<Array<number | number[]>> = [
+	const s = Sudoku.fromPrefilled([
 		[[2, 4, 5, 8], 1, 7, 9, [2, 4, 5], 3, 6, [4, 8], [2, 4, 8]],
 		[
 			[2, 3, 4, 5, 6], // Remove "3" from here
@@ -33,17 +31,7 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 			[1, 2, 3, 4, 9], // And here
 		],
 		[9, [2, 3, 4, 8], [3, 6, 8], [1, 2], [2, 4, 6], [4, 6], 5, [1, 4, 8], 7],
-	];
-
-	for (const [rowIndex, row] of layout.entries()) {
-		for (const [colIndex, wantedCell] of row.entries()) {
-			if (Array.isArray(wantedCell)) {
-				s.getCell(rowIndex * 9 + colIndex).possible = new Set(wantedCell);
-			} else {
-				s.setContent(rowIndex * 9 + colIndex, String(wantedCell));
-			}
-		}
-	}
+	]);
 
 	pointingArrows(s);
 	t.true(s.anyChanged);
@@ -58,9 +46,7 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 });
 
 test('pointingArrows should find a pointing arrow of 2s.', t => {
-	const s = new Sudoku();
-
-	const layout: Array<Array<number | number[]>> = [
+	const s = Sudoku.fromPrefilled([
 		[
 			7,
 			[2, 3, 4, 8, 9], // Remove "2" from here
@@ -84,17 +70,7 @@ test('pointingArrows should find a pointing arrow of 2s.', t => {
 			[1, 4, 8, 9],
 		],
 		[[3, 4, 8], [3, 4, 8, 9], 5, 6, [4, 9], 1, 7, 2, [3, 4, 8, 9]],
-	];
-
-	for (const [rowIndex, row] of layout.entries()) {
-		for (const [colIndex, wantedCell] of row.entries()) {
-			if (Array.isArray(wantedCell)) {
-				s.getCell(rowIndex * 9 + colIndex).possible = new Set(wantedCell);
-			} else {
-				s.setContent(rowIndex * 9 + colIndex, String(wantedCell));
-			}
-		}
-	}
+	]);
 
 	pointingArrows(s);
 	t.true(s.anyChanged);
