@@ -11,10 +11,7 @@ type PrefilledSudoku = ReadonlyArray<
 >;
 
 type DispatchType = 'change' | 'error' | 'finish';
-export type SubscriptionCallback = (
-	sudoku: Sudoku,
-	type: DispatchType,
-) => void;
+export type SubscriptionCallback = (sudoku: Sudoku, type: DispatchType) => void;
 
 export const inRangeIncl = (low: number, high: number, n: number): void => {
 	if (!Number.isInteger(n)) {
