@@ -584,6 +584,7 @@ test('Sudoku#clone', t => {
 	const cloned = s.clone();
 
 	t.deepEqual(getComparableCells(s), getComparableCells(cloned));
+	t.not(s, cloned);
 });
 
 test('inRangeIncl', t => {
