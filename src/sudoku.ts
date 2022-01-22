@@ -92,6 +92,8 @@ export class Sudoku {
 
 	readonly #cells: ReadonlyCells;
 
+	shouldLogErrors = process.env['NODE_ENV'] !== 'test';
+
 	constructor(readonly size = 9) {
 		const blockWidth = Math.sqrt(size);
 
@@ -266,9 +268,7 @@ export class Sudoku {
 			try {
 				plugin(this);
 			} catch (error: unknown) {
-				if (process.env['NODE_ENV'] !== 'test') {
-					console.error(error, this.#cells);
-				}
+				this.logError(error, this.#cells);
 
 				return SolveTypes.error;
 			}
@@ -348,9 +348,7 @@ export class Sudoku {
 
 		for (const [index, cell] of this.#cells.entries()) {
 			if (!cell.valid) {
-				if (process.env['NODE_ENV'] !== 'test') {
-					console.error('cell was not valid', [index, cell]);
-				}
+				this.logError('cell was not valid', [index, cell]);
 
 				return false;
 			}
@@ -374,9 +372,7 @@ export class Sudoku {
 			}
 
 			if (requiredNumbers.size > 0) {
-				if (process.env['NODE_ENV'] !== 'test') {
-					console.error('dict.size > 0: %o', requiredNumbers);
-				}
+				this.logError('dict.size > 0: %o', requiredNumbers);
 
 				return false;
 			}
@@ -445,5 +441,15 @@ export class Sudoku {
 		return rows;
 	};
 
-	clone = (): Sudoku => Sudoku.fromPrefilled(this.toPrefilledSudoku());
+	clone = (): Sudoku => {
+		const newSudoku = Sudoku.fromPrefilled(this.toPrefilledSudoku());
+		newSudoku.shouldLogErrors = this.shouldLogErrors;
+		return newSudoku;
+	};
+
+	logError = (message: any, ...data: any[]): void => {
+		if (this.shouldLogErrors) {
+			console.error(message, ...data);
+		}
+	};
 }
