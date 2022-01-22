@@ -10,10 +10,10 @@ type PrefilledSudoku = ReadonlyArray<
 	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
 >;
 
-type DispatchTypes = 'change' | 'error' | 'finish';
+type DispatchType = 'change' | 'error' | 'finish';
 export type SubscriptionCallback = (
 	sudoku: Sudoku,
-	type: DispatchTypes,
+	type: DispatchType,
 ) => void;
 
 export const inRangeIncl = (low: number, high: number, n: number): void => {
@@ -224,6 +224,7 @@ export class Sudoku {
 		if (cell.possible.size === 1) {
 			cell.setContent(cell.possible.values().next().value as number);
 			this.anyChanged ||= true;
+			this.#dispatch('change');
 		}
 
 		return this;
@@ -279,10 +280,10 @@ export class Sudoku {
 		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
 	};
 
-	solve = (): this => {
+	solve = (): DispatchType => {
 		if (!this.isValid()) {
 			this.#dispatch('error');
-			return this;
+			return 'error';
 		}
 
 		for (const cell of this.#cells) {
@@ -297,11 +298,17 @@ export class Sudoku {
 			shouldContinue = this.#singleSolve();
 		} while (shouldContinue === SolveTypes.changed);
 
-		this.#dispatch(
-			shouldContinue === SolveTypes.unchanged ? 'finish' : 'error',
-		);
+		let dispatchType: DispatchType;
+		if (shouldContinue === SolveTypes.error) {
+			dispatchType = 'error';
+		} else if (this.isSolved()) {
+			dispatchType = 'finish';
+		} else {
+			dispatchType = 'change';
+		}
 
-		return this;
+		this.#dispatch(dispatchType);
+		return dispatchType;
 	};
 
 	subscribe = (callback: SubscriptionCallback): this => {
@@ -316,7 +323,7 @@ export class Sudoku {
 		return this;
 	};
 
-	#dispatch = (type: DispatchTypes): this => {
+	#dispatch = (type: DispatchType): this => {
 		for (const callback of this.#subscriptions) {
 			callback(this, type);
 		}

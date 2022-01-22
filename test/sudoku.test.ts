@@ -176,11 +176,7 @@ test('Sudoku#solve easy', t => {
 		['7', '8', _, _, '5', '3', _, '1'],
 	]);
 
-	s.subscribe((_s, type) => {
-		t.is(type, 'finish');
-	});
-
-	s.solve();
+	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
@@ -215,11 +211,7 @@ test('Sudoku#solve evil', t => {
 		['9', _, _, _, _, _, '4', _, '8'],
 	]);
 
-	s.subscribe((_s, type) => {
-		t.is(type, 'finish');
-	});
-
-	s.solve();
+	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
@@ -254,11 +246,7 @@ test('Sudoku#solve expert', t => {
 		[_, _, '5', _, _, _, '7'],
 	]);
 
-	s.subscribe((_s, type) => {
-		t.is(type, 'finish');
-	});
-
-	s.solve();
+	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
@@ -305,11 +293,7 @@ test('Sudoku#solve tough 16x16', t => {
 		16,
 	);
 
-	s.subscribe((_s, type) => {
-		t.is(type, 'finish');
-	});
-
-	s.solve();
+	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
@@ -352,11 +336,7 @@ test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 		[_, _, _, _, _, '6'],
 	]);
 
-	s.subscribe((_s, type) => {
-		t.is(type, 'error');
-	});
-
-	s.solve();
+	t.is(s.solve(), 'error');
 
 	t.false(s.isSolved());
 });
@@ -379,11 +359,7 @@ test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
 		[_, _, _, '3'],
 	]);
 
-	s.subscribe((_s, type) => {
-		t.is(type, 'error');
-	});
-
-	s.solve();
+	t.is(s.solve(), 'error');
 
 	t.false(s.isSolved());
 });
