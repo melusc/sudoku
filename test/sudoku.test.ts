@@ -1,6 +1,9 @@
 import test from 'ava';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
+import {getComparableCells} from './plugins/helpers.js';
+
+const _ = undefined;
 
 test('Sudoku should be a class', t => {
 	t.is(typeof new Sudoku(), 'object');
@@ -161,7 +164,6 @@ test('Sudoku#getBlock', t => {
 test('Sudoku#solve easy', t => {
 	t.plan(3);
 
-	const _ = undefined;
 	const s = Sudoku.fromPrefilled([
 		[_, '1', _, '3', '8', _, _, '5', '2'],
 		[_, '6', '5', _, _, _, _, '8', '9'],
@@ -200,8 +202,6 @@ test('Sudoku#solve easy', t => {
 
 test('Sudoku#solve evil', t => {
 	t.plan(3);
-
-	const _ = undefined;
 
 	const s = Sudoku.fromPrefilled([
 		['6', _, '4', _, _, _, _, _, '3'],
@@ -242,8 +242,6 @@ test('Sudoku#solve evil', t => {
 test('Sudoku#solve expert', t => {
 	t.plan(3);
 
-	const _ = undefined;
-
 	const s = Sudoku.fromPrefilled([
 		[_, _, _, _, _, '4', _, _, '2'],
 		[_, '6', _, '2', _, _, _, '3'],
@@ -282,8 +280,6 @@ test('Sudoku#solve expert', t => {
 
 test('Sudoku#solve tough 16x16', t => {
 	t.plan(3);
-
-	const _ = undefined;
 
 	// https://puzzlemadness.co.uk/16by16giantsudoku/tough/2022/1/7
 	// (https://i.imgur.com/SClE7Yf.png)
@@ -343,8 +339,6 @@ test('Sudoku#solve tough 16x16', t => {
 test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 	t.plan(2);
 
-	const _ = undefined;
-
 	const s = Sudoku.fromPrefilled([
 		// Here both 5 and 6 would have to be in the middle/middle cell
 		// which is not possible, since only one number can be in each cell
@@ -369,8 +363,6 @@ test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 
 test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
 	t.plan(2);
-
-	const _ = undefined;
 
 	const s = Sudoku.fromPrefilled([
 		// Here 1,2,3 have to be in the third column of the middle/middle block
@@ -574,6 +566,24 @@ test('Sudoku#isSolved', t => {
 		s.isSolved(),
 		'A completely filled sudoku should return false if it has an obvious mistake',
 	);
+});
+
+test('Sudoku#clone', t => {
+	const s = Sudoku.fromPrefilled([
+		[_, _, _, _, _, '4', _, _, '2'],
+		[_, '6', _, '2', _, _, _, '3'],
+		[_, '8', _, _, _, '3', '5', _, '9'],
+		[_, '4', _, _, _, _, '1'],
+		['1', _, _, '7', _, '5'],
+		['5', _, '3'],
+		[_, '9', _, '3'],
+		[_, _, '4', _, '6', '1'],
+		[_, _, '5', _, _, _, '7'],
+	]);
+
+	const cloned = s.clone();
+
+	t.deepEqual(getComparableCells(s), getComparableCells(cloned));
 });
 
 test('inRangeIncl', t => {

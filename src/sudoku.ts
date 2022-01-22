@@ -420,4 +420,26 @@ export class Sudoku {
 
 		return true;
 	};
+
+	toPrefilledSudoku = (): PrefilledSudoku => {
+		const rows: Array<Array<number | number[]>> = [];
+
+		for (let i = 0; i < this.size; ++i) {
+			const row = this.getRow(i);
+			const resultingRow: Array<number | number[]> = [];
+			rows.push(resultingRow);
+
+			for (const cell of row) {
+				if (cell.content === undefined) {
+					resultingRow.push([...cell.possible]);
+				} else {
+					resultingRow.push(cell.content);
+				}
+			}
+		}
+
+		return rows;
+	};
+
+	clone = (): Sudoku => Sudoku.fromPrefilled(this.toPrefilledSudoku());
 }
