@@ -4,7 +4,7 @@ import {
 	generateEmptyCellPossibles,
 	type ReadonlyCells,
 } from './cell.js';
-import * as plugins from './plugins/plugins.js';
+import * as plugins from './plugins/index.js';
 
 type PrefilledSudoku = ReadonlyArray<
 	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
