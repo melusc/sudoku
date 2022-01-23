@@ -16,7 +16,7 @@ export class Cell {
 
 	customValid = true;
 
-	constructor(private readonly sudokuSize = 9) {
+	constructor(private readonly sudokuSize: number) {
 		this.candidates = generateEmptyCellCandidates(sudokuSize);
 	}
 

@@ -2,7 +2,7 @@ import test from 'ava';
 import {Cell} from '../src/cell.js';
 
 test('Cell should be a class', t => {
-	const c = new Cell();
+	const c = new Cell(9);
 	t.is(typeof c, 'object');
 
 	t.is(c.content, undefined);
@@ -11,7 +11,7 @@ test('Cell should be a class', t => {
 });
 
 test('Cell#setContent', t => {
-	const c = new Cell();
+	const c = new Cell(9);
 
 	t.is(c.content, undefined);
 	t.is(c.candidates.size, 9);
@@ -23,19 +23,19 @@ test('Cell#setContent', t => {
 });
 
 test('Cell#setValidity', t => {
-	let c = new Cell();
+	let c = new Cell(9);
 	c.setContent(0);
 	t.false(c.valid, '"0" is not valid');
 
 	// ====
 
-	c = new Cell();
+	c = new Cell(9);
 	c.setContent(1);
 	t.true(c.valid, '"1" is valid');
 });
 
 test('Cell#clear', t => {
-	let c = new Cell();
+	let c = new Cell(9);
 	c.setContent(3).clear();
 	t.is(
 		c.content,
@@ -50,7 +50,7 @@ test('Cell#clear', t => {
 	t.true(c.valid, 'Resetting an invalid cell should reset valid to true');
 
 	// ====
-	c = new Cell();
+	c = new Cell(9);
 	c.setContent(1).clear();
 	t.is(
 		c.content,

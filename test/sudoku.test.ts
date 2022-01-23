@@ -6,18 +6,18 @@ import {getComparableCells} from './plugins/helpers.js';
 const _ = undefined;
 
 test('Sudoku should be a class', t => {
-	t.is(typeof new Sudoku(), 'object');
+	t.is(typeof new Sudoku(9), 'object');
 });
 
 test('Sudoku#setContent', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	s.setContent(0, '4');
 
 	t.is(s.getContent(0), 4);
 });
 
 test('Sudoku#getContent', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	t.is(s.getContent(8 * 9 + 8), undefined);
 
 	s.setContent(8 * 9 + 8, '4');
@@ -29,7 +29,7 @@ test('Sudoku#getContent', t => {
 });
 
 test('Sudoku#clearCell', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	s.setContent(6 * 9 + 6, '4');
 	t.is(s.getContent(6 * 9 + 6), 4);
 	s.clearCell(6 * 9 + 6);
@@ -37,7 +37,7 @@ test('Sudoku#clearCell', t => {
 });
 
 test('Sudoku#clearAllCells', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	s.setContent(6 * 9 + 6, '4')
 		.setContent(1 * 9 + 1, '5')
 		.setContent(2 * 9 + 4, '3');
@@ -54,7 +54,7 @@ test('Sudoku#clearAllCells', t => {
 });
 
 test('Sudoku#getCol', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	s.setContent(2 * 9 + 8, '2').setContent(5 * 9 + 8, '4');
 
 	const col = s.getCol(8);
@@ -76,7 +76,7 @@ test('Sudoku#getCol', t => {
 });
 
 test('Sudoku#getRow', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	s.setContent(8 * 9 + 8, '3')
 		.setContent(8 * 9 + 2, '4')
 		.setContent(8 * 9 + 7, '7');
@@ -90,7 +90,7 @@ test('Sudoku#getRow', t => {
 });
 
 test('Sudoku#getCell', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 	t.is(s.getCell(0), s.getBlock(0)[0]!);
 
 	t.is(
@@ -100,7 +100,7 @@ test('Sudoku#getCell', t => {
 });
 
 test('Sudoku#getCells', t => {
-	let s = new Sudoku();
+	let s = new Sudoku(9);
 
 	const cells1 = s.getCells();
 
@@ -116,7 +116,7 @@ test('Sudoku#getCells', t => {
 
 	// ====
 
-	s = new Sudoku();
+	s = new Sudoku(9);
 
 	const sudoku = s
 		.setContent(0, '2')
@@ -130,7 +130,7 @@ test('Sudoku#getCells', t => {
 	// ====
 
 	const firstRow = Array.from({length: 9}, (_v, index) => index + 1);
-	s = Sudoku.fromPrefilled([firstRow.map(content => String(content))]);
+	s = Sudoku.fromPrefilled([firstRow.map(content => String(content))], 9);
 
 	const cells2 = s.getCells();
 
@@ -138,7 +138,7 @@ test('Sudoku#getCells', t => {
 });
 
 test('Sudoku#getBlock', t => {
-	let s = new Sudoku();
+	let s = new Sudoku(9);
 	const block1 = s.getBlock(0);
 
 	t.true(Array.isArray(block1));
@@ -146,7 +146,7 @@ test('Sudoku#getBlock', t => {
 
 	// ====
 
-	s = new Sudoku();
+	s = new Sudoku(9);
 
 	for (let row = 0; row < 3; ++row) {
 		for (let col = 0; col < 3; ++col) {
@@ -164,17 +164,20 @@ test('Sudoku#getBlock', t => {
 test('Sudoku#solve easy', t => {
 	t.plan(3);
 
-	const s = Sudoku.fromPrefilled([
-		[_, '1', _, '3', '8', _, _, '5', '2'],
-		[_, '6', '5', _, _, _, _, '8', '9'],
-		[_, _, _, '5', _, '9'],
-		[_, _, _, '4', '1', _, '8'],
-		['2', '3', _, _, _, _, _, '4', '6'],
-		[_, _, '8', _, '3', '7'],
-		[_, _, _, '1', _, '8'],
-		['6', '5', _, _, _, _, '2', '3'],
-		['7', '8', _, _, '5', '3', _, '1'],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			[_, '1', _, '3', '8', _, _, '5', '2'],
+			[_, '6', '5', _, _, _, _, '8', '9'],
+			[_, _, _, '5', _, '9'],
+			[_, _, _, '4', '1', _, '8'],
+			['2', '3', _, _, _, _, _, '4', '6'],
+			[_, _, '8', _, '3', '7'],
+			[_, _, _, '1', _, '8'],
+			['6', '5', _, _, _, _, '2', '3'],
+			['7', '8', _, _, '5', '3', _, '1'],
+		],
+		9,
+	);
 
 	t.is(s.solve(), 'finish');
 
@@ -199,17 +202,20 @@ test('Sudoku#solve easy', t => {
 test('Sudoku#solve evil', t => {
 	t.plan(3);
 
-	const s = Sudoku.fromPrefilled([
-		['6', _, '4', _, _, _, _, _, '3'],
-		[_, _, _, _, '3', '7', '8'],
-		[_, _, _, '5', _, _, '7'],
-		['8', '9', _, '1'],
-		['3', _, _, _, _, _, _, _, '2'],
-		[_, _, _, _, _, '3', _, '1', '9'],
-		[_, _, '5', _, _, '9'],
-		[_, _, '1', '8', '6'],
-		['9', _, _, _, _, _, '4', _, '8'],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			['6', _, '4', _, _, _, _, _, '3'],
+			[_, _, _, _, '3', '7', '8'],
+			[_, _, _, '5', _, _, '7'],
+			['8', '9', _, '1'],
+			['3', _, _, _, _, _, _, _, '2'],
+			[_, _, _, _, _, '3', _, '1', '9'],
+			[_, _, '5', _, _, '9'],
+			[_, _, '1', '8', '6'],
+			['9', _, _, _, _, _, '4', _, '8'],
+		],
+		9,
+	);
 
 	t.is(s.solve(), 'finish');
 
@@ -234,17 +240,20 @@ test('Sudoku#solve evil', t => {
 test('Sudoku#solve expert', t => {
 	t.plan(3);
 
-	const s = Sudoku.fromPrefilled([
-		[_, _, _, _, _, '4', _, _, '2'],
-		[_, '6', _, '2', _, _, _, '3'],
-		[_, '8', _, _, _, '3', '5', _, '9'],
-		[_, '4', _, _, _, _, '1'],
-		['1', _, _, '7', _, '5'],
-		['5', _, '3'],
-		[_, '9', _, '3'],
-		[_, _, '4', _, '6', '1'],
-		[_, _, '5', _, _, _, '7'],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			[_, _, _, _, _, '4', _, _, '2'],
+			[_, '6', _, '2', _, _, _, '3'],
+			[_, '8', _, _, _, '3', '5', _, '9'],
+			[_, '4', _, _, _, _, '1'],
+			['1', _, _, '7', _, '5'],
+			['5', _, '3'],
+			[_, '9', _, '3'],
+			[_, _, '4', _, '6', '1'],
+			[_, _, '5', _, _, _, '7'],
+		],
+		9,
+	);
 
 	t.is(s.solve(), 'finish');
 
@@ -323,18 +332,21 @@ test('Sudoku#solve tough 16x16', t => {
 test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 	t.plan(2);
 
-	const s = Sudoku.fromPrefilled([
-		// Here both 5 and 6 would have to be in the middle/middle cell
-		// which is not possible, since only one number can be in each cell
-		[],
-		[_, _, _, '6'],
-		[_, _, _, '5'],
-		[_, _, _, _, _, _, '5', '6'],
-		[],
-		[_, '6', '5'],
-		[_, _, _, _, _, '5'],
-		[_, _, _, _, _, '6'],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			// Here both 5 and 6 would have to be in the middle/middle cell
+			// which is not possible, since only one number can be in each cell
+			[],
+			[_, _, _, '6'],
+			[_, _, _, '5'],
+			[_, _, _, _, _, _, '5', '6'],
+			[],
+			[_, '6', '5'],
+			[_, _, _, _, _, '5'],
+			[_, _, _, _, _, '6'],
+		],
+		9,
+	);
 
 	t.is(s.solve(), 'error');
 
@@ -344,20 +356,23 @@ test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
 	t.plan(2);
 
-	const s = Sudoku.fromPrefilled([
-		// Here 1,2,3 have to be in the third column of the middle/middle block
-		// And 4,5,6 have to be in the first row of the middle/middle block
-		// Since those two overlap this is an invalid sudoku
-		[_, _, _, _, '1'],
-		[_, _, _, _, '2'],
-		[_, _, _, _, '3'],
-		_,
-		['4', '5', '6'],
-		[_, _, _, _, _, _, '4', '5', '6'],
-		[_, _, _, '1'],
-		[_, _, _, '2'],
-		[_, _, _, '3'],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			// Here 1,2,3 have to be in the third column of the middle/middle block
+			// And 4,5,6 have to be in the first row of the middle/middle block
+			// Since those two overlap this is an invalid sudoku
+			[_, _, _, _, '1'],
+			[_, _, _, _, '2'],
+			[_, _, _, _, '3'],
+			_,
+			['4', '5', '6'],
+			[_, _, _, _, _, _, '4', '5', '6'],
+			[_, _, _, '1'],
+			[_, _, _, '2'],
+			[_, _, _, '3'],
+		],
+		9,
+	);
 
 	t.is(s.solve(), 'error');
 
@@ -365,7 +380,7 @@ test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
 });
 
 test('Sudoku#subscribe', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 
 	t.plan(2);
 
@@ -384,7 +399,7 @@ test('Sudoku#subscribe', t => {
 });
 
 test('Sudoku#unsubscribe', t => {
-	const s = new Sudoku();
+	const s = new Sudoku(9);
 
 	t.plan(3);
 
@@ -409,13 +424,13 @@ test('Sudoku#unsubscribe', t => {
 });
 
 test('Sudoku#cellsIndividuallyValidByStructure', t => {
-	let s = new Sudoku();
+	let s = new Sudoku(9);
 
 	t.true(s.cellsIndividuallyValidByStructure(), 'Empty sudoku should be valid');
 
 	// ====
 
-	s = new Sudoku();
+	s = new Sudoku(9);
 	s.setContent(2, 'Hello there');
 	t.is(s.getContent(2), undefined);
 	t.true(
@@ -430,7 +445,7 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 
 	// ====
 
-	s = new Sudoku();
+	s = new Sudoku(9);
 	s.setContent(2, '3').setContent(3, '3');
 	t.false(
 		s.cellsIndividuallyValidByStructure(),
@@ -444,7 +459,7 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 
 	// ====
 
-	s = new Sudoku();
+	s = new Sudoku(9);
 	s.setContent(2, '3').setContent(3, '3');
 	t.false(
 		s.cellsIndividuallyValidByStructure(),
@@ -458,7 +473,7 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 });
 
 test('Sudoku#overrideCandidates new set equal old set', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
 
@@ -467,7 +482,7 @@ test('Sudoku#overrideCandidates new set equal old set', t => {
 });
 
 test('Sudoku#overrideCandidates old set is subset of new set', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1, 2]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1, 2]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
 
@@ -476,7 +491,7 @@ test('Sudoku#overrideCandidates old set is subset of new set', t => {
 });
 
 test('Sudoku#overrideCandidates new set is subset of old set', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2]));
 
@@ -485,7 +500,7 @@ test('Sudoku#overrideCandidates new set is subset of old set', t => {
 });
 
 test('Sudoku#removeCandidate toRemove is not in old set', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.removeCandidate(cell0, 4);
 
@@ -494,7 +509,7 @@ test('Sudoku#removeCandidate toRemove is not in old set', t => {
 });
 
 test('Sudoku#removeCandidate toRemove is in old set', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.removeCandidate(cell0, 3);
 
@@ -504,7 +519,7 @@ test('Sudoku#removeCandidate toRemove is in old set', t => {
 
 // Using overrideCandidates would also be possible
 test('Sudoku#removeCandidate candidates is empty afterwards', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1]]], 9);
 	const cell0 = sudoku.getCell(0);
 
 	t.throws(() => {
@@ -513,7 +528,7 @@ test('Sudoku#removeCandidate candidates is empty afterwards', t => {
 });
 
 test('Sudoku#removeCandidate one candidate afterwards', t => {
-	const sudoku = Sudoku.fromPrefilled([[[1, 2]]]);
+	const sudoku = Sudoku.fromPrefilled([[[1, 2]]], 9);
 	const cell0 = sudoku.getCell(0);
 
 	sudoku.removeCandidate(cell0, 1);
@@ -523,13 +538,13 @@ test('Sudoku#removeCandidate one candidate afterwards', t => {
 });
 
 test('Sudoku#isSolved', t => {
-	let s = new Sudoku();
+	let s = new Sudoku(9);
 
 	t.false(s.isSolved(), 'An empty sudoku should return false');
 
 	// ====
 
-	s = new Sudoku();
+	s = new Sudoku(9);
 	s.setContent(3, '2').setContent(4, '4');
 	t.false(s.isSolved(), 'A partially empty sudoku should return false');
 
@@ -537,6 +552,7 @@ test('Sudoku#isSolved', t => {
 
 	s = Sudoku.fromPrefilled(
 		Array.from({length: 9}, () => Array.from({length: 9}, () => '2')),
+		9,
 	);
 	t.false(
 		s.isSolved(),
@@ -545,17 +561,20 @@ test('Sudoku#isSolved', t => {
 });
 
 test('Sudoku#clone 9x9', t => {
-	const s = Sudoku.fromPrefilled([
-		[_, _, _, _, _, '4', _, _, '2'],
-		[_, '6', _, '2', _, _, _, '3'],
-		[_, '8', _, _, _, '3', '5', _, '9'],
-		[_, '4', _, _, _, _, '1'],
-		['1', _, _, '7', _, '5'],
-		['5', _, '3'],
-		[_, '9', _, '3'],
-		[_, _, '4', _, '6', '1'],
-		[_, _, '5', _, _, _, '7'],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			[_, _, _, _, _, '4', _, _, '2'],
+			[_, '6', _, '2', _, _, _, '3'],
+			[_, '8', _, _, _, '3', '5', _, '9'],
+			[_, '4', _, _, _, _, '1'],
+			['1', _, _, '7', _, '5'],
+			['5', _, '3'],
+			[_, '9', _, '3'],
+			[_, _, '4', _, '6', '1'],
+			[_, _, '5', _, _, _, '7'],
+		],
+		9,
+	);
 
 	const cloned = s.clone();
 

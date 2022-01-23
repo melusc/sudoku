@@ -54,7 +54,7 @@ export class Sudoku {
 		...'1234567890abcdefghijklmnopqrstuvwxyz',
 	];
 
-	static fromPrefilled = (cells: PrefilledSudoku, size = 9): Sudoku => {
+	static fromPrefilled = (cells: PrefilledSudoku, size: number): Sudoku => {
 		const s = new Sudoku(size);
 
 		for (const [rowIndex, row] of cells.entries()) {
@@ -94,7 +94,7 @@ export class Sudoku {
 
 	shouldLogErrors = process.env['NODE_ENV'] !== 'test';
 
-	constructor(readonly size = 9) {
+	constructor(readonly size: number) {
 		const blockWidth = Math.sqrt(size);
 
 		if (!Number.isInteger(blockWidth)) {

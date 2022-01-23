@@ -6,8 +6,8 @@ import {getComparableCells} from './helpers.js';
 const _ = undefined;
 
 test('removeByContent should not change an empty sudoku', t => {
-	const originalSudoku = new Sudoku();
-	const modifiedSudoku = new Sudoku();
+	const originalSudoku = new Sudoku(9);
+	const modifiedSudoku = new Sudoku(9);
 
 	removeByContent(modifiedSudoku);
 	t.false(modifiedSudoku.anyChanged);
@@ -19,11 +19,14 @@ test('removeByContent should not change an empty sudoku', t => {
 });
 
 test('removeByContent should solve [[1, 2, 3], [4, 5, 6], [_, 8, 9] (block) correctly.', t => {
-	const s = Sudoku.fromPrefilled([
-		[1, 2, 3],
-		[4, 5, 6],
-		[_, 8, 9],
-	]);
+	const s = Sudoku.fromPrefilled(
+		[
+			[1, 2, 3],
+			[4, 5, 6],
+			[_, 8, 9],
+		],
+		9,
+	);
 
 	removeByContent(s);
 
@@ -33,11 +36,14 @@ test('removeByContent should solve [[1, 2, 3], [4, 5, 6], [_, 8, 9] (block) corr
 });
 
 test('removeByContent should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (block).', t => {
-	const sudoku = Sudoku.fromPrefilled([
-		[1, 2, 3],
-		[_, _, 6],
-		[7, 8, 9],
-	]);
+	const sudoku = Sudoku.fromPrefilled(
+		[
+			[1, 2, 3],
+			[_, _, 6],
+			[7, 8, 9],
+		],
+		9,
+	);
 
 	removeByContent(sudoku);
 
@@ -52,6 +58,7 @@ test('removeByContent should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (blo
 test('removeByContent should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.', t => {
 	const sudoku = Sudoku.fromPrefilled(
 		[_, 2, 5, 3, 8, 9, 4, 7, 6].map(item => [item]),
+		9,
 	);
 
 	removeByContent(sudoku);
@@ -64,6 +71,7 @@ test('removeByContent should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.'
 test('removeByContent should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', t => {
 	const sudoku = Sudoku.fromPrefilled(
 		[_, 5, 4, 3, 2, 7, 1, 8, _].map(item => [item]),
+		9,
 	);
 
 	removeByContent(sudoku);
@@ -77,7 +85,7 @@ test('removeByContent should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', t
 });
 
 test('removeByContent should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.', t => {
-	const sudoku = Sudoku.fromPrefilled([[1, 2, 3, _, 5, 6, 7, 8, 9]]);
+	const sudoku = Sudoku.fromPrefilled([[1, 2, 3, _, 5, 6, 7, 8, 9]], 9);
 
 	removeByContent(sudoku);
 
@@ -88,7 +96,7 @@ test('removeByContent should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.'
 });
 
 test('removeByContent should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', t => {
-	const sudoku = Sudoku.fromPrefilled([[5, 7, 8, 1, 2, _, 3, _, 6]]);
+	const sudoku = Sudoku.fromPrefilled([[5, 7, 8, 1, 2, _, 3, _, 6]], 9);
 
 	removeByContent(sudoku);
 
