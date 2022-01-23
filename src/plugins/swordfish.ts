@@ -10,10 +10,10 @@ const swordfishByType = (
 	const indexedCells = new Map<number, Map<number, bigint>>();
 
 	/*
-		Index all cell possibles
+		Index all cell candidates
 		For each row / col and each number
 		add the index of the number:
-		number[`row index`][`cell possible number`] |= `index in row`
+		number[`row index`][`cell candidate`] |= `index in row`
 	*/
 	for (let i = 0; i < sudoku.size; ++i) {
 		const structure = sudoku[getterName](i);
@@ -21,18 +21,18 @@ const swordfishByType = (
 		const foundContent = new Set<number>();
 		indexedCells.set(i, currentIndex);
 
-		for (const [index, {possible, content}] of structure.entries()) {
+		for (const [index, {candidates, content}] of structure.entries()) {
 			if (content === undefined) {
-				for (const number of possible) {
+				for (const candidate of candidates) {
 					// Ignore numbers that already exist as "content"
-					// These numbers will be removed from "possible" soon, anyway
-					if (foundContent.has(number)) {
+					// These numbers will be removed from "candidates" soon, anyway
+					if (foundContent.has(candidate)) {
 						continue;
 					}
 
 					currentIndex.set(
-						number,
-						(currentIndex.get(number) ?? 0n) | (1n << BigInt(index)),
+						candidate,
+						(currentIndex.get(candidate) ?? 0n) | (1n << BigInt(index)),
 					);
 				}
 			} else {
@@ -91,7 +91,7 @@ const swordfishByType = (
 						continue;
 					}
 
-					sudoku.removePossible(struct[cellIndex]!, number);
+					sudoku.removeCandidate(struct[cellIndex]!, number);
 				}
 			}
 		}

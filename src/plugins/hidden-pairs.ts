@@ -17,18 +17,18 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// This is a lot better than comparing arrays of indexes
 	const summary = new Map<number, bigint>();
 
-	for (const [index, {content, possible}] of structure.entries()) {
+	for (const [index, {content, candidates}] of structure.entries()) {
 		const pow = 1n << BigInt(index);
 
 		if (content === undefined) {
-			for (const number of possible) {
-				summary.set(number, (summary.get(number) ?? 0n) | pow);
+			for (const candidate of candidates) {
+				summary.set(candidate, (summary.get(candidate) ?? 0n) | pow);
 			}
 		} else {
 			/*
           This part fixes a bug:
           [
-            {1,2,3}, // these are possibles
+            {1,2,3}, // these are candidates
             {1,2},
             3, // this is filled in that cell
             ...
@@ -36,7 +36,7 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
           Webpack doesn't keep the same order as is exported from plugins.ts
           (and the plugins shouldn't rely on it).
           When remove-duplicates (now naked-pairs) doesn't run first, the scenarios above can occur
-          where hidden-pairs finds the only cell that has 3 in #possible and then removes all others
+          where hidden-pairs finds the only cell that has 3 in #candidates and then removes all others
           (here cell at index 0), incorrectly resulting in two cells with 3
         */
 
@@ -93,7 +93,7 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 
 			const cell = structure[index]!;
 
-			sudoku.overridePossibles(cell, new Set(numbers));
+			sudoku.overrideCandidates(cell, new Set(numbers));
 		}
 	}
 };

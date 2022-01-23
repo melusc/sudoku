@@ -7,14 +7,14 @@ import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
 
-	for (const [index, {content, possible}] of structure.entries()) {
+	for (const [index, {content, candidates}] of structure.entries()) {
 		if (content !== undefined) {
 			continue;
 		}
 
 		let key = 0n;
-		for (const number of possible) {
-			key |= 1n << BigInt(number - 1);
+		for (const candidate of candidates) {
+			key |= 1n << BigInt(candidate - 1);
 		}
 
 		let exactMatchFound = false;
@@ -59,7 +59,7 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 
 			for (const [index, cell] of structure.entries()) {
 				if (!indices.includes(index)) {
-					sudoku.removePossible(cell, number + 1);
+					sudoku.removeCandidate(cell, number + 1);
 				}
 			}
 		}

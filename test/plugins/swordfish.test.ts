@@ -8,10 +8,10 @@ const makeCheck
 		const cell = s.getCell(index);
 
 		if (Array.isArray(expected)) {
-			t.deepEqual(s.getCell(index).possible, new Set(expected));
+			t.deepEqual(s.getCell(index).candidates, new Set(expected));
 		} else {
 			t.is(cell.content, expected);
-			t.is(cell.possible.size, 0);
+			t.is(cell.candidates.size, 0);
 		}
 	};
 

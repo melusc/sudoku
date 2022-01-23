@@ -36,13 +36,13 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 	pointingArrows(s);
 	t.true(s.anyChanged);
 
-	t.deepEqual([...s.getCell(9).possible], [2, 4, 5, 6]);
+	t.deepEqual([...s.getCell(9).candidates], [2, 4, 5, 6]);
 
-	t.deepEqual([...s.getCell(10).possible], [2, 4, 5]);
+	t.deepEqual([...s.getCell(10).candidates], [2, 4, 5]);
 
 	const cell11 = s.getCell(11);
 	t.is(cell11.content, 6);
-	t.is(cell11.possible.size, 0);
+	t.is(cell11.candidates.size, 0);
 });
 
 test('pointingArrows should find a pointing arrow of 2s.', t => {
@@ -75,5 +75,5 @@ test('pointingArrows should find a pointing arrow of 2s.', t => {
 	pointingArrows(s);
 	t.true(s.anyChanged);
 
-	t.deepEqual([...s.getCell(1).possible], [3, 4, 8, 9]);
+	t.deepEqual([...s.getCell(1).candidates], [3, 4, 8, 9]);
 });

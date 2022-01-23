@@ -4,20 +4,20 @@ const uniqueId = (prefix = ''): string => `${prefix}${counter++}`;
 export type Cells = Cell[];
 export type ReadonlyCells = readonly Cell[];
 
-export const generateEmptyCellPossibles = (size: number): Set<number> =>
+export const generateEmptyCellCandidates = (size: number): Set<number> =>
 	new Set(Array.from({length: size}, (_v, index) => index + 1));
 
 export class Cell {
 	#content: number | undefined;
 
-	possible: Set<number>;
+	candidates: Set<number>;
 
 	key = uniqueId('cell-');
 
 	customValid = true;
 
 	constructor(private readonly sudokuSize = 9) {
-		this.possible = generateEmptyCellPossibles(sudokuSize);
+		this.candidates = generateEmptyCellCandidates(sudokuSize);
 	}
 
 	get content(): number | undefined {
@@ -30,7 +30,7 @@ export class Cell {
 		return (
 			this.customValid
 			&& (content === undefined
-				? this.possible.size > 0
+				? this.candidates.size > 0
 				: Number.isInteger(content)
 				  && content > 0
 				  && content <= this.sudokuSize)
@@ -42,7 +42,7 @@ export class Cell {
 			this.clear();
 		} else {
 			this.#content = content;
-			this.possible.clear();
+			this.candidates.clear();
 		}
 
 		return this;
@@ -51,7 +51,7 @@ export class Cell {
 	clear = (): this => {
 		this.#content = undefined;
 
-		this.possible = generateEmptyCellPossibles(this.sudokuSize);
+		this.candidates = generateEmptyCellCandidates(this.sudokuSize);
 
 		return this;
 	};

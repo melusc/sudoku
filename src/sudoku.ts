@@ -1,7 +1,7 @@
 import {
 	Cell,
 	type Cells,
-	generateEmptyCellPossibles,
+	generateEmptyCellCandidates,
 	type ReadonlyCells,
 } from './cell.js';
 import * as plugins from './plugins/index.js';
@@ -67,7 +67,7 @@ export class Sudoku {
 				const cellIndex = (rowIndex * size) + colIndex;
 				const cell = s.getCell(cellIndex);
 				if (isReadonlyArray(content)) {
-					cell.possible = new Set(content);
+					cell.candidates = new Set(content);
 				} else if (content !== undefined) {
 					s.setContent(cellIndex, content);
 				}
@@ -209,19 +209,21 @@ export class Sudoku {
 	getCells = (): ReadonlyCells => this.#cells;
 
 	/** @internal */
-	#checkCellContent = (cell: Cell): this => {
+	#checkCellCandidates = (cell: Cell): this => {
 		if (cell.content !== undefined) {
 			return this;
 		}
 
-		if (cell.possible.size === 0) {
+		if (cell.candidates.size === 0) {
 			throw new Error(
-				`Unexpected empty cell possibles in cell #${this.#cells.indexOf(cell)}`,
+				`Unexpected empty cell candidates in cell #${this.#cells.indexOf(
+					cell,
+				)}`,
 			);
 		}
 
-		if (cell.possible.size === 1) {
-			cell.setContent(cell.possible.values().next().value as number);
+		if (cell.candidates.size === 1) {
+			cell.setContent(cell.candidates.values().next().value as number);
 			this.anyChanged ||= true;
 			this.#dispatch('change');
 		}
@@ -230,32 +232,32 @@ export class Sudoku {
 	};
 
 	/** @internal */
-	removePossible = (cell: Cell, toRemove: number): this => {
-		const {possible} = cell;
+	removeCandidate = (cell: Cell, toRemove: number): this => {
+		const {candidates} = cell;
 
-		if (possible.has(toRemove)) {
+		if (candidates.has(toRemove)) {
 			this.anyChanged ||= true;
-			possible.delete(toRemove);
+			candidates.delete(toRemove);
 
-			this.#checkCellContent(cell);
+			this.#checkCellCandidates(cell);
 		}
 
 		return this;
 	};
 
 	/** @internal */
-	overridePossibles = (cell: Cell, possibles: Set<number>): this => {
+	overrideCandidates = (cell: Cell, candidates: Set<number>): this => {
 		let anyChanged = false;
-		for (const item of cell.possible) {
-			if (!possibles.has(item)) {
-				cell.possible.delete(item);
+		for (const candidate of cell.candidates) {
+			if (!candidates.has(candidate)) {
+				cell.candidates.delete(candidate);
 				anyChanged ||= true;
 			}
 		}
 
 		if (anyChanged) {
 			this.anyChanged ||= true;
-			this.#checkCellContent(cell);
+			this.#checkCellCandidates(cell);
 		}
 
 		return this;
@@ -285,7 +287,7 @@ export class Sudoku {
 
 		for (const cell of this.#cells) {
 			if (cell.content === undefined) {
-				cell.clear(); // Reset possibles
+				cell.clear(); // Reset candidates
 			}
 		}
 
@@ -359,12 +361,12 @@ export class Sudoku {
 
 	isValid = (): boolean => {
 		for (const structure of this.eachStructure()) {
-			const requiredNumbers = generateEmptyCellPossibles(this.size);
+			const requiredNumbers = generateEmptyCellCandidates(this.size);
 
 			for (const cell of structure) {
 				if (cell.content === undefined) {
-					for (const possible of cell.possible) {
-						requiredNumbers.delete(possible);
+					for (const candidate of cell.candidates) {
+						requiredNumbers.delete(candidate);
 					}
 				} else {
 					requiredNumbers.delete(cell.content);
@@ -431,7 +433,7 @@ export class Sudoku {
 
 			for (const cell of row) {
 				if (cell.content === undefined) {
-					resultingRow.push([...cell.possible]);
+					resultingRow.push([...cell.candidates]);
 				} else {
 					resultingRow.push(cell.content);
 				}

@@ -30,11 +30,11 @@ test('nakedPairs should correctly find the pairs of "1" and "6".', t => {
 	nakedPairs(s);
 	t.true(s.anyChanged);
 
-	t.deepEqual([...s.getCell(6).possible], [7, 8]);
+	t.deepEqual([...s.getCell(6).candidates], [7, 8]);
 });
 
 test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', t => {
-	const possibles = [
+	const candidates = [
 		[1, 2, 5], // #1
 		[6, 7, 8, 3],
 		[1, 4, 6, 9],
@@ -46,7 +46,7 @@ test('nakedPairs should not change anything upon finding ("1", "2", "5") across 
 		[1, 4, 8],
 	];
 
-	const s = Sudoku.fromPrefilled([_, _, _, possibles]);
+	const s = Sudoku.fromPrefilled([_, _, _, candidates]);
 
 	const row = s.getRow(3);
 
@@ -54,7 +54,7 @@ test('nakedPairs should not change anything upon finding ("1", "2", "5") across 
 	t.false(s.anyChanged);
 
 	for (let index = 0; index < 9; ++index) {
-		t.deepEqual([...row[index]!.possible], possibles[index]!);
+		t.deepEqual([...row[index]!.candidates], candidates[index]!);
 	}
 });
 
@@ -78,7 +78,7 @@ test('nakedPairs should find an incomplete naked pair', t => {
 	nakedPairs(s);
 
 	t.deepEqual(
-		s.getRow(0).map(({possible}) => [...possible]),
+		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 2, 4], // #1
 			[1, 2, 4], // #2
@@ -113,7 +113,7 @@ test('nakedPairs should find an incomplete naked pair with incomplete cell as fi
 	nakedPairs(s);
 
 	t.deepEqual(
-		s.getRow(0).map(({possible}) => [...possible]),
+		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 4], // #1
 			[3, 5, 6, 7, 8, 9],
@@ -148,7 +148,7 @@ test('nakedPairs should find an incomplete naked pair with multiple incomplete c
 	nakedPairs(s);
 
 	t.deepEqual(
-		s.getRow(0).map(({possible}) => [...possible]),
+		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 4], // #1
 			[3, 5, 6, 7, 8, 9],
@@ -182,7 +182,7 @@ test('nakedPairs with incomplete cells that do not overlap much', t => {
 	nakedPairs(s);
 
 	t.deepEqual(
-		s.getRow(0).map(({possible}) => [...possible]),
+		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 4], // #1
 			[5, 6, 7, 8, 9],

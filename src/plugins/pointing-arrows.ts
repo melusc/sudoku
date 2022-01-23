@@ -15,7 +15,7 @@ const clearSection = (
 			continue;
 		}
 
-		sudoku.removePossible(cell, numberToRemove);
+		sudoku.removeCandidate(cell, numberToRemove);
 	}
 };
 
@@ -37,15 +37,15 @@ export const pointingArrows = (sudoku: Sudoku): void => {
     */
 		const summary = new Map<number, bigint>();
 
-		for (const [index, {content, possible}] of block.entries()) {
+		for (const [index, {content, candidates}] of block.entries()) {
 			const row = BigInt(Math.trunc(index / blockWidth));
 			const col = BigInt(index % blockWidth);
 
 			const key = (1n << col) | (1n << (row + blockWidthBigInt));
 
 			if (content === undefined) {
-				for (const number of possible) {
-					summary.set(number, (summary.get(number) ?? 0n) | key);
+				for (const candidate of candidates) {
+					summary.set(candidate, (summary.get(candidate) ?? 0n) | key);
 				}
 			} else {
 				summary.set(content, (summary.get(content) ?? 0n) | key);

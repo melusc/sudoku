@@ -29,11 +29,11 @@ test('hiddenPairs should find the hidden pairs ("3", "4", "9").', t => {
 
 	const wantedSet = new Set([3, 4, 9]);
 
-	t.deepEqual(s.getCell(4 * 9).possible, wantedSet);
+	t.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 3).possible, wantedSet);
+	t.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 5).possible, wantedSet);
+	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
 });
 
 test('hiddenPairs should find the only cell that can have "1".', t => {
@@ -55,12 +55,12 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 
 	const cell = s.getCell(3);
 	t.is(cell.content, 1);
-	t.is(cell.possible.size, 0);
+	t.is(cell.candidates.size, 0);
 });
 
 test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", t => {
 	// Two cells can have a "1"
-	const possibles = [
+	const candidates = [
 		[2, 3, 5, 7, 9],
 		[3, 5, 6, 8],
 		[1, 3, 4],
@@ -72,8 +72,8 @@ test("hiddenPairs should not modify any cells if there aren't any hidden pairs."
 		[2, 6, 8, 9],
 	];
 
-	const unmodifiedSudoku = Sudoku.fromPrefilled([possibles]);
-	const s = Sudoku.fromPrefilled([possibles]);
+	const unmodifiedSudoku = Sudoku.fromPrefilled([candidates]);
+	const s = Sudoku.fromPrefilled([candidates]);
 
 	hiddenPairs(s);
 
@@ -100,7 +100,7 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	t.true(s.anyChanged);
 
 	t.deepEqual(
-		s.getRow(0).map(({possible}) => [...possible]),
+		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[7, 8],
 			[7, 8, 9],

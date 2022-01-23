@@ -29,7 +29,7 @@ test('removeByContent should solve [[1, 2, 3], [4, 5, 6], [_, 8, 9] (block) corr
 
 	const cell = s.getCell(2 * 9);
 	t.is(cell.content, 7);
-	t.is(cell.possible.size, 0);
+	t.is(cell.candidates.size, 0);
 });
 
 test('removeByContent should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (block).', t => {
@@ -44,9 +44,9 @@ test('removeByContent should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (blo
 	const cell1 = sudoku.getCell(1 * 9);
 	const cell2 = sudoku.getCell(1 * 9 + 1);
 
-	t.deepEqual(cell1.possible, new Set([4, 5]));
+	t.deepEqual(cell1.candidates, new Set([4, 5]));
 
-	t.deepEqual(cell2.possible, new Set([4, 5]));
+	t.deepEqual(cell2.candidates, new Set([4, 5]));
 });
 
 test('removeByContent should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.', t => {
@@ -58,7 +58,7 @@ test('removeByContent should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.'
 
 	const cell = sudoku.getCell(0);
 	t.is(cell.content, 1);
-	t.is(cell.possible.size, 0);
+	t.is(cell.candidates.size, 0);
 });
 
 test('removeByContent should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', t => {
@@ -71,9 +71,9 @@ test('removeByContent should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', t
 	const cell1 = sudoku.getCell(0);
 	const cell2 = sudoku.getCell(8 * 9);
 
-	t.deepEqual(cell1.possible, new Set([6, 9]));
+	t.deepEqual(cell1.candidates, new Set([6, 9]));
 
-	t.deepEqual(cell2.possible, new Set([6, 9]));
+	t.deepEqual(cell2.candidates, new Set([6, 9]));
 });
 
 test('removeByContent should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.', t => {
@@ -84,7 +84,7 @@ test('removeByContent should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.'
 	const cell = sudoku.getCell(3);
 
 	t.is(cell.content, 4);
-	t.is(cell.possible.size, 0);
+	t.is(cell.candidates.size, 0);
 });
 
 test('removeByContent should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', t => {
@@ -95,7 +95,7 @@ test('removeByContent should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', t => {
 	const cell1 = sudoku.getCell(5);
 	const cell2 = sudoku.getCell(7);
 
-	t.deepEqual(cell1.possible, new Set([4, 9]));
+	t.deepEqual(cell1.candidates, new Set([4, 9]));
 
-	t.deepEqual(cell2.possible, new Set([4, 9]));
+	t.deepEqual(cell2.candidates, new Set([4, 9]));
 });

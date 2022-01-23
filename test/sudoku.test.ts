@@ -25,7 +25,7 @@ test('Sudoku#getContent', t => {
 
 	s.setContent(8 * 9 + 8, 'A');
 	t.is(s.getContent(8 * 9 + 8), undefined);
-	t.is(s.getCell(8 * 9 + 8).possible.size, 9);
+	t.is(s.getCell(8 * 9 + 8).candidates.size, 9);
 });
 
 test('Sudoku#clearCell', t => {
@@ -111,7 +111,7 @@ test('Sudoku#getCells', t => {
 
 		t.is(typeof cell.key, 'string');
 
-		t.is(cell.possible.size, 9);
+		t.is(cell.candidates.size, 9);
 	}
 
 	// ====
@@ -457,69 +457,69 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 	);
 });
 
-test('Sudoku#overridePossibles new set equal old set', t => {
+test('Sudoku#overrideCandidates new set equal old set', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	sudoku.overridePossibles(cell0, new Set([1, 2, 3]));
+	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
 
 	t.false(sudoku.anyChanged);
-	t.deepEqual(cell0.possible, new Set([1, 2, 3]));
+	t.deepEqual(cell0.candidates, new Set([1, 2, 3]));
 });
 
-test('Sudoku#overridePossibles old set is subset of new set', t => {
+test('Sudoku#overrideCandidates old set is subset of new set', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2]]]);
 	const cell0 = sudoku.getCell(0);
-	sudoku.overridePossibles(cell0, new Set([1, 2, 3]));
+	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
 
 	t.false(sudoku.anyChanged);
-	t.deepEqual(cell0.possible, new Set([1, 2]));
+	t.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
-test('Sudoku#overridePossibles new set is subset of old set', t => {
+test('Sudoku#overrideCandidates new set is subset of old set', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	sudoku.overridePossibles(cell0, new Set([1, 2]));
+	sudoku.overrideCandidates(cell0, new Set([1, 2]));
 
 	t.true(sudoku.anyChanged);
-	t.deepEqual(cell0.possible, new Set([1, 2]));
+	t.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
-test('Sudoku#removePossible toRemove is not in old set', t => {
+test('Sudoku#removeCandidate toRemove is not in old set', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	sudoku.removePossible(cell0, 4);
+	sudoku.removeCandidate(cell0, 4);
 
 	t.false(sudoku.anyChanged);
-	t.deepEqual(cell0.possible, new Set([1, 2, 3]));
+	t.deepEqual(cell0.candidates, new Set([1, 2, 3]));
 });
 
-test('Sudoku#removePossible toRemove is in old set', t => {
+test('Sudoku#removeCandidate toRemove is in old set', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]]);
 	const cell0 = sudoku.getCell(0);
-	sudoku.removePossible(cell0, 3);
+	sudoku.removeCandidate(cell0, 3);
 
 	t.true(sudoku.anyChanged);
-	t.deepEqual(cell0.possible, new Set([1, 2]));
+	t.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
-// Using overridePossibles would also be possible
-test('Sudoku#removePossible possible is empty afterwards', t => {
+// Using overrideCandidates would also be possible
+test('Sudoku#removeCandidate candidates is empty afterwards', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1]]]);
 	const cell0 = sudoku.getCell(0);
 
 	t.throws(() => {
-		sudoku.removePossible(cell0, 1);
+		sudoku.removeCandidate(cell0, 1);
 	});
 });
 
-test('Sudoku#removePossible one possible afterwards', t => {
+test('Sudoku#removeCandidate one candidate afterwards', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2]]]);
 	const cell0 = sudoku.getCell(0);
 
-	sudoku.removePossible(cell0, 1);
+	sudoku.removeCandidate(cell0, 1);
 	t.true(sudoku.anyChanged);
 	t.is(cell0.content, 2);
-	t.is(cell0.possible.size, 0);
+	t.is(cell0.candidates.size, 0);
 });
 
 test('Sudoku#isSolved', t => {

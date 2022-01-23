@@ -7,19 +7,19 @@ test('Cell should be a class', t => {
 
 	t.is(c.content, undefined);
 
-	t.deepEqual(c.possible, new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+	t.deepEqual(c.candidates, new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]));
 });
 
 test('Cell#setContent', t => {
 	const c = new Cell();
 
 	t.is(c.content, undefined);
-	t.is(c.possible.size, 9);
+	t.is(c.candidates.size, 9);
 
 	c.setContent(1);
 
 	t.is(c.content, 1);
-	t.is(c.possible.size, 0);
+	t.is(c.candidates.size, 0);
 });
 
 test('Cell#setValidity', t => {
@@ -43,9 +43,9 @@ test('Cell#clear', t => {
 		'Resetting an invalid cell should reset content to undefined',
 	);
 	t.is(
-		c.possible.size,
+		c.candidates.size,
 		9,
-		'Resetting an invalid cell should reset possible to "Set(1 through 9)"',
+		'Resetting an invalid cell should reset candidates to "Set(1..9)"',
 	);
 	t.true(c.valid, 'Resetting an invalid cell should reset valid to true');
 
@@ -58,9 +58,9 @@ test('Cell#clear', t => {
 		'Resetting a valid cell should reset content to undefined',
 	);
 	t.is(
-		c.possible.size,
+		c.candidates.size,
 		9,
-		'Resetting a valid cell should reset possible to "Set(1 through 9)"',
+		'Resetting a valid cell should reset candidates to "Set(1..9)"',
 	);
 	t.true(c.valid, 'Resetting a valid cell should keep valid at true');
 });
