@@ -11,13 +11,22 @@ const bitCount32 = (n: bigint): bigint => {
 	return n & 0x3Fn;
 };
 
+const bitCountCache = new Map<bigint, bigint>();
+
 export const bitCount = (n: bigint): bigint => {
+	if (bitCountCache.has(n)) {
+		return bitCountCache.get(n)!;
+	}
+
+	const n_ = n;
+
 	let bits = 0n;
 	while (n !== 0n) {
 		bits += bitCount32(n & 0xFF_FF_FF_FFn);
 		n >>= 32n;
 	}
 
+	bitCountCache.set(n_, bits);
 	return bits;
 };
 
