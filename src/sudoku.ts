@@ -444,7 +444,7 @@ export class Sudoku {
 	};
 
 	clone = (): Sudoku => {
-		const newSudoku = Sudoku.fromPrefilled(this.toPrefilledSudoku());
+		const newSudoku = Sudoku.fromPrefilled(this.toPrefilledSudoku(), this.size);
 		newSudoku.shouldLogErrors = this.shouldLogErrors;
 		return newSudoku;
 	};
