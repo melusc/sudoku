@@ -4,6 +4,16 @@
 
 import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 
+const throwSmallerThanAllowed = (key: bigint, indicesLength: number): void => {
+	if (bitCount(key) < indicesLength) {
+		throw new Error(
+			`bitCount was smaller than allowed: ${key.toString(
+				2,
+			)}; ${indicesLength} (naked-pairs)`,
+		);
+	}
+};
+
 const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
 
@@ -27,7 +37,12 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 
 				exactMatchFound ||= key === numbersMask;
 			} else {
-				equalKeys.push([numbersMask | key, [...indices, index]]);
+				const newKey = numbersMask | key;
+
+				// Exit as early as possible, rather here than below
+				throwSmallerThanAllowed(newKey, indices.length + 1);
+
+				equalKeys.push([newKey, [...indices, index]]);
 			}
 		}
 
@@ -37,13 +52,7 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 	}
 
 	for (const [key, indices] of equalKeys) {
-		if (bitCount(key) < indices.length) {
-			throw new Error(
-				`bitCount was smaller than allowed: ${key.toString(2)}; ${
-					indices.length
-				} (naked-pairs)`,
-			);
-		}
+		throwSmallerThanAllowed(key, indices.length);
 
 		if (
 			indices.length === sudoku.size

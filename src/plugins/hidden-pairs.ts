@@ -4,6 +4,16 @@
 
 import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 
+const throwIfSmaller = (key: bigint, numbers: number[]) => {
+	if (bitCount(key) < numbers.length) {
+		throw new Error(
+			`bitCount was smaller than allowed: ${key.toString(2)}; ${numbers.join(
+				',',
+			)} (hidden-pairs)`,
+		);
+	}
+}
+
 const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// Getting all the indexes of a number
 	// works like this:
@@ -54,6 +64,10 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 				equalIndex[0] |= key;
 				indices.push(number);
 
+				// Exit early since it is an error in any case
+				// already at this point
+				throwIfSmaller(equalIndex[0], indices);
+
 				exactMatchFound ||= key === curKey;
 			}
 		}
@@ -64,18 +78,9 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	}
 
 	for (const [key, numbers] of equalIndexes) {
-		const bitCountKey = bitCount(key);
-		const numberLength = BigInt(numbers.length);
+		throwIfSmaller(key, numbers);
 
-		if (bitCountKey < numberLength) {
-			throw new Error(
-				`bitCount was smaller than allowed: ${key.toString(2)}; ${numbers.join(
-					',',
-				)} (hidden-pairs)`,
-			);
-		}
-
-		if (bitCountKey > numberLength) {
+		if (bitCount(key) > numbers.length) {
 			continue;
 		}
 
