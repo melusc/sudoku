@@ -4,7 +4,7 @@
 
 import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 
-const throwIfSmaller = (key: bigint, numbers: number[]) => {
+const throwIfSmaller = (key: bigint, numbers: number[]): void => {
 	if (bitCount(key) < numbers.length) {
 		throw new Error(
 			`bitCount was smaller than allowed: ${key.toString(2)}; ${numbers.join(
@@ -12,7 +12,7 @@ const throwIfSmaller = (key: bigint, numbers: number[]) => {
 			)} (hidden-pairs)`,
 		);
 	}
-}
+};
 
 const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// Getting all the indexes of a number
