@@ -1,6 +1,52 @@
 import type {Sudoku} from '../sudoku.js';
 import {bitCount} from './shared.js';
 
+const throwIfMore = (key: bigint, indicesLength: number): void => {
+	/* Scenario: key describes the rows, indices which rows
+	 If the candidates are spread across less columns
+	 than the rows they could be in it's invalid
+
+	 Imagine:
+	 [_, 1, _, 1, _, 1]
+	 [_, _, _, _, _, _]
+	 [_, 1, _, 1, _, 1]
+	 [_, 1, _, 1, _, 1]
+	 [_, _, _, _, _, _]
+	 [_, 1, _, 1, _, 1]
+	 if 1 ends up being in (0, 1), (2, 3), (3, 4)
+	 where could it go in the 6th row? nowhere -> throw Error
+	*/
+
+	if (bitCount(key) < indicesLength) {
+		throw new Error(
+			`bitCount key (${key.toString(
+				2,
+			)}) was smaller than indicesLength (${indicesLength}) (swordfish).`,
+		);
+	}
+};
+
+const makeClearStructure
+	= (sudoku: Sudoku, getterName: 'getRow' | 'getCol') =>
+	(key: bigint, indices: number[], number: number): void => {
+		for (let structIndex = 0; structIndex < sudoku.size; ++structIndex) {
+			if (indices.includes(structIndex)) {
+				continue;
+			}
+
+			const struct = sudoku[getterName](structIndex);
+
+			// Cell-index in row/col
+			for (let cellIndex = 0; cellIndex < sudoku.size; ++cellIndex) {
+				if ((key & (1n << BigInt(cellIndex))) === 0n) {
+					continue;
+				}
+
+				sudoku.removeCandidate(struct[cellIndex]!, number);
+			}
+		}
+	};
+
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */
 
 const swordfishByType = (
@@ -8,6 +54,7 @@ const swordfishByType = (
 	getterName: 'getRow' | 'getCol',
 ): void => {
 	const indexedCells = new Map<number, Map<number, bigint>>();
+	const clearStructure = makeClearStructure(sudoku, getterName);
 
 	/*
 		Index all cell candidates
@@ -63,8 +110,15 @@ const swordfishByType = (
 
 				if ((currentKey & key) === key) {
 					indices.push(index);
-				} else {
-					array.push([currentKey | key, [...indices, Number(index)]]);
+					throwIfMore(currentKey, indices.length);
+				} else if (sudoku.mode === 'thorough') {
+					const newKey = currentKey | key;
+
+					throwIfMore(newKey, indices.length + 1);
+
+					if (bitCount(newKey) < sudoku.size) {
+						array.push([currentKey | key, [...indices, index]]);
+					}
 				}
 			}
 
@@ -74,26 +128,13 @@ const swordfishByType = (
 
 	for (const [number, indexed] of merged) {
 		for (const [key, indices] of indexed) {
-			if (bitCount(key) !== BigInt(indices.length)) {
+			throwIfMore(key, indices.length);
+
+			if (bitCount(key) > BigInt(indices.length)) {
 				continue;
 			}
 
-			for (let structIndex = 0; structIndex < sudoku.size; ++structIndex) {
-				if (indices.includes(structIndex)) {
-					continue;
-				}
-
-				const struct = sudoku[getterName](structIndex);
-
-				// Cell-index in row/col
-				for (let cellIndex = 0; cellIndex < sudoku.size; ++cellIndex) {
-					if ((key & (1n << BigInt(cellIndex))) === 0n) {
-						continue;
-					}
-
-					sudoku.removeCandidate(struct[cellIndex]!, number);
-				}
-			}
+			clearStructure(key, indices, number);
 		}
 	}
 };

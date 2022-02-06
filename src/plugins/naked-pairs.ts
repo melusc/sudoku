@@ -36,7 +36,7 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 				indices.push(index);
 
 				exactMatchFound ||= key === numbersMask;
-			} else {
+			} else if (sudoku.mode === 'thorough') {
 				const newKey = numbersMask | key;
 
 				// Exit as early as possible, rather here than below
