@@ -39,7 +39,7 @@ test('nakedPairs should correctly find the pairs of "1" and "6".', t => {
 test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', t => {
 	const candidates = [
 		[1, 2, 5], // #1
-		[6, 7, 8, 3],
+		[3, 6, 7, 8],
 		[1, 4, 6, 9],
 		[1, 2, 5], // #2
 		[1, 2, 5, 6],
