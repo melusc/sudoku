@@ -51,7 +51,7 @@ const isReadonlyArray = (arg0: any): arg0 is readonly any[] =>
 
 export class Sudoku {
 	static readonly alphabet: readonly string[] = [
-		...'1234567890abcdefghijklmnopqrstuvwxyz',
+		...'1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 	];
 
 	static fromPrefilled = (cells: PrefilledSudoku, size: number): Sudoku => {
@@ -123,11 +123,11 @@ export class Sudoku {
 				cell.clear();
 			}
 		} else {
-			const index = Sudoku.alphabet.indexOf(content.toLowerCase());
+			const index = Sudoku.alphabet.indexOf(content.toUpperCase());
 			if (index === -1) {
 				cell.clear();
 			} else {
-				cell.setContent(index + 1);
+				cell.setContent(index);
 			}
 		}
 
@@ -136,10 +136,14 @@ export class Sudoku {
 		return this.#dispatch('change');
 	};
 
-	getContent = (index: number): number | undefined => {
-		inRangeIncl(0, this.amountCells - 1, index);
+	getContent = (index: number): string | undefined => {
+		const {content} = this.getCell(index);
 
-		return this.#cells[index]!.content;
+		if (content === undefined) {
+			return content;
+		}
+
+		return Sudoku.alphabet[content];
 	};
 
 	clearCell = (index: number): this => {

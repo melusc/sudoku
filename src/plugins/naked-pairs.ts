@@ -24,7 +24,7 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 
 		let key = 0n;
 		for (const candidate of candidates) {
-			key |= 1n << BigInt(candidate - 1);
+			key |= 1n << BigInt(candidate);
 		}
 
 		let exactMatchFound = false;
@@ -68,7 +68,7 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 
 			for (const [index, cell] of structure.entries()) {
 				if (!indices.includes(index)) {
-					sudoku.removeCandidate(cell, number + 1);
+					sudoku.removeCandidate(cell, number);
 				}
 			}
 		}

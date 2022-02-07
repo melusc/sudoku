@@ -2,6 +2,7 @@ import test from 'ava';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
 import {getComparableCells} from './plugins/helpers.js';
+import {transformChunkedArray, transformFlatArray} from './util.js';
 
 const _ = undefined;
 
@@ -13,25 +14,33 @@ test('Sudoku#setContent', t => {
 	const s = new Sudoku(9);
 	s.setContent(0, '4');
 
-	t.is(s.getContent(0), 4);
+	t.is(s.getContent(0), '4');
 });
 
 test('Sudoku#getContent', t => {
-	const s = new Sudoku(9);
+	const s = new Sudoku(16);
 	t.is(s.getContent(8 * 9 + 8), undefined);
 
 	s.setContent(8 * 9 + 8, '4');
-	t.is(s.getContent(8 * 9 + 8), 4);
+	t.is(s.getContent(8 * 9 + 8), '4');
 
-	s.setContent(8 * 9 + 8, 'A');
+	s.setContent(8 * 9 + 8, '.');
 	t.is(s.getContent(8 * 9 + 8), undefined);
-	t.is(s.getCell(8 * 9 + 8).candidates.size, 9);
+	t.is(s.getCell(8 * 9 + 8).candidates.size, 16);
+
+	s.setContent(0, 'A');
+	t.is(s.getContent(0), 'A');
+	t.is(s.getCell(0).content, 10);
+
+	s.setContent(0, 0);
+	t.is(s.getContent(0), '1');
+	t.is(s.getCell(0).content, 0);
 });
 
 test('Sudoku#clearCell', t => {
 	const s = new Sudoku(9);
 	s.setContent(6 * 9 + 6, '4');
-	t.is(s.getContent(6 * 9 + 6), 4);
+	t.is(s.getContent(6 * 9 + 6), '4');
 	s.clearCell(6 * 9 + 6);
 	t.is(s.getContent(6 * 9 + 6), undefined);
 });
@@ -42,9 +51,9 @@ test('Sudoku#clearAllCells', t => {
 		.setContent(1 * 9 + 1, '5')
 		.setContent(2 * 9 + 4, '3');
 
-	t.is(s.getContent(6 * 9 + 6), 4);
-	t.is(s.getContent(1 * 9 + 1), 5);
-	t.is(s.getContent(2 * 9 + 4), 3);
+	t.is(s.getContent(6 * 9 + 6), '4');
+	t.is(s.getContent(1 * 9 + 1), '5');
+	t.is(s.getContent(2 * 9 + 4), '3');
 
 	s.clearAllCells();
 
@@ -64,10 +73,10 @@ test('Sudoku#getCol', t => {
 		[
 			undefined,
 			undefined,
-			2,
+			1,
 			undefined,
 			undefined,
-			4,
+			3,
 			undefined,
 			undefined,
 			undefined,
@@ -85,7 +94,7 @@ test('Sudoku#getRow', t => {
 
 	t.deepEqual(
 		row.map(cell => cell.content),
-		[undefined, undefined, 4, undefined, undefined, undefined, undefined, 7, 3],
+		[undefined, undefined, 3, undefined, undefined, undefined, undefined, 6, 2],
 	);
 });
 
@@ -123,9 +132,9 @@ test('Sudoku#getCells', t => {
 		.setContent(1 * 9 + 1, '4')
 		.setContent(5 * 9 + 7, '2');
 
-	t.is(sudoku.getCell(0).content, 2);
-	t.is(sudoku.getCell(1 * 9 + 1).content, 4);
-	t.is(sudoku.getCell(5 * 9 + 7).content, 2);
+	t.is(sudoku.getCell(0).content, 1);
+	t.is(sudoku.getCell(1 * 9 + 1).content, 3);
+	t.is(sudoku.getCell(5 * 9 + 7).content, 1);
 
 	// ====
 
@@ -134,7 +143,7 @@ test('Sudoku#getCells', t => {
 
 	const cells2 = s.getCells();
 
-	t.deepEqual(cells2.map(cell => cell.content).slice(0, 9), firstRow);
+	t.deepEqual(cells2.map(cell => cell.content! + 1).slice(0, 9), firstRow);
 });
 
 test('Sudoku#getBlock', t => {
@@ -157,7 +166,7 @@ test('Sudoku#getBlock', t => {
 	const block2 = s.getBlock(0);
 
 	for (const [index, element] of block2.entries()) {
-		t.is(element.content, index + 1);
+		t.is(element.content, index);
 	}
 });
 
@@ -183,7 +192,7 @@ test('Sudoku#solve easy', t => {
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
-		[
+		transformFlatArray([
 			[9, 1, 4, 3, 8, 6, 7, 5, 2],
 			[3, 6, 5, 7, 2, 1, 4, 8, 9],
 			[8, 7, 2, 5, 4, 9, 3, 6, 1],
@@ -193,7 +202,7 @@ test('Sudoku#solve easy', t => {
 			[4, 2, 3, 1, 6, 8, 5, 9, 7],
 			[6, 5, 1, 9, 7, 4, 2, 3, 8],
 			[7, 8, 9, 2, 5, 3, 6, 1, 4],
-		].flat(),
+		]),
 	);
 
 	t.true(s.isSolved());
@@ -221,7 +230,7 @@ test('Sudoku#solve evil', t => {
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
-		[
+		transformFlatArray([
 			[6, 7, 4, 9, 2, 8, 1, 5, 3],
 			[1, 5, 9, 6, 3, 7, 8, 2, 4],
 			[2, 3, 8, 5, 4, 1, 7, 9, 6],
@@ -231,7 +240,7 @@ test('Sudoku#solve evil', t => {
 			[4, 8, 5, 3, 7, 9, 2, 6, 1],
 			[7, 2, 1, 8, 6, 4, 9, 3, 5],
 			[9, 6, 3, 2, 1, 5, 4, 7, 8],
-		].flat(),
+		]),
 	);
 
 	t.true(s.isSolved());
@@ -259,7 +268,7 @@ test('Sudoku#solve expert', t => {
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
-		[
+		transformFlatArray([
 			[3, 5, 1, 9, 8, 4, 6, 7, 2],
 			[4, 6, 9, 2, 5, 7, 8, 3, 1],
 			[2, 8, 7, 6, 1, 3, 5, 4, 9],
@@ -269,7 +278,7 @@ test('Sudoku#solve expert', t => {
 			[6, 9, 2, 3, 7, 8, 4, 1, 5],
 			[7, 3, 4, 5, 6, 1, 9, 2, 8],
 			[8, 1, 5, 4, 2, 9, 7, 6, 3],
-		].flat(),
+		]),
 	);
 
 	t.true(s.isSolved());
@@ -281,7 +290,7 @@ test('Sudoku#solve tough 16x16', t => {
 	// https://puzzlemadness.co.uk/16by16giantsudoku/tough/2022/1/7
 	// (https://i.imgur.com/SClE7Yf.png)
 	const s = Sudoku.fromPrefilled(
-		[
+		transformChunkedArray([
 			[_, 11, _, 4, _, _, 5, _, _, _, 3, _, _, 16, 8],
 			[1, 10, _, _, 14, 12, _, _, _, _, _, 15, 9, _, 3, 13],
 			[8, 9, 15, _, _, _, 11, _, 13, _, 7, _, _, _, _, 14],
@@ -298,15 +307,17 @@ test('Sudoku#solve tough 16x16', t => {
 			[_, 7, _, 3, _, 11, _, 2, _, 16, _, 1, 5, 9],
 			[_, _, _, _, 5, _, 6, _, _, _, _, 11, _, 3],
 			[_, _, _, 10, _, _, _, 13, 9, 8],
-		],
+		]),
 		16,
 	);
+
+	s.shouldLogErrors = true;
 
 	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
 		s.getCells().map(cell => cell.content),
-		[
+		transformFlatArray([
 			[2, 11, 12, 4, 7, 13, 5, 6, 1, 9, 3, 14, 15, 16, 8, 10],
 			[1, 10, 7, 16, 14, 12, 2, 8, 5, 11, 6, 15, 9, 4, 3, 13],
 			[8, 9, 15, 5, 3, 16, 11, 1, 13, 4, 7, 10, 2, 6, 12, 14],
@@ -323,7 +334,7 @@ test('Sudoku#solve tough 16x16', t => {
 			[15, 7, 8, 3, 4, 11, 12, 2, 14, 16, 10, 1, 5, 9, 13, 6],
 			[12, 13, 1, 9, 5, 10, 6, 16, 7, 15, 4, 11, 8, 3, 14, 2],
 			[6, 5, 11, 10, 1, 14, 3, 13, 9, 8, 12, 2, 4, 15, 16, 7],
-		].flat(),
+		]),
 	);
 
 	t.true(s.isSolved());
@@ -385,8 +396,8 @@ test('Sudoku#subscribe', t => {
 	t.plan(2);
 
 	const callback = (sudoku: Sudoku): void => {
-		t.is(sudoku.getCell(3 * 9 + 2).content, 2);
-		t.is(sudoku.getCell(4 * 9 + 1).content, 4);
+		t.is(sudoku.getCell(3 * 9 + 2).content, 1);
+		t.is(sudoku.getCell(4 * 9 + 1).content, 3);
 	};
 
 	// Callback shouldn't (can't) fire
@@ -407,11 +418,11 @@ test('Sudoku#unsubscribe', t => {
 	// Callback2 will not and as such fire four times
 
 	const callback1 = (): void => {
-		t.is(s.getContent(3 * 9 + 2), 2);
+		t.is(s.getContent(3 * 9 + 2), '2');
 	};
 
 	const callback2 = (): void => {
-		t.is(s.getContent(3 * 9 + 2), 2);
+		t.is(s.getContent(3 * 9 + 2), '2');
 	};
 
 	s.subscribe(callback1).subscribe(callback2);
@@ -584,7 +595,7 @@ test('Sudoku#clone 9x9', t => {
 
 test('Sudoku#clone 16x16', t => {
 	const s = Sudoku.fromPrefilled(
-		[
+		transformChunkedArray([
 			[2, 11, 12, 4, 7, 13, 5, 6, 1, 9, 3, 14, 15, 16, 8, 10],
 			[1, 10, 7, 16, 14, 12, 2, 8, 5, 11, 6, 15, 9, 4, 3, 13],
 			[8, 9, 15, 5, 3, 16, 11, 1, 13, 4, 7, 10, 2, 6, 12, 14],
@@ -601,7 +612,7 @@ test('Sudoku#clone 16x16', t => {
 			[15, 7, 8, 3, 4, 11, 12, 2, 14, 16, 10, 1, 5, 9, 13, 6],
 			[12, 13, 1, 9, 5, 10, 6, 16, 7, 15, 4, 11, 8, 3, 14, 2],
 			[6, 5, 11, 10, 1, 14, 3, 13, 9, 8, 12, 2, 4, 15, 16, 7],
-		],
+		]),
 		16,
 	);
 

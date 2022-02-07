@@ -23,7 +23,7 @@ test('removeByContent should solve [[1, 2, 3], [4, 5, 6], [_, 8, 9] (block) corr
 		[
 			[1, 2, 3],
 			[4, 5, 6],
-			[_, 8, 9],
+			[_, 8, 0],
 		],
 		9,
 	);
@@ -40,7 +40,7 @@ test('removeByContent should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (blo
 		[
 			[1, 2, 3],
 			[_, _, 6],
-			[7, 8, 9],
+			[7, 8, 0],
 		],
 		9,
 	);
@@ -57,7 +57,7 @@ test('removeByContent should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (blo
 
 test('removeByContent should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.', t => {
 	const sudoku = Sudoku.fromPrefilled(
-		[_, 2, 5, 3, 8, 9, 4, 7, 6].map(item => [item]),
+		[_, 2, 5, 3, 8, 0, 4, 7, 6].map(item => [item]),
 		9,
 	);
 
@@ -79,13 +79,13 @@ test('removeByContent should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', t
 	const cell1 = sudoku.getCell(0);
 	const cell2 = sudoku.getCell(8 * 9);
 
-	t.deepEqual(cell1.candidates, new Set([6, 9]));
+	t.deepEqual(cell1.candidates, new Set([0, 6]));
 
-	t.deepEqual(cell2.candidates, new Set([6, 9]));
+	t.deepEqual(cell2.candidates, new Set([0, 6]));
 });
 
 test('removeByContent should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.', t => {
-	const sudoku = Sudoku.fromPrefilled([[1, 2, 3, _, 5, 6, 7, 8, 9]], 9);
+	const sudoku = Sudoku.fromPrefilled([[1, 2, 3, _, 5, 6, 7, 8, 0]], 9);
 
 	removeByContent(sudoku);
 
@@ -103,7 +103,7 @@ test('removeByContent should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', t => {
 	const cell1 = sudoku.getCell(5);
 	const cell2 = sudoku.getCell(7);
 
-	t.deepEqual(cell1.candidates, new Set([4, 9]));
+	t.deepEqual(cell1.candidates, new Set([0, 4]));
 
-	t.deepEqual(cell2.candidates, new Set([4, 9]));
+	t.deepEqual(cell2.candidates, new Set([0, 4]));
 });
