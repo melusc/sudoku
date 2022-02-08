@@ -58,18 +58,28 @@ export class Sudoku {
 		const s = new Sudoku(size);
 
 		for (const [rowIndex, row] of cells.entries()) {
+			// Even though it would also throw in s.getCell
+			// this throws a more useful error
+			inRangeIncl(0, size - 1, rowIndex);
+
 			if (!row) {
 				continue;
 			}
 
 			for (const [colIndex, content] of row.entries()) {
+				inRangeIncl(0, size - 1, colIndex);
+
 				// prettier-ignore
 				const cellIndex = (rowIndex * size) + colIndex;
 				const cell = s.getCell(cellIndex);
 				if (isReadonlyArray(content)) {
+					for (const candidate of content) {
+						inRangeIncl(0, size - 1, candidate);
+					}
+
 					cell.candidates = new Set(content);
 				} else if (content !== undefined) {
-					s.setContent(cellIndex, content);
+					s.setContent(cell, content);
 				}
 			}
 		}
@@ -104,6 +114,10 @@ export class Sudoku {
 			throw new TypeError('Expected size to be a square of an integer.');
 		}
 
+		if (size <= 0) {
+			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
+		}
+
 		this.blockWidth = blockWidth;
 
 		const amountCells = size ** 2;
@@ -116,14 +130,16 @@ export class Sudoku {
 
 		if (typeof content === 'number') {
 			if (Number.isInteger(content)) {
+				inRangeIncl(0, this.size - 1, content);
+
 				cell.setContent(content);
 			} else {
-				cell.clear();
+				throw new TypeError(`content was not an integer: ${content}`);
 			}
 		} else {
 			const index = Sudoku.alphabet.indexOf(content.toUpperCase());
 			if (index === -1) {
-				cell.clear();
+				throw new Error(`content was not in alphabet: "${content}"`);
 			} else {
 				cell.setContent(index);
 			}

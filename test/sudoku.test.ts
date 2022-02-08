@@ -10,11 +10,31 @@ test('Sudoku should be a class', t => {
 	t.is(typeof new Sudoku(9), 'object');
 });
 
-test('Sudoku#setContent', t => {
+test('Sudoku#setContent valid content', t => {
 	const s = new Sudoku(9);
 	s.setContent(0, '4');
 
 	t.is(s.getContent(0), '4');
+
+	s.setContent(0, 4); // because '1' is 0, '2' is 1 ...
+	t.is(s.getContent(0), '5');
+});
+
+test('Sudoku#setContent invalid content', t => {
+	const s = new Sudoku(9);
+	t.throws(
+		() => {
+			s.setContent(0, '.');
+		},
+		{message: /not in alphabet: "\."$/},
+	);
+
+	t.throws(
+		() => {
+			s.setContent(0, 9);
+		},
+		{message: /9/},
+	);
 });
 
 test('Sudoku#getContent', t => {
@@ -23,10 +43,6 @@ test('Sudoku#getContent', t => {
 
 	s.setContent(8 * 9 + 8, '4');
 	t.is(s.getContent(8 * 9 + 8), '4');
-
-	s.setContent(8 * 9 + 8, '.');
-	t.is(s.getContent(8 * 9 + 8), undefined);
-	t.is(s.getCell(8 * 9 + 8).candidates.size, 16);
 
 	s.setContent(0, 'A');
 	t.is(s.getContent(0), 'A');
@@ -442,7 +458,7 @@ test('Sudoku#cellsIndividuallyValidByStructure', t => {
 	// ====
 
 	s = new Sudoku(9);
-	s.setContent(2, 'Hello there');
+	s.getCell(2).setContent(9);
 	t.is(s.getContent(2), undefined);
 	t.true(
 		s.cellsIndividuallyValidByStructure(),
@@ -620,6 +636,64 @@ test('Sudoku#clone 16x16', t => {
 
 	t.deepEqual(getComparableCells(cloned), getComparableCells(s));
 	t.not(cloned, s);
+});
+
+test('Sudoku.fromPrefilled valid sudoku', t => {
+	const s = Sudoku.fromPrefilled(
+		[
+			[0, 1, 2, 3],
+			[0, 1, 2, 3],
+			[0, 1, 2, 3],
+			[0, 1, 2, 3],
+		],
+		4,
+	);
+
+	for (let i = 0; i < s.size; ++i) {
+		const row = s.getRow(i);
+		t.deepEqual(
+			row.map(cell => cell.content),
+			[0, 1, 2, 3],
+		);
+	}
+});
+
+test('Sudoku.fromPrefilled too many cols', t => {
+	t.throws(
+		() => {
+			Sudoku.fromPrefilled(
+				[
+					[0, 1, 2, 3, 4],
+					[0, 1, 2, 3, 4],
+					[0, 1, 2, 3, 4],
+				],
+				4,
+			);
+		},
+		{
+			message: /4/, // 4 is index, not number
+		},
+	);
+});
+
+test('Sudoku.fromPrefilled too many rows', t => {
+	t.throws(
+		() => {
+			Sudoku.fromPrefilled(
+				[
+					[0, 1, 2, 3],
+					[0, 1, 2, 3],
+					[0, 1, 2, 3],
+					[0, 1, 2, 3],
+					[0, 1, 2, 3],
+				],
+				4,
+			);
+		},
+		{
+			message: /4/,
+		},
+	);
 });
 
 test('inRangeIncl', t => {
