@@ -111,10 +111,8 @@ export class Sudoku {
 		this.#cells = Array.from({length: amountCells}, () => new Cell(size));
 	}
 
-	setContent = (index: number, content: string | number): this => {
-		inRangeIncl(0, this.amountCells - 1, index);
-
-		const cell = this.#cells[index]!;
+	setContent = (cellOrIndex: number | Cell, content: string | number): this => {
+		const cell = this.getCell(cellOrIndex);
 
 		if (typeof content === 'number') {
 			if (Number.isInteger(content)) {
@@ -136,8 +134,8 @@ export class Sudoku {
 		return this.#dispatch('change');
 	};
 
-	getContent = (index: number): string | undefined => {
-		const {content} = this.getCell(index);
+	getContent = (cellOrIndex: number | Cell): string | undefined => {
+		const {content} = this.getCell(cellOrIndex);
 
 		if (content === undefined) {
 			return content;
@@ -146,7 +144,7 @@ export class Sudoku {
 		return Sudoku.alphabet[content];
 	};
 
-	clearCell = (index: number): this => {
+	clearCell = (index: number | Cell): this => {
 		const cell = this.getCell(index);
 		cell.customValid = true;
 		cell.clear();
@@ -172,7 +170,7 @@ export class Sudoku {
 		const result: Cells = [];
 
 		for (let index = col; index < this.amountCells; index += this.size) {
-			result.push(this.#cells[index]!);
+			result.push(this.getCell(index));
 		}
 
 		return result;
@@ -207,7 +205,11 @@ export class Sudoku {
 		return result;
 	});
 
-	getCell = (index: number): Cell => {
+	getCell = (index: number | Cell): Cell => {
+		if (index instanceof Cell) {
+			return index;
+		}
+
 		inRangeIncl(0, this.amountCells - 1, index);
 
 		return this.#cells[index]!;
@@ -216,7 +218,9 @@ export class Sudoku {
 	getCells = (): ReadonlyCells => this.#cells;
 
 	/** @internal */
-	#checkCellCandidates = (cell: Cell): this => {
+	#checkCellCandidates = (cellOrIndex: number | Cell): this => {
+		const cell = this.getCell(cellOrIndex);
+
 		if (cell.content !== undefined) {
 			return this;
 		}
@@ -239,21 +243,26 @@ export class Sudoku {
 	};
 
 	/** @internal */
-	removeCandidate = (cell: Cell, toRemove: number): this => {
-		const {candidates} = cell;
+	removeCandidate = (cellOrIndex: number | Cell, toRemove: number): this => {
+		const {candidates} = this.getCell(cellOrIndex);
 
 		if (candidates.has(toRemove)) {
 			this.anyChanged ||= true;
 			candidates.delete(toRemove);
 
-			this.#checkCellCandidates(cell);
+			this.#checkCellCandidates(cellOrIndex);
 		}
 
 		return this;
 	};
 
 	/** @internal */
-	overrideCandidates = (cell: Cell, candidates: Set<number>): this => {
+	overrideCandidates = (
+		cellOrIndex: number | Cell,
+		candidates: Set<number>,
+	): this => {
+		const cell = this.getCell(cellOrIndex);
+
 		let anyChanged = false;
 		for (const candidate of cell.candidates) {
 			if (!candidates.has(candidate)) {
