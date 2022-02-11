@@ -3,7 +3,7 @@ import {bitCount, bitIndex} from '../../src/plugins/shared.js';
 
 test('bitCount', t => {
 	const smallNumbers = Array.from({length: 4096}, (_v, i) => BigInt(i));
-	const bigNumbers: Array<bigint> = [
+	const bigNumbers: bigint[] = [
 		1n << 256n,
 		(1n << 256n) - 1n,
 		0x21_89_41_AB_C8n,
