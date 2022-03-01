@@ -735,8 +735,10 @@ test('Sudoku.fromString invalid character', t => {
 test('Sudoku#toString should produce a valid string', t => {
 	const s = new Sudoku(16);
 
-	for (let i = 0; i < 16 ** 2; ++i) {
-		s.setContent(i, randomInt(16));
+	// Only fill every second cell to also test
+	// stringifying empty cells
+	for (let i = 0; i < s.size ** 2; i += 2) {
+		s.setContent(i, randomInt(s.size));
 	}
 
 	// Test by passing it to Sudoku.fromString
