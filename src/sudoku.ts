@@ -88,6 +88,19 @@ export class Sudoku {
 		return s;
 	};
 
+	static fromString = (input: string, size: number): Sudoku => {
+		const sudoku = new Sudoku(size);
+
+		for (let i = 0; i < input.length; ++i) {
+			const char = input.charAt(i);
+			if (char !== ' ') {
+				sudoku.setContent(i, input.charAt(i));
+			}
+		}
+
+		return sudoku;
+	};
+
 	readonly #subscriptions: Set<SubscriptionCallback> = new Set();
 
 	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
@@ -473,6 +486,16 @@ export class Sudoku {
 		}
 
 		return rows;
+	};
+
+	toString = (): string => {
+		const result: string[] = [];
+
+		for (const cell of this.getCells()) {
+			result.push(this.getContent(cell) ?? ' ');
+		}
+
+		return result.join('');
 	};
 
 	clone = (): Sudoku => {

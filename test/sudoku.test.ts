@@ -1,3 +1,5 @@
+import {randomInt} from 'node:crypto';
+
 import test from 'ava';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
@@ -693,6 +695,55 @@ test('Sudoku.fromPrefilled too many rows', t => {
 		{
 			message: /4/,
 		},
+	);
+});
+
+test('Sudoku.fromString valid sudoku', t => {
+	const s = Sudoku.fromString('1234'.repeat(4), 4);
+
+	for (let i = 0; i < s.size; ++i) {
+		const row = s.getRow(i);
+		t.deepEqual(
+			row.map(cell => cell.content),
+			[0, 1, 2, 3],
+		);
+	}
+});
+
+test('Sudoku.fromString too long', t => {
+	t.throws(
+		() => {
+			Sudoku.fromString('1234'.repeat(5), 4);
+		},
+		{
+			message: /16/,
+		},
+	);
+});
+
+test('Sudoku.fromString invalid character', t => {
+	t.throws(
+		() => {
+			Sudoku.fromString('1234ü', 4);
+		},
+		{
+			message: /"ü"/i,
+		},
+	);
+});
+
+test('Sudoku#toString should produce a valid string', t => {
+	const s = new Sudoku(16);
+
+	for (let i = 0; i < 16 ** 2; ++i) {
+		s.setContent(i, randomInt(16));
+	}
+
+	// Test by passing it to Sudoku.fromString
+	// and making sure that the two sudokus are equal
+	t.deepEqual(
+		getComparableCells(Sudoku.fromString(s.toString(), 16)),
+		getComparableCells(s),
 	);
 });
 
