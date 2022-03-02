@@ -7,7 +7,7 @@ export type Cell = {
 };
 export type ReadonlyCells = readonly Cell[];
 
-export type Structure = ReadonlyCells & {contents: Record<number, number>};
+type Structure = ReadonlyCells & {contents: Record<number, number>};
 
 type PrefilledSudoku = ReadonlyArray<
 	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
@@ -32,7 +32,7 @@ enum SolveTypes {
 	error,
 }
 
-export const generateEmptyCellCandidates = (size: number): Set<number> =>
+const generateEmptyCellCandidates = (size: number): Set<number> =>
 	new Set(Array.from({length: size}, (_v, index) => index));
 
 // Using a proxy means there's no need to check for undefined every single time, only check it once here

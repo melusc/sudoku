@@ -1,1 +1,6 @@
-export {type SubscriptionCallback, Sudoku} from './sudoku.js';
+export {
+	type SubscriptionCallback,
+	Sudoku,
+	type Cell,
+	type ReadonlyCells,
+} from './sudoku.js';
