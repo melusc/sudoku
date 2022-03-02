@@ -1,5 +1,4 @@
-import type {ReadonlyCells} from '../cell.js';
-import type {Sudoku} from '../sudoku.js';
+import type {Sudoku, ReadonlyCells} from '../sudoku.js';
 
 // From https://stackoverflow.com/q/43122082/13249743
 const bitCount32 = (n: bigint): bigint => {

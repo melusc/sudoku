@@ -1,10 +1,13 @@
-import {
-	Cell,
-	type Cells,
-	generateEmptyCellCandidates,
-	type ReadonlyCells,
-} from './cell.js';
 import * as plugins from './plugins/index.js';
+
+export type Cell = {
+	content: number | undefined;
+	candidates: Set<number>;
+	readonly index: number;
+};
+export type ReadonlyCells = readonly Cell[];
+
+export type Structure = ReadonlyCells & {contents: Record<number, number>};
 
 type PrefilledSudoku = ReadonlyArray<
 	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
@@ -29,19 +32,51 @@ enum SolveTypes {
 	error,
 }
 
-const makeStructureCacher = <T = unknown, R = unknown>(
-	fn: (arg0: T) => R,
-): ((arg0: T) => R) => {
-	const cache = new Map<T, R>();
-	return (arg: T): R => {
-		if (cache.has(arg)) {
-			return cache.get(arg)!;
+export const generateEmptyCellCandidates = (size: number): Set<number> =>
+	new Set(Array.from({length: size}, (_v, index) => index));
+
+// Using a proxy means there's no need to check for undefined every single time, only check it once here
+// It also allows to simply do `contents[number]++` without checking for undefined
+const makeContentsRecord = (): Record<number, number> =>
+	new Proxy<Record<number, number>>(
+		{},
+		{
+			get(target, key): number {
+				return (Reflect.get(target, key) as number | undefined) ?? 0;
+			},
+			set(target, key: string, value): boolean {
+				if (value < 0) {
+					throw new Error(`${key} , value < 0`);
+				}
+
+				return Reflect.set(target, key, value);
+			},
+		},
+	);
+
+const makeStructureCacher = (
+	fn: (index: number) => ReadonlyCells,
+): ((index: number) => Structure) => {
+	const cache = new Map<number, Structure>();
+	return (index: number): Structure => {
+		if (cache.has(index)) {
+			return cache.get(index)!;
 		}
 
-		const result = fn(arg);
-		cache.set(arg, result);
+		const result = fn(index);
 
-		return result;
+		const contents = makeContentsRecord();
+
+		for (const {content} of result) {
+			if (content !== undefined) {
+				++contents[content];
+			}
+		}
+
+		const merged = Object.assign(result, {contents});
+		cache.set(index, merged);
+
+		return merged;
 	};
 };
 
@@ -135,32 +170,49 @@ export class Sudoku {
 
 		const amountCells = size ** 2;
 		this.amountCells = amountCells;
-		this.#cells = Array.from({length: amountCells}, () => new Cell(size));
+		this.#cells = Array.from({length: amountCells}, (_v, index) => ({
+			content: undefined,
+			candidates: generateEmptyCellCandidates(size),
+			index,
+		}));
 	}
 
 	setContent = (cellOrIndex: number | Cell, content: string | number): this => {
 		const cell = this.getCell(cellOrIndex);
 
-		if (typeof content === 'number') {
-			if (Number.isInteger(content)) {
-				inRangeIncl(0, this.size - 1, content);
-
-				cell.setContent(content);
-			} else {
-				throw new TypeError(`content was not an integer: ${content}`);
-			}
-		} else {
+		if (typeof content === 'string') {
 			const index = Sudoku.alphabet.indexOf(content.toUpperCase());
 			if (index === -1) {
 				throw new Error(`content was not in alphabet: "${content}"`);
-			} else {
-				cell.setContent(index);
 			}
+
+			return this.setContent(cell, index);
 		}
 
-		this.cellsIndividuallyValidByStructure();
+		if (Number.isInteger(content)) {
+			inRangeIncl(0, this.size - 1, content);
 
-		return this.#dispatch('change');
+			const previousContent = cell.content;
+
+			cell.candidates.clear();
+
+			for (const {contents} of this.getStructuresOfCell(cell)) {
+				++contents[content];
+
+				if (previousContent !== undefined) {
+					--contents[previousContent];
+				}
+			}
+
+			// If the structure is uninitialised contents will be updated there
+			// if it is initialised it won't be updated there
+			// Therefore always update it after getStructuresOfCell
+			cell.content = content;
+
+			return this.#dispatch('change');
+		}
+
+		throw new TypeError(`content was not an integer: ${content}`);
 	};
 
 	getContent = (cellOrIndex: number | Cell): string | undefined => {
@@ -175,18 +227,23 @@ export class Sudoku {
 
 	clearCell = (index: number | Cell): this => {
 		const cell = this.getCell(index);
-		cell.customValid = true;
-		cell.clear();
+		const {content} = cell;
 
-		this.cellsIndividuallyValidByStructure();
+		if (content !== undefined) {
+			for (const structure of this.getStructuresOfCell(cell)) {
+				--structure.contents[content];
+			}
+		}
+
+		cell.content = undefined;
+		cell.candidates = generateEmptyCellCandidates(this.size);
 
 		return this.#dispatch('change');
 	};
 
 	clearAllCells = (): this => {
 		for (const cell of this.#cells) {
-			cell.clear();
-			cell.customValid = true;
+			this.clearCell(cell);
 		}
 
 		return this.#dispatch('change');
@@ -196,7 +253,7 @@ export class Sudoku {
 	getCol = makeStructureCacher((col: number): ReadonlyCells => {
 		inRangeIncl(0, this.size - 1, col);
 
-		const result: Cells = [];
+		const result: Cell[] = [];
 
 		for (let index = col; index < this.amountCells; index += this.size) {
 			result.push(this.getCell(index));
@@ -221,7 +278,7 @@ export class Sudoku {
 		const colOffset = (index % blockWidth) * blockWidth;
 		const rowOffset = Math.floor(index / blockWidth) * blockWidth;
 
-		const result: Cells = [];
+		const result: Cell[] = [];
 
 		for (let index_ = 0; index_ < size; ++index_) {
 			const row = rowOffset + Math.floor(index_ / blockWidth);
@@ -235,13 +292,13 @@ export class Sudoku {
 	});
 
 	getCell = (index: number | Cell): Cell => {
-		if (index instanceof Cell) {
-			return index;
+		if (typeof index === 'number') {
+			inRangeIncl(0, this.amountCells - 1, index);
+
+			return this.#cells[index]!;
 		}
 
-		inRangeIncl(0, this.amountCells - 1, index);
-
-		return this.#cells[index]!;
+		return index;
 	};
 
 	getCells = (): ReadonlyCells => this.#cells;
@@ -263,7 +320,7 @@ export class Sudoku {
 		}
 
 		if (cell.candidates.size === 1) {
-			cell.setContent(cell.candidates.values().next().value as number);
+			this.setContent(cell, [...cell.candidates][0]!);
 			this.anyChanged ||= true;
 			this.#dispatch('change');
 		}
@@ -332,7 +389,7 @@ export class Sudoku {
 
 		for (const cell of this.#cells) {
 			if (cell.content === undefined) {
-				cell.clear(); // Reset candidates
+				this.clearCell(cell); // Reset candidates
 			}
 		}
 
@@ -375,7 +432,7 @@ export class Sudoku {
 		return this;
 	};
 
-	* eachStructure(): Iterable<ReadonlyCells> {
+	* eachStructure(): Iterable<Structure> {
 		for (const structureGetter of [this.getCol, this.getRow, this.getBlock]) {
 			for (let i = 0; i < this.size; ++i) {
 				yield structureGetter(i);
@@ -384,19 +441,54 @@ export class Sudoku {
 	}
 
 	/** @internal */
-	cellsIndividuallyValidByStructure = (): boolean => {
+	cellsIndividuallyValid = (): boolean => {
 		for (const cell of this.#cells) {
-			cell.customValid = true;
+			if (!this.isCellValid(cell)) {
+				this.logError('cell was not valid', [cell]);
+
+				return false;
+			}
 		}
 
-		for (const structure of this.eachStructure()) {
-			this._setValiditiesByStructure(structure);
+		return true;
+	};
+
+	/** @internal */
+	* getStructuresOfCell(cellOrIndex: number | Cell): Iterable<Structure> {
+		const cell = this.getCell(cellOrIndex);
+
+		const {index} = cell;
+
+		const colIndex = index % this.size;
+		const rowIndex = Math.floor(index / this.size);
+		// prettier-ignore
+		const blockIndex
+			= Math.floor(colIndex / this.blockWidth)
+			+ (Math.floor(rowIndex / this.blockWidth) * this.blockWidth);
+
+		yield this.getCol(colIndex);
+		yield this.getRow(rowIndex);
+		yield this.getBlock(blockIndex);
+	}
+
+	isCellValid = (cellOrIndex: number | Cell): boolean => {
+		const cell = this.getCell(cellOrIndex);
+
+		// Invalid cases:
+		//   cell.content === undefined && cell.candidates.size === 0
+		//   cell.content !== undefined && cell.candidates.size > 0
+		if ((cell.content === undefined) === (cell.candidates.size === 0)) {
+			return false;
 		}
 
-		for (const [index, cell] of this.#cells.entries()) {
-			if (!cell.valid) {
-				this.logError('cell was not valid', [index, cell]);
+		const {content} = cell;
 
+		if (content === undefined) {
+			return true;
+		}
+
+		for (const {contents} of this.getStructuresOfCell(cell)) {
+			if (contents[content]! > 1) {
 				return false;
 			}
 		}
@@ -425,37 +517,11 @@ export class Sudoku {
 			}
 		}
 
-		return this.cellsIndividuallyValidByStructure();
-	};
-
-	/** @internal */
-	_setValiditiesByStructure = (structure: ReadonlyCells): this => {
-		const found = new Map<number, Cell>();
-
-		// For every content add the cell to `found`
-		// If a second cell is found, that means that there are duplicates
-		// so both are invalid
-
-		for (const cell of structure) {
-			const {content} = cell;
-
-			if (content !== undefined) {
-				const previousCell = found.get(content);
-
-				if (previousCell) {
-					previousCell.customValid = false;
-					cell.customValid = false;
-				} else {
-					found.set(content, cell);
-				}
-			}
-		}
-
-		return this;
+		return this.cellsIndividuallyValid();
 	};
 
 	isSolved = (): boolean => {
-		if (!this.cellsIndividuallyValidByStructure()) {
+		if (!this.isValid()) {
 			return false;
 		}
 

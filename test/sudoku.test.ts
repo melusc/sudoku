@@ -136,8 +136,6 @@ test('Sudoku#getCells', t => {
 	for (const cell of cells1) {
 		t.is(cell.content, undefined);
 
-		t.is(typeof cell.key, 'string');
-
 		t.is(cell.candidates.size, 9);
 	}
 
@@ -432,8 +430,8 @@ test('Sudoku#unsubscribe', t => {
 
 	t.plan(3);
 
-	// Callback1 will be unsubscribed and as such only fire twice
-	// Callback2 will not and as such fire four times
+	// Callback1 will be unsubscribed and as such only fire once
+	// Callback2 will not and as such fire twice times
 
 	const callback1 = (): void => {
 		t.is(s.getContent(3 * 9 + 2), '2');
@@ -452,56 +450,87 @@ test('Sudoku#unsubscribe', t => {
 	s.setContent(4 * 9 + 1, '4');
 });
 
-test('Sudoku#cellsIndividuallyValidByStructure', t => {
-	let s = new Sudoku(9);
+test('Sudoku#cellsIndividuallyValid empty sudoku', t => {
+	const s = new Sudoku(9);
 
-	t.true(s.cellsIndividuallyValidByStructure(), 'Empty sudoku should be valid');
-
-	// ====
-
-	s = new Sudoku(9);
-	s.getCell(2).setContent(9);
-	t.is(s.getContent(2), undefined);
-	t.true(
-		s.cellsIndividuallyValidByStructure(),
-		'A sudoku with an invalid cell should return false',
-	);
-	s.setContent(2, '2');
-	t.true(
-		s.cellsIndividuallyValidByStructure(),
-		'It should return true after fixing an invalid cell',
-	);
-
-	// ====
-
-	s = new Sudoku(9);
-	s.setContent(2, '3').setContent(3, '3');
-	t.false(
-		s.cellsIndividuallyValidByStructure(),
-		'A sudoku with duplicates should return false (1)',
-	);
-	s.clearCell(3);
-	t.true(
-		s.cellsIndividuallyValidByStructure(),
-		'After clearing the duplicate cell it should return true',
-	);
-
-	// ====
-
-	s = new Sudoku(9);
-	s.setContent(2, '3').setContent(3, '3');
-	t.false(
-		s.cellsIndividuallyValidByStructure(),
-		'A sudoku with duplicates should return false (2)',
-	);
-	s.setContent(3, '4');
-	t.true(
-		s.cellsIndividuallyValidByStructure(),
-		'After overwriting the duplicate cell it should return true',
-	);
+	t.true(s.cellsIndividuallyValid());
 });
 
-test('Sudoku#overrideCandidates new set equal old set', t => {
+test('Sudoku#cellsIndividuallyValid duplicates', t => {
+	const s = new Sudoku(9);
+
+	s.setContent(0, '1').setContent(1, '1');
+
+	t.false(s.cellsIndividuallyValid());
+});
+
+test('Sudoku#isCellValid valid cell', t => {
+	const s = new Sudoku(9);
+
+	t.true(s.isCellValid(0));
+});
+
+test('Sudoku#isCellValid empty candidates no content', t => {
+	const s = new Sudoku(9);
+	const cell = s.getCell(0);
+	cell.candidates.clear();
+	t.false(s.isCellValid(cell));
+});
+
+test('Sudoku#isCellValid content and candidates', t => {
+	const s = new Sudoku(9);
+	const cell = s.getCell(0);
+	cell.content = 3;
+	t.false(s.isCellValid(cell));
+});
+
+test('Sudoku#isCellValid duplicate in row', t => {
+	const s = new Sudoku(9);
+	// The cells only share the same row
+	s.setContent(0, 1).setContent(7, 1);
+	t.false(s.isCellValid(0));
+});
+
+test('Sudoku#isCellValid duplicate in col', t => {
+	const s = new Sudoku(9);
+	// The cells only share the same col
+	s.setContent(0, 1).setContent(72, 1);
+	t.false(s.isCellValid(0));
+});
+
+test('Sudoku#isCellValid duplicate in block', t => {
+	const s = new Sudoku(9);
+	// The cells only share the same block
+	s.setContent(0, 1).setContent(10, 1);
+	t.false(s.isCellValid(0));
+});
+
+test('Sudoku#isValid empty Sudoku', t => {
+	const s = new Sudoku(16);
+
+	t.true(s.isValid());
+});
+
+test('Sudoku#isValid First row has no "1" anywhere', t => {
+	const s = new Sudoku(9);
+
+	for (const c of s.getRow(0)) {
+		c.candidates.delete(0);
+	}
+
+	t.false(s.isValid());
+});
+
+// Duplicate, because #isCellValid / #cellsIndividuallyValid already cover this
+// but just test to make sure #isValid always calls them
+test('Sudoku#isValid First row has duplicates', t => {
+	const s = new Sudoku(9);
+	s.setContent(0, 1).setContent(1, 1);
+
+	t.false(s.isValid());
+});
+
+test('Sudoku#overrideCandidates new set equal to old set', t => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));

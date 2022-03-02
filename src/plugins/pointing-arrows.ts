@@ -1,5 +1,4 @@
-import type {ReadonlyCells} from '../cell.js';
-import type {Sudoku} from '../sudoku.js';
+import type {Sudoku, ReadonlyCells} from '../sudoku.js';
 import {bitCount, bitIndex} from './shared.js';
 
 const clearSection = (
