@@ -7,7 +7,7 @@ export type Cell = {
 };
 export type ReadonlyCells = readonly Cell[];
 
-type Structure = ReadonlyCells & {contents: Record<number, number>};
+export type Structure = ReadonlyCells & {contents: Record<number, number>};
 
 type PrefilledSudoku = ReadonlyArray<
 	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
@@ -47,6 +47,11 @@ const makeContentsRecord = (): Record<number, number> =>
 			set(target, key: string, value): boolean {
 				if (value < 0) {
 					throw new Error(`${key} , value < 0`);
+				}
+
+				if (value === 0) {
+					Reflect.deleteProperty(target, key);
+					return true;
 				}
 
 				return Reflect.set(target, key, value);

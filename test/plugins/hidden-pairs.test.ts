@@ -123,3 +123,42 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 		],
 	);
 });
+
+test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring "5".', t => {
+	/*
+	  It might see (3, 4, 5, 0) in #1..3, but it should know
+		that 5 already is a number in the structure and
+		should therefore ignore it, leaving (3, 4, 0)
+	*/
+
+	const s = Sudoku.fromPrefilled(
+		[
+			_,
+			_,
+			_,
+			_,
+			[
+				[3, 4, 5, 6, 8, 0], // #1
+				[1, 5, 7, 8],
+				5,
+				[1, 3, 4, 5, 7, 8, 0], // #2
+				[5, 7, 8],
+				[2, 3, 4, 5, 6, 0], // #3
+				[1, 6, 7, 8],
+				[1, 6, 7, 8],
+				[2, 5, 6, 8],
+			],
+		],
+		9,
+	);
+
+	hiddenPairs(s);
+
+	const wantedSet = new Set([3, 4, 0]);
+
+	t.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
+
+	t.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
+
+	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
+});

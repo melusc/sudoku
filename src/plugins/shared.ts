@@ -1,4 +1,4 @@
-import type {Sudoku, ReadonlyCells} from '../sudoku.js';
+import type {Sudoku, Structure} from '../sudoku.js';
 
 // From https://stackoverflow.com/q/43122082/13249743
 const bitCount32 = (n: bigint): bigint => {
@@ -37,7 +37,7 @@ export const bitIndex = (n: bigint): number => {
 	return n.toString(2).length - 1;
 };
 
-export type VisitorFn = (structure: ReadonlyCells, sudoku: Sudoku) => void;
+export type VisitorFn = (structure: Structure, sudoku: Sudoku) => void;
 export const makeVisitor
 	= (cb: VisitorFn): ((sudoku: Sudoku) => void) =>
 	(sudoku: Sudoku): void => {

@@ -1,10 +1,12 @@
 import {makeVisitor} from './shared.js';
 
 export const removeByContent = makeVisitor((structure, sudoku) => {
-	for (const {content} of structure) {
-		if (content !== undefined) {
-			for (const cell of structure) {
-				sudoku.removeCandidate(cell, content);
+	const contents = Object.keys(structure.contents);
+
+	for (const cell of structure) {
+		if (cell.content === undefined) {
+			for (const content of contents) {
+				sudoku.removeCandidate(cell, Number(content));
 			}
 		}
 	}
