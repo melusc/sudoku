@@ -50,8 +50,7 @@ const makeContentsRecord = (): Record<number, number> =>
 				}
 
 				if (value === 0) {
-					Reflect.deleteProperty(target, key);
-					return true;
+					return Reflect.deleteProperty(target, key);
 				}
 
 				return Reflect.set(target, key, value);
@@ -147,6 +146,7 @@ export class Sudoku {
 
 	/** @internal */
 	anyChanged = false;
+	rounds = 0;
 
 	/** @internal */
 	readonly amountCells: number;
@@ -387,6 +387,8 @@ export class Sudoku {
 	};
 
 	solve = (): DispatchType => {
+		this.rounds = 0;
+
 		if (!this.isValid()) {
 			this.#dispatch('error');
 			return 'error';
@@ -399,8 +401,8 @@ export class Sudoku {
 		}
 
 		let shouldContinue: SolveTypes;
-
 		do {
+			++this.rounds;
 			shouldContinue = this.#singleSolve();
 		} while (shouldContinue === SolveTypes.changed);
 
