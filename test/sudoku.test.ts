@@ -450,6 +450,18 @@ test('Sudoku#unsubscribe', t => {
 	s.setContent(4 * 9 + 1, '4');
 });
 
+test('Sudoku#emit', t => {
+	const s = new Sudoku(9);
+
+	t.plan(1);
+
+	s.subscribe((_s, type) => {
+		t.is(type, 'change');
+	});
+
+	s.emit('change');
+});
+
 test('Sudoku#cellsIndividuallyValid empty sudoku', t => {
 	const s = new Sudoku(9);
 

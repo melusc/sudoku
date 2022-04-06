@@ -45,6 +45,8 @@ const makeClearStructure
 				sudoku.removeCandidate(struct[cellIndex]!, number);
 			}
 		}
+
+		sudoku.emit('change');
 	};
 
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */

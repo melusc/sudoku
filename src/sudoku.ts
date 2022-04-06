@@ -214,7 +214,7 @@ export class Sudoku {
 			// Therefore always update it after getStructuresOfCell
 			cell.content = content;
 
-			return this.#dispatch('change');
+			return this.emit('change');
 		}
 
 		throw new TypeError(`content was not an integer: ${content}`);
@@ -243,7 +243,7 @@ export class Sudoku {
 		cell.content = undefined;
 		cell.candidates = generateEmptyCellCandidates(this.size);
 
-		return this.#dispatch('change');
+		return this.emit('change');
 	};
 
 	clearAllCells = (): this => {
@@ -251,7 +251,7 @@ export class Sudoku {
 			this.clearCell(cell);
 		}
 
-		return this.#dispatch('change');
+		return this.emit('change');
 	};
 
 	// eslint-disable-next-line @typescript-eslint/member-ordering
@@ -327,7 +327,7 @@ export class Sudoku {
 		if (cell.candidates.size === 1) {
 			this.setContent(cell, [...cell.candidates][0]!);
 			this.anyChanged ||= true;
-			this.#dispatch('change');
+			this.emit('change');
 		}
 
 		return this;
@@ -390,7 +390,7 @@ export class Sudoku {
 		this.rounds = 0;
 
 		if (!this.isValid()) {
-			this.#dispatch('error');
+			this.emit('error');
 			return 'error';
 		}
 
@@ -415,7 +415,7 @@ export class Sudoku {
 			dispatchType = 'change';
 		}
 
-		this.#dispatch(dispatchType);
+		this.emit(dispatchType);
 		return dispatchType;
 	};
 
@@ -431,7 +431,8 @@ export class Sudoku {
 		return this;
 	};
 
-	#dispatch = (type: DispatchType): this => {
+	/** @internal */
+	emit = (type: DispatchType): this => {
 		for (const callback of this.#subscriptions) {
 			callback(this, type);
 		}

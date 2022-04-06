@@ -85,6 +85,8 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 
 			sudoku.overrideCandidates(cell, new Set(numbers));
 		}
+
+		sudoku.emit('change');
 	}
 };
 

@@ -8,6 +8,8 @@ export const removeByContent = makeVisitor((structure, sudoku) => {
 			for (const content of contents) {
 				sudoku.removeCandidate(cell, Number(content));
 			}
+
+			sudoku.emit('change');
 		}
 	}
 });

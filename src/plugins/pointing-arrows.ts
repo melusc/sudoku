@@ -16,6 +16,8 @@ const clearSection = (
 
 		sudoku.removeCandidate(cell, numberToRemove);
 	}
+
+	sudoku.emit('change');
 };
 
 export const pointingArrows = (sudoku: Sudoku): void => {

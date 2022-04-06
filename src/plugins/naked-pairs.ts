@@ -72,6 +72,8 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 				}
 			}
 		}
+
+		sudoku.emit('change');
 	}
 };
 
