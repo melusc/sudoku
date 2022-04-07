@@ -46,10 +46,12 @@ export const pointingArrows = (sudoku: Sudoku): void => {
 
 			if (content === undefined) {
 				for (const candidate of candidates) {
-					summary.set(candidate, (summary.get(candidate) ?? 0n) | key);
+					if (block.contents[candidate] === 0) {
+						summary.set(candidate, (summary.get(candidate) ?? 0n) | key);
+					}
 				}
 			} else {
-				summary.set(content, (summary.get(content) ?? 0n) | key);
+				summary.set(content, key);
 			}
 		}
 
@@ -58,14 +60,16 @@ export const pointingArrows = (sudoku: Sudoku): void => {
 			const colSection = key & rowOffset;
 			const rowSection = (key >> blockWidthBigInt) & rowOffset;
 
-			if (bitCount(colSection) === 1n && bitCount(rowSection) > 1) {
+			if (bitCount(colSection) === 1n) {
 				clearSection(
 					sudoku.getCol(blockColIndex + bitIndex(colSection)),
 					sudoku,
 					blockRowIndex,
 					number,
 				);
-			} else if (bitCount(rowSection) === 1n && bitCount(colSection) > 1) {
+			}
+
+			if (bitCount(rowSection) === 1n) {
 				clearSection(
 					sudoku.getRow(blockRowIndex + bitIndex(rowSection)),
 					sudoku,

@@ -67,7 +67,6 @@ const swordfishByType = (
 	for (let i = 0; i < sudoku.size; ++i) {
 		const structure = sudoku[getterName](i);
 		const currentIndex = new Map<number, bigint>();
-		const foundContent = new Set<number>();
 		indexedCells.set(i, currentIndex);
 
 		for (const [index, {candidates, content}] of structure.entries()) {
@@ -75,7 +74,7 @@ const swordfishByType = (
 				for (const candidate of candidates) {
 					// Ignore numbers that already exist as "content"
 					// These numbers will be removed from "candidates" soon, anyway
-					if (foundContent.has(candidate)) {
+					if (structure.contents[candidate] !== 0) {
 						continue;
 					}
 
@@ -84,9 +83,6 @@ const swordfishByType = (
 						(currentIndex.get(candidate) ?? 0n) | (1n << BigInt(index)),
 					);
 				}
-			} else {
-				foundContent.add(content);
-				currentIndex.delete(content);
 			}
 		}
 	}
