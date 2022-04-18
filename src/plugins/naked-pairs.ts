@@ -15,6 +15,7 @@ const throwSmallerThanAllowed = (key: bigint, indicesLength: number): void => {
 };
 
 const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
+	// All combinations of cells
 	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
 
 	for (const [index, {content, candidates}] of structure.entries()) {
@@ -22,6 +23,10 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 			continue;
 		}
 
+		/* Represent candidates as a number
+			 Key in binary from right, if nth-digit is 1 the candidates contain n
+			 Example: 10100 means it contains [2, 4]
+		*/
 		let key = 0n;
 		for (const candidate of candidates) {
 			key |= 1n << BigInt(candidate);
@@ -29,9 +34,11 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 
 		let exactMatchFound = false;
 
+		// For all previous combinations (because new ones get added before the loop is over)
 		for (let i = 0, l = equalKeys.length; i < l; ++i) {
 			const [numbersMask, indices] = equalKeys[i]!;
 
+			// If key is subset of previous key
 			if ((key & numbersMask) === key) {
 				indices.push(index);
 
@@ -55,7 +62,15 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 		throwSmallerThanAllowed(key, indices.length);
 
 		if (
+			/* No interesting information gained
+				 There aren't any cells to remove candidates from
+			*/
 			indices.length === sudoku.size
+			/* If there are more numbers in the naked pair
+				 than cells, not all numbers can be in the cells
+				 therefore the numbers can't safely be removed from the other cells
+				 because they /could/ be in the other cells
+			*/
 			|| bitCount(key) > BigInt(indices.length)
 		) {
 			continue;
