@@ -29,7 +29,9 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 		*/
 		let key = 0n;
 		for (const candidate of candidates) {
-			key |= 1n << BigInt(candidate);
+			if (structure.contents[candidate] === 0) {
+				key |= 1n << BigInt(candidate);
+			}
 		}
 
 		let exactMatchFound = false;
