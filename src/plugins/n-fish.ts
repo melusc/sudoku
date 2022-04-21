@@ -51,7 +51,7 @@ const makeClearStructure
 
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */
 
-const swordfishByType = (
+const nFishByStructure = (
 	sudoku: Sudoku,
 	getterName: 'getRow' | 'getCol',
 ): void => {
@@ -137,7 +137,7 @@ const swordfishByType = (
 	}
 };
 
-export const swordfish = (sudoku: Sudoku): void => {
-	swordfishByType(sudoku, 'getRow');
-	swordfishByType(sudoku, 'getCol');
+export const nFish = (sudoku: Sudoku): void => {
+	nFishByStructure(sudoku, 'getRow');
+	nFishByStructure(sudoku, 'getCol');
 };

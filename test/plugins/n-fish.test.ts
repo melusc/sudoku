@@ -1,5 +1,5 @@
 import test, {ExecutionContext} from 'ava';
-import {swordfish} from '../../src/plugins/swordfish.js';
+import {nFish} from '../../src/plugins/n-fish.js';
 import {Sudoku} from '../../src/sudoku.js';
 
 const makeCheck
@@ -15,7 +15,7 @@ const makeCheck
 		}
 	};
 
-test('regular swordfish #1', t => {
+test('regular n-fish #1', t => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[4, [1, 6], 2, [1, 7], 5, 3, 8, 0, [1, 7, 6]],
@@ -35,7 +35,7 @@ test('regular swordfish #1', t => {
 	);
 	const check = makeCheck(s, t);
 
-	swordfish(s);
+	nFish(s);
 	t.true(s.anyChanged);
 
 	check(1 * 9 + 0, [1, 7]); // was 1, 7
@@ -51,7 +51,7 @@ test('regular swordfish #1', t => {
 	check(4 * 9 + 6, [1, 3]); // was 1, 7
 });
 
-test('regular swordfish #2', t => {
+test('regular n-fish #2', t => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[[5, 6], [3, 5, 6], 2, [3, 4], 8, 1, [4, 5], 0, 7],
@@ -68,7 +68,7 @@ test('regular swordfish #2', t => {
 	);
 	const check = makeCheck(s, t);
 
-	swordfish(s);
+	nFish(s);
 	t.true(s.anyChanged);
 
 	check(0 * 9 + 1, [3, 6]);
@@ -90,7 +90,7 @@ test('regular swordfish #2', t => {
 	check(8 * 9 + 8, [3, 0]);
 });
 
-test('Swordfish with little intersecting', t => {
+test('n-fish with little intersecting', t => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[[1], 3, 3, [1], 3, 3, 3, 3, 3],
@@ -110,7 +110,7 @@ test('Swordfish with little intersecting', t => {
 
 	const check = makeCheck(s, t);
 
-	swordfish(s);
+	nFish(s);
 	t.true(s.anyChanged);
 
 	check(0 * 9 + 0, [1]);
