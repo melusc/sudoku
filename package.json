@@ -33,17 +33,17 @@
 	"scripts": {
 		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && xo --fix",
-		"build": "del-cli ./dist/lib/** && tsc",
+		"build": "rimraf dist/lib && tsc",
 		"test": "yarn run ava",
-		"pretest": "del-cli ./dist/test/** && tsc --project test/tsconfig.json"
+		"pretest": "rimraf dist/test && tsc --project test/tsconfig.json"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
 		"@lusc/tsconfig": "^1.0.0",
 		"@types/node": "^17.0.30",
 		"ava": "^4.2.0",
-		"del-cli": "^4.0.1",
 		"prettier": "^2.6.2",
+		"rimraf": "^3.0.2",
 		"typescript": "^4.6.4",
 		"xo": "^0.48.0"
 	},
