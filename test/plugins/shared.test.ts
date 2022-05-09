@@ -15,7 +15,6 @@ test('bitCount', t => {
 	}
 });
 
-// Implicitely testing bitCount as well
 test('bitIndex', t => {
 	let counter = 1n;
 
@@ -28,5 +27,11 @@ test('bitIndex', t => {
 test('bitIndex 3 should throw', t => {
 	t.throws(() => {
 		bitIndex(3n);
+	});
+});
+
+test('bitIndex 0 should throw', t => {
+	t.throws(() => {
+		bitIndex(0n);
 	});
 });

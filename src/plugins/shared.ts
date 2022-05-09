@@ -29,12 +29,28 @@ export const bitCount = (n: bigint): bigint => {
 	return bits;
 };
 
+const throwNotExactlyOneBit = (n: bigint): never => {
+	throw new TypeError(`${n} doesn't have exactly one bit.`);
+};
+
 export const bitIndex = (n: bigint): number => {
-	if (bitCount(n) !== 1n) {
-		throw new TypeError(`${n} doesn't have exactly one bit.`);
+	if (n === 0n) {
+		throwNotExactlyOneBit(n);
 	}
 
-	return n.toString(2).length - 1;
+	const n_ = n;
+	let index = 0;
+
+	while ((n & 1n) === 0n) {
+		n >>= 1n;
+		++index;
+	}
+
+	if (n !== 1n) {
+		throwNotExactlyOneBit(n_);
+	}
+
+	return index;
 };
 
 export type VisitorFn = (structure: Structure, sudoku: Sudoku) => void;
