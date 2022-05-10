@@ -10,7 +10,7 @@ const makeCheck
 		if (Array.isArray(expected)) {
 			t.deepEqual(s.getCell(index).candidates, new Set(expected));
 		} else {
-			t.is(cell.content, expected);
+			t.is(cell.element, expected);
 			t.is(cell.candidates.size, 0);
 		}
 	};

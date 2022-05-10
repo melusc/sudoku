@@ -27,12 +27,12 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// This is a lot better than comparing arrays of indexes
 	const summary = new Map<number, bigint>();
 
-	for (const [index, {content, candidates}] of structure.entries()) {
+	for (const [index, {element, candidates}] of structure.entries()) {
 		const pow = 1n << BigInt(index);
 
-		if (content === undefined) {
+		if (element === undefined) {
 			for (const candidate of candidates) {
-				if (structure.contents[candidate] === 0) {
+				if (structure.elements[candidate] === 0) {
 					summary.set(candidate, (summary.get(candidate) ?? 0n) | pow);
 				}
 			}

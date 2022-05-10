@@ -38,20 +38,20 @@ export const pointingArrows = (sudoku: Sudoku): void => {
     */
 		const summary = new Map<number, bigint>();
 
-		for (const [index, {content, candidates}] of block.entries()) {
+		for (const [index, {element, candidates}] of block.entries()) {
 			const row = BigInt(Math.trunc(index / blockWidth));
 			const col = BigInt(index % blockWidth);
 
 			const key = (1n << col) | (1n << (row + blockWidthBigInt));
 
-			if (content === undefined) {
+			if (element === undefined) {
 				for (const candidate of candidates) {
-					if (block.contents[candidate] === 0) {
+					if (block.elements[candidate] === 0) {
 						summary.set(candidate, (summary.get(candidate) ?? 0n) | key);
 					}
 				}
 			} else {
-				summary.set(content, key);
+				summary.set(element, key);
 			}
 		}
 

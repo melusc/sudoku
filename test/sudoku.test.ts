@@ -12,82 +12,82 @@ test('Sudoku should be a class', t => {
 	t.is(typeof new Sudoku(9), 'object');
 });
 
-test('Sudoku#setContent valid content', t => {
+test('Sudoku#setElement valid element', t => {
 	const s = new Sudoku(9);
-	s.setContent(0, '4');
+	s.setElement(0, '4');
 
-	t.is(s.getContent(0), '4');
+	t.is(s.getElement(0), '4');
 
-	s.setContent(0, 4); // because '1' is 0, '2' is 1 ...
-	t.is(s.getContent(0), '5');
+	s.setElement(0, 4); // because '1' is 0, '2' is 1 ...
+	t.is(s.getElement(0), '5');
 });
 
-test('Sudoku#setContent invalid content', t => {
+test('Sudoku#setElement invalid element', t => {
 	const s = new Sudoku(9);
 	t.throws(
 		() => {
-			s.setContent(0, '.');
+			s.setElement(0, '.');
 		},
 		{message: /not in alphabet: "\."$/},
 	);
 
 	t.throws(
 		() => {
-			s.setContent(0, 9);
+			s.setElement(0, 9);
 		},
 		{message: /9/},
 	);
 });
 
-test('Sudoku#getContent', t => {
+test('Sudoku#getElement', t => {
 	const s = new Sudoku(16);
-	t.is(s.getContent(8 * 9 + 8), undefined);
+	t.is(s.getElement(8 * 9 + 8), undefined);
 
-	s.setContent(8 * 9 + 8, '4');
-	t.is(s.getContent(8 * 9 + 8), '4');
+	s.setElement(8 * 9 + 8, '4');
+	t.is(s.getElement(8 * 9 + 8), '4');
 
-	s.setContent(0, 'A');
-	t.is(s.getContent(0), 'A');
-	t.is(s.getCell(0).content, 10);
+	s.setElement(0, 'A');
+	t.is(s.getElement(0), 'A');
+	t.is(s.getCell(0).element, 10);
 
-	s.setContent(0, 0);
-	t.is(s.getContent(0), '1');
-	t.is(s.getCell(0).content, 0);
+	s.setElement(0, 0);
+	t.is(s.getElement(0), '1');
+	t.is(s.getCell(0).element, 0);
 });
 
 test('Sudoku#clearCell', t => {
 	const s = new Sudoku(9);
-	s.setContent(6 * 9 + 6, '4');
-	t.is(s.getContent(6 * 9 + 6), '4');
+	s.setElement(6 * 9 + 6, '4');
+	t.is(s.getElement(6 * 9 + 6), '4');
 	s.clearCell(6 * 9 + 6);
-	t.is(s.getContent(6 * 9 + 6), undefined);
+	t.is(s.getElement(6 * 9 + 6), undefined);
 });
 
 test('Sudoku#clearAllCells', t => {
 	const s = new Sudoku(9);
-	s.setContent(6 * 9 + 6, '4')
-		.setContent(1 * 9 + 1, '5')
-		.setContent(2 * 9 + 4, '3');
+	s.setElement(6 * 9 + 6, '4')
+		.setElement(1 * 9 + 1, '5')
+		.setElement(2 * 9 + 4, '3');
 
-	t.is(s.getContent(6 * 9 + 6), '4');
-	t.is(s.getContent(1 * 9 + 1), '5');
-	t.is(s.getContent(2 * 9 + 4), '3');
+	t.is(s.getElement(6 * 9 + 6), '4');
+	t.is(s.getElement(1 * 9 + 1), '5');
+	t.is(s.getElement(2 * 9 + 4), '3');
 
 	s.clearAllCells();
 
-	t.is(s.getContent(6 * 9 + 6), undefined);
-	t.is(s.getContent(1 * 9 + 1), undefined);
-	t.is(s.getContent(2 * 9 + 4), undefined);
+	t.is(s.getElement(6 * 9 + 6), undefined);
+	t.is(s.getElement(1 * 9 + 1), undefined);
+	t.is(s.getElement(2 * 9 + 4), undefined);
 });
 
 test('Sudoku#getCol', t => {
 	const s = new Sudoku(9);
-	s.setContent(2 * 9 + 8, '2').setContent(5 * 9 + 8, '4');
+	s.setElement(2 * 9 + 8, '2').setElement(5 * 9 + 8, '4');
 
 	const col = s.getCol(8);
 
 	t.deepEqual(
-		col.map(cell => cell.content),
+		col.map(cell => cell.element),
 		[
 			undefined,
 			undefined,
@@ -104,14 +104,14 @@ test('Sudoku#getCol', t => {
 
 test('Sudoku#getRow', t => {
 	const s = new Sudoku(9);
-	s.setContent(8 * 9 + 8, '3')
-		.setContent(8 * 9 + 2, '4')
-		.setContent(8 * 9 + 7, '7');
+	s.setElement(8 * 9 + 8, '3')
+		.setElement(8 * 9 + 2, '4')
+		.setElement(8 * 9 + 7, '7');
 
 	const row = s.getRow(8);
 
 	t.deepEqual(
-		row.map(cell => cell.content),
+		row.map(cell => cell.element),
 		[undefined, undefined, 3, undefined, undefined, undefined, undefined, 6, 2],
 	);
 });
@@ -134,7 +134,7 @@ test('Sudoku#getCells', t => {
 	t.is(cells1.length, 81);
 
 	for (const cell of cells1) {
-		t.is(cell.content, undefined);
+		t.is(cell.element, undefined);
 
 		t.is(cell.candidates.size, 9);
 	}
@@ -144,22 +144,22 @@ test('Sudoku#getCells', t => {
 	s = new Sudoku(9);
 
 	const sudoku = s
-		.setContent(0, '2')
-		.setContent(1 * 9 + 1, '4')
-		.setContent(5 * 9 + 7, '2');
+		.setElement(0, '2')
+		.setElement(1 * 9 + 1, '4')
+		.setElement(5 * 9 + 7, '2');
 
-	t.is(sudoku.getCell(0).content, 1);
-	t.is(sudoku.getCell(1 * 9 + 1).content, 3);
-	t.is(sudoku.getCell(5 * 9 + 7).content, 1);
+	t.is(sudoku.getCell(0).element, 1);
+	t.is(sudoku.getCell(1 * 9 + 1).element, 3);
+	t.is(sudoku.getCell(5 * 9 + 7).element, 1);
 
 	// ====
 
 	const firstRow = Array.from({length: 9}, (_v, index) => index + 1);
-	s = Sudoku.fromPrefilled([firstRow.map(content => String(content))], 9);
+	s = Sudoku.fromPrefilled([firstRow.map(element => String(element))], 9);
 
 	const cells2 = s.getCells();
 
-	t.deepEqual(cells2.map(cell => cell.content! + 1).slice(0, 9), firstRow);
+	t.deepEqual(cells2.map(cell => cell.element! + 1).slice(0, 9), firstRow);
 });
 
 test('Sudoku#getBlock', t => {
@@ -175,14 +175,14 @@ test('Sudoku#getBlock', t => {
 
 	for (let row = 0; row < 3; ++row) {
 		for (let col = 0; col < 3; ++col) {
-			s.setContent(row * 9 + col, `${row * 3 + col + 1}`);
+			s.setElement(row * 9 + col, `${row * 3 + col + 1}`);
 		}
 	}
 
 	const block2 = s.getBlock(0);
 
 	for (const [index, element] of block2.entries()) {
-		t.is(element.content, index);
+		t.is(element.element, index);
 	}
 });
 
@@ -207,7 +207,7 @@ test('Sudoku#solve easy', t => {
 	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
-		s.getCells().map(cell => cell.content),
+		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[9, 1, 4, 3, 8, 6, 7, 5, 2],
 			[3, 6, 5, 7, 2, 1, 4, 8, 9],
@@ -245,7 +245,7 @@ test('Sudoku#solve evil', t => {
 	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
-		s.getCells().map(cell => cell.content),
+		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[6, 7, 4, 9, 2, 8, 1, 5, 3],
 			[1, 5, 9, 6, 3, 7, 8, 2, 4],
@@ -283,7 +283,7 @@ test('Sudoku#solve expert', t => {
 	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
-		s.getCells().map(cell => cell.content),
+		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[3, 5, 1, 9, 8, 4, 6, 7, 2],
 			[4, 6, 9, 2, 5, 7, 8, 3, 1],
@@ -332,7 +332,7 @@ test('Sudoku#solve tough 16x16', t => {
 	t.is(s.solve(), 'finish');
 
 	t.deepEqual(
-		s.getCells().map(cell => cell.content),
+		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[2, 11, 12, 4, 7, 13, 5, 6, 1, 9, 3, 14, 15, 16, 8, 10],
 			[1, 10, 7, 16, 14, 12, 2, 8, 5, 11, 6, 15, 9, 4, 3, 13],
@@ -412,17 +412,17 @@ test('Sudoku#subscribe', t => {
 	t.plan(2);
 
 	const callback = (sudoku: Sudoku): void => {
-		t.is(sudoku.getCell(3 * 9 + 2).content, 1);
-		t.is(sudoku.getCell(4 * 9 + 1).content, 3);
+		t.is(sudoku.getCell(3 * 9 + 2).element, 1);
+		t.is(sudoku.getCell(4 * 9 + 1).element, 3);
 	};
 
 	// Callback shouldn't (can't) fire
-	s.setContent(3 * 9 + 2, '2');
+	s.setElement(3 * 9 + 2, '2');
 
 	s.subscribe(callback);
 
 	// Callback should fire
-	s.setContent(4 * 9 + 1, '4');
+	s.setElement(4 * 9 + 1, '4');
 });
 
 test('Sudoku#unsubscribe', t => {
@@ -434,20 +434,20 @@ test('Sudoku#unsubscribe', t => {
 	// Callback2 will not and as such fire twice times
 
 	const callback1 = (): void => {
-		t.is(s.getContent(3 * 9 + 2), '2');
+		t.is(s.getElement(3 * 9 + 2), '2');
 	};
 
 	const callback2 = (): void => {
-		t.is(s.getContent(3 * 9 + 2), '2');
+		t.is(s.getElement(3 * 9 + 2), '2');
 	};
 
 	s.subscribe(callback1).subscribe(callback2);
 
-	s.setContent(3 * 9 + 2, '2');
+	s.setElement(3 * 9 + 2, '2');
 
 	s.unsubscribe(callback1);
 
-	s.setContent(4 * 9 + 1, '4');
+	s.setElement(4 * 9 + 1, '4');
 });
 
 test('Sudoku#emit', t => {
@@ -471,7 +471,7 @@ test('Sudoku#cellsIndividuallyValid empty sudoku', t => {
 test('Sudoku#cellsIndividuallyValid duplicates', t => {
 	const s = new Sudoku(9);
 
-	s.setContent(0, '1').setContent(1, '1');
+	s.setElement(0, '1').setElement(1, '1');
 
 	t.false(s.cellsIndividuallyValid());
 });
@@ -482,38 +482,38 @@ test('Sudoku#isCellValid valid cell', t => {
 	t.true(s.isCellValid(0));
 });
 
-test('Sudoku#isCellValid empty candidates no content', t => {
+test('Sudoku#isCellValid empty candidates no element', t => {
 	const s = new Sudoku(9);
 	const cell = s.getCell(0);
 	cell.candidates.clear();
 	t.false(s.isCellValid(cell));
 });
 
-test('Sudoku#isCellValid content and candidates', t => {
+test('Sudoku#isCellValid element and candidates', t => {
 	const s = new Sudoku(9);
 	const cell = s.getCell(0);
-	cell.content = 3;
+	cell.element = 3;
 	t.false(s.isCellValid(cell));
 });
 
 test('Sudoku#isCellValid duplicate in row', t => {
 	const s = new Sudoku(9);
 	// The cells only share the same row
-	s.setContent(0, 1).setContent(7, 1);
+	s.setElement(0, 1).setElement(7, 1);
 	t.false(s.isCellValid(0));
 });
 
 test('Sudoku#isCellValid duplicate in col', t => {
 	const s = new Sudoku(9);
 	// The cells only share the same col
-	s.setContent(0, 1).setContent(72, 1);
+	s.setElement(0, 1).setElement(72, 1);
 	t.false(s.isCellValid(0));
 });
 
 test('Sudoku#isCellValid duplicate in block', t => {
 	const s = new Sudoku(9);
 	// The cells only share the same block
-	s.setContent(0, 1).setContent(10, 1);
+	s.setElement(0, 1).setElement(10, 1);
 	t.false(s.isCellValid(0));
 });
 
@@ -537,7 +537,7 @@ test('Sudoku#isValid First row has no "1" anywhere', t => {
 // but just test to make sure #isValid always calls them
 test('Sudoku#isValid First row has duplicates', t => {
 	const s = new Sudoku(9);
-	s.setContent(0, 1).setContent(1, 1);
+	s.setElement(0, 1).setElement(1, 1);
 
 	t.false(s.isValid());
 });
@@ -603,7 +603,7 @@ test('Sudoku#removeCandidate one candidate afterwards', t => {
 
 	sudoku.removeCandidate(cell0, 1);
 	t.true(sudoku.anyChanged);
-	t.is(cell0.content, 2);
+	t.is(cell0.element, 2);
 	t.is(cell0.candidates.size, 0);
 });
 
@@ -615,7 +615,7 @@ test('Sudoku#isSolved', t => {
 	// ====
 
 	s = new Sudoku(9);
-	s.setContent(3, '2').setContent(4, '4');
+	s.setElement(3, '2').setElement(4, '4');
 	t.false(s.isSolved(), 'A partially empty sudoku should return false');
 
 	// ====
@@ -695,7 +695,7 @@ test('Sudoku.fromPrefilled valid sudoku', t => {
 	for (let i = 0; i < s.size; ++i) {
 		const row = s.getRow(i);
 		t.deepEqual(
-			row.map(cell => cell.content),
+			row.map(cell => cell.element),
 			[0, 1, 2, 3],
 		);
 	}
@@ -745,7 +745,7 @@ test('Sudoku.fromString valid sudoku', t => {
 	for (let i = 0; i < s.size; ++i) {
 		const row = s.getRow(i);
 		t.deepEqual(
-			row.map(cell => cell.content),
+			row.map(cell => cell.element),
 			[0, 1, 2, 3],
 		);
 	}
@@ -779,7 +779,7 @@ test('Sudoku#toString should produce a valid string', t => {
 	// Only fill every second cell to also test
 	// stringifying empty cells
 	for (let i = 0; i < s.size ** 2; i += 2) {
-		s.setContent(i, randomInt(s.size));
+		s.setElement(i, randomInt(s.size));
 	}
 
 	// Test by passing it to Sudoku.fromString

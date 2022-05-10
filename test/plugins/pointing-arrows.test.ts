@@ -44,7 +44,7 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 	t.deepEqual([...s.getCell(10).candidates], [2, 4, 5]);
 
 	const cell11 = s.getCell(11);
-	t.is(cell11.content, 6);
+	t.is(cell11.element, 6);
 	t.is(cell11.candidates.size, 0);
 });
 

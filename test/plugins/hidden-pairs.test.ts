@@ -60,7 +60,7 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 	hiddenPairs(s);
 
 	const cell = s.getCell(3);
-	t.is(cell.content, 1);
+	t.is(cell.element, 1);
 	t.is(cell.candidates.size, 0);
 });
 

@@ -18,8 +18,8 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 	// All combinations of cells
 	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
 
-	for (const [index, {content, candidates}] of structure.entries()) {
-		if (content !== undefined) {
+	for (const [index, {element, candidates}] of structure.entries()) {
+		if (element !== undefined) {
 			continue;
 		}
 
@@ -29,7 +29,7 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 		*/
 		let key = 0n;
 		for (const candidate of candidates) {
-			if (structure.contents[candidate] === 0) {
+			if (structure.elements[candidate] === 0) {
 				key |= 1n << BigInt(candidate);
 			}
 		}

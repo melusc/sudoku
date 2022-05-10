@@ -69,12 +69,12 @@ const nFishByStructure = (
 		const currentIndex = new Map<number, bigint>();
 		indexedCells.set(i, currentIndex);
 
-		for (const [index, {candidates, content}] of structure.entries()) {
-			if (content === undefined) {
+		for (const [index, {candidates, element}] of structure.entries()) {
+			if (element === undefined) {
 				for (const candidate of candidates) {
-					// Ignore numbers that already exist as "content"
+					// Ignore numbers that already exist as an element
 					// These numbers will be removed from "candidates" soon, anyway
-					if (structure.contents[candidate] !== 0) {
+					if (structure.elements[candidate] !== 0) {
 						continue;
 					}
 
