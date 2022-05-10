@@ -7,9 +7,9 @@ import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
 const throwIfSmaller = (key: bigint, numbers: number[]): void => {
 	if (bitCount(key) < numbers.length) {
 		throw new Error(
-			`bitCount was smaller than allowed: ${key.toString(2)}; ${numbers.join(
-				',',
-			)} (hidden-pairs)`,
+			`Amount of numbers was less than the amount of cells they're spread across ${key.toString(
+				2,
+			)}; {${numbers.join(',')}} (hidden-pairs)`,
 		);
 	}
 };
