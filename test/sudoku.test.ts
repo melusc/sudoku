@@ -155,7 +155,7 @@ test('Sudoku#getCells', t => {
 	// ====
 
 	const firstRow = Array.from({length: 9}, (_v, index) => index + 1);
-	s = Sudoku.fromPrefilled([firstRow.map(element => String(element))], 9);
+	s = Sudoku.fromPrefilled([firstRow.map(String)], 9);
 
 	const cells2 = s.getCells();
 
