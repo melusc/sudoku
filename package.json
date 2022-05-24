@@ -9,15 +9,15 @@
 		"access": "public"
 	},
 	"files": [
-		"dist/lib"
+		"dist/src"
 	],
 	"engines": {
 		"node": "^12.20.0 || ^14.13.1 || >=16.0.0"
 	},
-	"main": "./dist/lib/index.js",
+	"main": "./dist/src/index.js",
 	"exports": {
-		".": "./dist/lib/index.js",
-		"./plugins": "./dist/lib/plugins/index.js"
+		".": "./dist/src/index.js",
+		"./plugins": "./dist/src/plugins/index.js"
 	},
 	"type": "module",
 	"ava": {
@@ -30,16 +30,16 @@
 		"typescript": {
 			"compile": false,
 			"rewritePaths": {
-				"test/": "dist/test/test/"
+				"test/": "dist/test/"
 			}
 		}
 	},
 	"scripts": {
 		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && xo --fix",
-		"build": "rimraf dist/lib && tsc",
-		"test": "yarn run ava",
-		"pretest": "rimraf dist/test && tsc --project test/tsconfig.json"
+		"build": "rimraf dist && tsc",
+		"pretest": "yarn build",
+		"test": "yarn ava"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
