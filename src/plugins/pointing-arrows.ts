@@ -58,7 +58,7 @@ export const pointingArrows = (sudoku: Sudoku): void => {
 		const rowOffset = (1n << blockWidthBigInt) - 1n;
 		for (const [number, key] of summary) {
 			const colSection = key & rowOffset;
-			const rowSection = (key >> blockWidthBigInt) & rowOffset;
+			const rowSection = key >> blockWidthBigInt;
 
 			if (bitCount(colSection) === 1n) {
 				clearSection(
