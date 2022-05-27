@@ -2,8 +2,8 @@ import test, {ExecutionContext} from 'ava';
 import {nFish} from '../../src/plugins/n-fish.js';
 import {Sudoku} from '../../src/sudoku.js';
 
-const makeCheck =
-	(s: Sudoku, t: ExecutionContext) =>
+const makeCheck
+	= (s: Sudoku, t: ExecutionContext) =>
 	(index: number, expected: number[] | number): void => {
 		const cell = s.getCell(index);
 
