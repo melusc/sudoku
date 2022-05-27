@@ -2,14 +2,19 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
+import {
+	BetterMap,
+	eachCandidate,
+	makeVisitor,
+	type VisitorFn,
+} from './shared.js';
 
-const throwIfSmaller = (key: bigint, numbers: number[]): void => {
-	if (bitCount(key) < numbers.length) {
+const throwIfSmaller = (indices: number[], numbers: number[]): void => {
+	if (indices.length < numbers.length) {
 		throw new Error(
-			`Amount of numbers was less than the amount of cells they're spread across ${key.toString(
-				2,
-			)}; {${numbers.join(',')}} (hidden-pairs)`,
+			`Less indices than numbers: indices={${indices.join(
+				',',
+			)}}, numbers={${numbers.join(',')}} (hidden pairs)`,
 		);
 	}
 };
@@ -25,68 +30,53 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// Iterating through each cell and
 	// doing `currentValue | 1 << index`
 	// This is a lot better than comparing arrays of indexes
-	const summary = new Map<number, bigint>();
+	const summary = new BetterMap<
+		number,
+		{
+			indicesKey: bigint;
+			indices: number[];
+		}
+	>();
 
-	for (const [index, {element, candidates}] of structure.entries()) {
+	for (const [index, cell] of structure.entries()) {
 		const pow = 1n << BigInt(index);
 
-		if (element === undefined) {
-			for (const candidate of candidates) {
-				if (structure.elements[candidate] === 0) {
-					summary.set(candidate, (summary.get(candidate) ?? 0n) | pow);
-				}
+		if (cell.element === undefined) {
+			for (const candidate of eachCandidate(structure, cell)) {
+				const item = summary.defaultGet(candidate, () => ({
+					indicesKey: 0n,
+					indices: [],
+				}));
+				item.indices.push(index);
+				item.indicesKey |= pow;
 			}
 		}
 	}
 
-	const equalIndexes: Array<[bigint, number[]]> = [];
-	const size = BigInt(sudoku.size);
-
-	for (const [number, key] of summary) {
-		if (bitCount(key) === size) {
+	for (const {indicesKey: indicesKeyRef, indices} of summary.values()) {
+		if (indices.length === sudoku.size) {
 			continue;
 		}
 
-		let exactMatchFound = false;
+		const numbers: number[] = [];
 
-		for (const equalIndex of equalIndexes) {
-			const [curKey, indices] = equalIndex;
-
-			if ((key | curKey) === key || (key | curKey) === curKey) {
-				equalIndex[0] |= key;
-				indices.push(number);
-
-				// Exit early since it is an error in any case
-				// already at this point
-				throwIfSmaller(equalIndex[0], indices);
-
-				exactMatchFound ||= key === curKey;
+		for (const [elementI, {indicesKey}] of summary) {
+			if ((indicesKeyRef & indicesKey) === indicesKey) {
+				numbers.push(elementI);
 			}
 		}
 
-		if (!exactMatchFound) {
-			equalIndexes.push([key, [number]]);
-		}
-	}
+		throwIfSmaller(indices, numbers);
 
-	for (const [key, numbers] of equalIndexes) {
-		throwIfSmaller(key, numbers);
-
-		if (bitCount(key) > numbers.length) {
+		if (indices.length > numbers.length) {
 			continue;
 		}
 
-		for (let index = 0; index < sudoku.size; ++index) {
-			if ((key & (1n << BigInt(index))) === 0n) {
-				continue;
-			}
-
+		for (const index of indices) {
 			const cell = structure[index]!;
 
 			sudoku.overrideCandidates(cell, new Set(numbers));
 		}
-
-		sudoku.emit('change');
 	}
 };
 

@@ -1,53 +1,29 @@
-import type {Sudoku} from '../sudoku.js';
-import {bitCount} from './shared.js';
+import {Sudoku} from '../sudoku.js';
+import {BetterMap, eachCandidate} from './shared.js';
 
-const throwIfMore = (key: bigint, indicesLength: number): void => {
-	/* Scenario: key describes the rows, indices which rows
-	 If the candidates are spread across less columns
-	 than the rows they could be in it's invalid
-
-	 Imagine:
-	 [_, 1, _, 1, _, 1]
-	 [_, _, _, _, _, _]
-	 [_, 1, _, 1, _, 1]
-	 [_, 1, _, 1, _, 1]
-	 [_, _, _, _, _, _]
-	 [_, 1, _, 1, _, 1]
-	 if 1 ends up being in (0, 1), (2, 3), (3, 4)
-	 where could it go in the 6th row? nowhere -> throw Error
+const throwIfInvalid = (structIndices: number[], indices: number[]): void => {
+	/*
+		[
+			[1, 1, 1, ...],
+			[1, 1, 1, ...],
+			[1, 1, 1, ...],
+			[1, 1, 1, ...],
+			...
+		]
+		There's no way to place all 1s
+		without duplicates
 	*/
 
-	if (bitCount(key) < indicesLength) {
+	if (structIndices.length > indices.length) {
+		console.log(structIndices, indices);
+
 		throw new Error(
-			`bitCount key (${key.toString(
-				2,
-			)}) was smaller than indicesLength (${indicesLength}) (swordfish).`,
+			`Less structIndices than indices: structIndices={${structIndices.join(
+				',',
+			)}}, indices={${indices.join(',')}} (n fish)`,
 		);
 	}
 };
-
-const makeClearStructure
-	= (sudoku: Sudoku, getterName: 'getRow' | 'getCol') =>
-	(key: bigint, indices: number[], number: number): void => {
-		for (let structIndex = 0; structIndex < sudoku.size; ++structIndex) {
-			if (indices.includes(structIndex)) {
-				continue;
-			}
-
-			const struct = sudoku[getterName](structIndex);
-
-			// Cell-index in row/col
-			for (let cellIndex = 0; cellIndex < sudoku.size; ++cellIndex) {
-				if ((key & (1n << BigInt(cellIndex))) === 0n) {
-					continue;
-				}
-
-				sudoku.removeCandidate(struct[cellIndex]!, number);
-			}
-		}
-
-		sudoku.emit('change');
-	};
 
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */
 
@@ -55,84 +31,76 @@ const nFishByStructure = (
 	sudoku: Sudoku,
 	getterName: 'getRow' | 'getCol',
 ): void => {
-	const indexedCells = new Map<number, Map<number, bigint>>();
-	const clearStructure = makeClearStructure(sudoku, getterName);
+	const summary = new BetterMap<
+		/* element: */ number,
+		BetterMap</* strucIndex */ number, {key: bigint; indices: number[]}>
+	>();
 
 	/*
 		Index all cell candidates
 		For each row / col and each number
 		add the index of the number:
-		number[`row index`][`cell candidate`] |= `index in row`
+		number[`cell candidate`][`row-index`] |= `index in row`
 	*/
-	for (let i = 0; i < sudoku.size; ++i) {
-		const structure = sudoku[getterName](i);
-		const currentIndex = new Map<number, bigint>();
-		indexedCells.set(i, currentIndex);
+	for (let structureIndex = 0; structureIndex < sudoku.size; ++structureIndex) {
+		const structure = sudoku[getterName](structureIndex);
 
-		for (const [index, {candidates, element}] of structure.entries()) {
-			if (element === undefined) {
-				for (const candidate of candidates) {
-					// Ignore numbers that already exist as an element
-					// These numbers will be removed from "candidates" soon, anyway
-					if (structure.elements[candidate] !== 0) {
-						continue;
-					}
-
-					currentIndex.set(
+		for (const [index, cell] of structure.entries()) {
+			if (cell.element === undefined) {
+				for (const candidate of eachCandidate(structure, cell)) {
+					const candidateSummary = summary.defaultGet(
 						candidate,
-						(currentIndex.get(candidate) ?? 0n) | (1n << BigInt(index)),
+						() => new BetterMap(),
 					);
+
+					const item = candidateSummary.defaultGet(structureIndex, () => ({
+						key: 0n,
+						indices: [],
+					}));
+
+					item.key |= 1n << BigInt(index);
+					item.indices.push(index);
 				}
 			}
 		}
 	}
 
-	const merged = new Map<number, Array<[key: bigint, indices: number[]]>>();
+	for (let element = 0; element < sudoku.size; ++element) {
+		const elementSummary = summary.get(element);
+		if (!elementSummary) {
+			continue;
+		}
 
-	for (const [index, indexed] of indexedCells) {
-		for (const [number, key] of indexed) {
-			// A completely empty sudoku will be a NxN swordfish
-			// but that is not helpful since nothing can be removed
-			if (bitCount(key) === BigInt(sudoku.size)) {
+		for (const {key: keyRef, indices} of elementSummary.values()) {
+			if (indices.length === sudoku.size) {
 				continue;
 			}
 
-			if (!merged.has(number)) {
-				merged.set(number, []);
+			const structureIndices: number[] = [];
+			for (const [structureIndex, entry] of elementSummary) {
+				if ((keyRef & entry.key) === entry.key) {
+					structureIndices.push(structureIndex);
+				}
 			}
 
-			const array = merged.get(number)!;
+			throwIfInvalid(structureIndices, indices);
 
-			for (let i = 0, l = array.length; i < l; ++i) {
-				const [currentKey, indices] = array[i]!;
+			if (indices.length !== structureIndices.length) {
+				continue;
+			}
 
-				if ((currentKey & key) === key) {
-					indices.push(index);
-					throwIfMore(currentKey, indices.length);
-				} else if (sudoku.mode === 'thorough') {
-					const newKey = currentKey | key;
+			for (const index of indices) {
+				const structure
+					= sudoku[getterName === 'getCol' ? 'getRow' : 'getCol'](index);
 
-					throwIfMore(newKey, indices.length + 1);
-
-					if (bitCount(newKey) < sudoku.size) {
-						array.push([currentKey | key, [...indices, index]]);
+				for (const [index, cell] of structure.entries()) {
+					if (!structureIndices.includes(index)) {
+						sudoku.removeCandidate(cell, element);
 					}
 				}
 			}
 
-			array.push([key, [Number(index)]]);
-		}
-	}
-
-	for (const [number, indexed] of merged) {
-		for (const [key, indices] of indexed) {
-			throwIfMore(key, indices.length);
-
-			if (bitCount(key) > BigInt(indices.length)) {
-				continue;
-			}
-
-			clearStructure(key, indices, number);
+			sudoku.emit('change');
 		}
 	}
 };

@@ -1,5 +1,5 @@
 import type {Sudoku, ReadonlyCells} from '../sudoku.js';
-import {bitCount, bitIndex} from './shared.js';
+import {BetterMap, eachCandidate} from './shared.js';
 
 const clearSection = (
 	structure: ReadonlyCells,
@@ -22,7 +22,6 @@ const clearSection = (
 
 export const pointingArrows = (sudoku: Sudoku): void => {
 	const {size, blockWidth} = sudoku;
-	const blockWidthBigInt = BigInt(blockWidth);
 
 	for (let blockIndex = 0; blockIndex < size; ++blockIndex) {
 		const block = sudoku.getBlock(blockIndex);
@@ -36,42 +35,48 @@ export const pointingArrows = (sudoku: Sudoku): void => {
       If one of the sections has only one bit,
       that is a pointing arrow
     */
-		const summary = new Map<number, bigint>();
+		const summary = new BetterMap<
+			number,
+			{
+				row: Set<number>;
+				col: Set<number>;
+			}
+		>();
 
-		for (const [index, {element, candidates}] of block.entries()) {
-			const row = BigInt(Math.trunc(index / blockWidth));
-			const col = BigInt(index % blockWidth);
+		for (const [index, cell] of block.entries()) {
+			const row = Math.trunc(index / blockWidth);
+			const col = index % blockWidth;
 
-			const key = (1n << col) | (1n << (row + blockWidthBigInt));
-
-			if (element === undefined) {
-				for (const candidate of candidates) {
-					if (block.elements[candidate] === 0) {
-						summary.set(candidate, (summary.get(candidate) ?? 0n) | key);
-					}
+			if (cell.element === undefined) {
+				for (const candidate of eachCandidate(block, cell)) {
+					const item = summary.defaultGet(candidate, () => ({
+						row: new Set(),
+						col: new Set(),
+					}));
+					item.row.add(row);
+					item.col.add(col);
 				}
 			} else {
-				summary.set(element, key);
+				summary.set(cell.element, {
+					row: new Set([row]),
+					col: new Set([col]),
+				});
 			}
 		}
 
-		const rowOffset = (1n << blockWidthBigInt) - 1n;
-		for (const [number, key] of summary) {
-			const colSection = key & rowOffset;
-			const rowSection = key >> blockWidthBigInt;
-
-			if (bitCount(colSection) === 1n) {
+		for (const [number, {row, col}] of summary) {
+			if (col.size === 1) {
 				clearSection(
-					sudoku.getCol(blockColIndex + bitIndex(colSection)),
+					sudoku.getCol(blockColIndex + [...col][0]!),
 					sudoku,
 					blockRowIndex,
 					number,
 				);
 			}
 
-			if (bitCount(rowSection) === 1n) {
+			if (row.size === 1) {
 				clearSection(
-					sudoku.getRow(blockRowIndex + bitIndex(rowSection)),
+					sudoku.getRow(blockRowIndex + [...row][0]!),
 					sudoku,
 					blockColIndex,
 					number,

@@ -2,24 +2,26 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import {bitCount, makeVisitor, type VisitorFn} from './shared.js';
+import {eachCandidate, makeVisitor, type VisitorFn} from './shared.js';
 
-const throwSmallerThanAllowed = (key: bigint, indicesLength: number): void => {
-	if (bitCount(key) < indicesLength) {
+const throwSmallerThanAllowed = (
+	elements: number[],
+	indices: number[],
+): void => {
+	if (elements.length < indices.length) {
 		throw new Error(
-			`bitCount was smaller than allowed: ${key.toString(
-				2,
-			)}; ${indicesLength} (naked-pairs)`,
+			`Less elements than indices: elements={${elements.join(
+				',',
+			)}}, indices=${indices.join(',')} (naked pairs)`,
 		);
 	}
 };
 
 const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
-	// All combinations of cells
-	const equalKeys: Array<[numbers: bigint, indices: number[]]> = [];
+	const summary = new Map<number, {key: bigint; elements: number[]}>();
 
-	for (const [index, {element, candidates}] of structure.entries()) {
-		if (element !== undefined) {
+	for (const [index, cell] of structure.entries()) {
+		if (cell.element !== undefined) {
 			continue;
 		}
 
@@ -28,69 +30,47 @@ const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 			 Example: 10100 means it contains [2, 4]
 		*/
 		let key = 0n;
-		for (const candidate of candidates) {
-			if (structure.elements[candidate] === 0) {
-				key |= 1n << BigInt(candidate);
-			}
+		const elements: number[] = [];
+		for (const candidate of eachCandidate(structure, cell)) {
+			key |= 1n << BigInt(candidate);
+			elements.push(candidate);
 		}
 
-		let exactMatchFound = false;
-
-		// For all previous combinations (because new ones get added before the loop is over)
-		for (let i = 0, l = equalKeys.length; i < l; ++i) {
-			const [numbersMask, indices] = equalKeys[i]!;
-
-			// If key is subset of previous key
-			if ((key & numbersMask) === key) {
-				indices.push(index);
-
-				exactMatchFound ||= key === numbersMask;
-			} else if (sudoku.mode === 'thorough') {
-				const newKey = numbersMask | key;
-
-				// Exit as early as possible, rather here than below
-				throwSmallerThanAllowed(newKey, indices.length + 1);
-
-				equalKeys.push([newKey, [...indices, index]]);
-			}
-		}
-
-		if (!exactMatchFound) {
-			equalKeys.push([key, [index]]);
-		}
+		summary.set(index, {
+			key,
+			elements,
+		});
 	}
 
-	for (const [key, indices] of equalKeys) {
-		throwSmallerThanAllowed(key, indices.length);
-
-		if (
-			/* No interesting information gained
-				 There aren't any cells to remove candidates from
-			*/
-			indices.length === sudoku.size
-			/* If there are more numbers in the naked pair
-				 than cells, not all numbers can be in the cells
-				 therefore the numbers can't safely be removed from the other cells
-				 because they /could/ be in the other cells
-			*/
-			|| bitCount(key) > BigInt(indices.length)
-		) {
+	for (const {key: keyO, elements} of summary.values()) {
+		if (elements.length === sudoku.size) {
 			continue;
 		}
 
-		for (let number = 0; number < sudoku.size; ++number) {
-			if ((key & (1n << BigInt(number))) === 0n) {
-				continue;
-			}
+		const indices: number[] = [];
 
-			for (const [index, cell] of structure.entries()) {
-				if (!indices.includes(index)) {
-					sudoku.removeCandidate(cell, number);
-				}
+		for (const [index, {key: keyI}] of summary) {
+			if ((keyO & keyI) === keyI) {
+				indices.push(index);
 			}
 		}
 
-		sudoku.emit('change');
+		throwSmallerThanAllowed(elements, indices);
+
+		if (elements.length > indices.length) {
+			continue;
+		}
+
+		for (let index = 0; index < sudoku.size; ++index) {
+			if (indices.includes(index)) {
+				continue;
+			}
+
+			const cell = structure[index]!;
+			for (const element of elements) {
+				sudoku.removeCandidate(cell, element);
+			}
+		}
 	}
 };
 

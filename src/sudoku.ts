@@ -157,8 +157,6 @@ export class Sudoku {
 
 	shouldLogErrors = process.env['NODE_ENV'] !== 'test';
 
-	mode: 'thorough' | 'fast' = 'thorough';
-
 	constructor(readonly size: number) {
 		const blockWidth = Math.sqrt(size);
 
@@ -574,7 +572,6 @@ export class Sudoku {
 	clone = (): Sudoku => {
 		const newSudoku = Sudoku.fromPrefilled(this.toPrefilledSudoku(), this.size);
 		newSudoku.shouldLogErrors = this.shouldLogErrors;
-		newSudoku.mode = this.mode;
 		return newSudoku;
 	};
 
