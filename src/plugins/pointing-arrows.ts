@@ -1,8 +1,8 @@
-import type {Sudoku, ReadonlyCells} from '../sudoku.js';
+import type {Sudoku, Structure} from '../sudoku.js';
 import {BetterMap, eachCandidate} from './shared.js';
 
 const clearSection = (
-	structure: ReadonlyCells,
+	structure: Structure,
 	sudoku: Sudoku,
 	blockIndex: number,
 	numberToRemove: number,
@@ -28,13 +28,6 @@ export const pointingArrows = (sudoku: Sudoku): void => {
 		const blockRowIndex = Math.trunc(blockIndex / blockWidth) * blockWidth;
 		const blockColIndex = (blockIndex % blockWidth) * blockWidth;
 
-		/*
-      The first three bits are for cols
-      The last three are for rows
-
-      If one of the sections has only one bit,
-      that is a pointing arrow
-    */
 		const summary = new BetterMap<
 			number,
 			{
