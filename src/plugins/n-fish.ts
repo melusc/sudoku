@@ -15,8 +15,6 @@ const throwIfInvalid = (structIndices: number[], indices: number[]): void => {
 	*/
 
 	if (structIndices.length > indices.length) {
-		console.log(structIndices, indices);
-
 		throw new Error(
 			`Less structIndices than indices: structIndices={${structIndices.join(
 				',',
@@ -33,7 +31,10 @@ const nFishByStructure = (
 ): void => {
 	const summary = new BetterMap<
 		/* element: */ number,
-		BetterMap</* strucIndex */ number, {key: bigint; indices: number[]}>
+		BetterMap<
+			/* strucIndex */ number,
+			{key: bigint; inStructureIndices: number[]}
+		>
 	>();
 
 	/*
@@ -45,7 +46,7 @@ const nFishByStructure = (
 	for (let structureIndex = 0; structureIndex < sudoku.size; ++structureIndex) {
 		const structure = sudoku[getterName](structureIndex);
 
-		for (const [index, cell] of structure.entries()) {
+		for (const [inStructureIndex, cell] of structure.entries()) {
 			if (cell.element === undefined) {
 				for (const candidate of eachCandidate(structure, cell)) {
 					const candidateSummary = summary.defaultGet(
@@ -55,11 +56,11 @@ const nFishByStructure = (
 
 					const item = candidateSummary.defaultGet(structureIndex, () => ({
 						key: 0n,
-						indices: [],
+						inStructureIndices: [],
 					}));
 
-					item.key |= 1n << BigInt(index);
-					item.indices.push(index);
+					item.key |= 1n << BigInt(inStructureIndex);
+					item.inStructureIndices.push(inStructureIndex);
 				}
 			}
 		}
@@ -71,8 +72,8 @@ const nFishByStructure = (
 			continue;
 		}
 
-		for (const {key: keyRef, indices} of elementSummary.values()) {
-			if (indices.length === sudoku.size) {
+		for (const {key: keyRef, inStructureIndices} of elementSummary.values()) {
+			if (inStructureIndices.length === sudoku.size) {
 				continue;
 			}
 
@@ -83,18 +84,20 @@ const nFishByStructure = (
 				}
 			}
 
-			throwIfInvalid(structureIndices, indices);
+			throwIfInvalid(structureIndices, inStructureIndices);
 
-			if (indices.length !== structureIndices.length) {
+			if (inStructureIndices.length !== structureIndices.length) {
 				continue;
 			}
 
-			for (const index of indices) {
+			for (const inStructureIndex of inStructureIndices) {
 				const structure
-					= sudoku[getterName === 'getCol' ? 'getRow' : 'getCol'](index);
+					= sudoku[getterName === 'getCol' ? 'getRow' : 'getCol'](
+						inStructureIndex,
+					);
 
-				for (const [index, cell] of structure.entries()) {
-					if (!structureIndices.includes(index)) {
+				for (const [structureIndex, cell] of structure.entries()) {
+					if (!structureIndices.includes(structureIndex)) {
 						sudoku.removeCandidate(cell, element);
 					}
 				}
