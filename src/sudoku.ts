@@ -155,7 +155,9 @@ export class Sudoku {
 
 	readonly #cells: ReadonlyCells;
 
-	shouldLogErrors = process.env['NODE_ENV'] !== 'test';
+	shouldLogErrors
+		// eslint-disable-next-line n/prefer-global/process
+		= typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
 
 	constructor(readonly size: number) {
 		const blockWidth = Math.sqrt(size);
