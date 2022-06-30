@@ -1,6 +1,6 @@
 {
 	"name": "@lusc/sudoku",
-	"version": "2.7.0",
+	"version": "3.0.0",
 	"repository": "https://github.com/melusc/sudoku",
 	"author": "lusc",
 	"license": "MIT",
