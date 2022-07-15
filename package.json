@@ -44,7 +44,7 @@
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
 		"@lusc/tsconfig": "^1.2.2",
-		"@types/node": "^18.0.3",
+		"@types/node": "^18.0.4",
 		"ava": "^4.3.0",
 		"prettier": "^2.7.1",
 		"rimraf": "^3.0.2",
