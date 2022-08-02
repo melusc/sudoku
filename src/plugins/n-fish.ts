@@ -66,12 +66,7 @@ const nFishByStructure = (
 		}
 	}
 
-	for (let element = 0; element < sudoku.size; ++element) {
-		const elementSummary = summary.get(element);
-		if (!elementSummary) {
-			continue;
-		}
-
+	for (const [element, elementSummary] of summary) {
 		for (const {key: keyRef, inStructureIndices} of elementSummary.values()) {
 			if (inStructureIndices.length === sudoku.size) {
 				continue;
