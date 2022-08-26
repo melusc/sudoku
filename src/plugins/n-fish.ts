@@ -1,4 +1,4 @@
-import {Sudoku} from '../sudoku.js';
+import type {Sudoku} from '../sudoku.js';
 import {BetterMap, eachCandidate} from './shared.js';
 
 const throwIfInvalid = (structIndices: number[], indices: number[]): void => {

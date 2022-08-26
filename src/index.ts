@@ -1,7 +1,7 @@
 export {
-	SubscriptionCallback,
+	type SubscriptionCallback,
 	Sudoku,
-	Cell,
-	ReadonlyCells,
-	Structure,
+	type Cell,
+	type ReadonlyCells,
+	type Structure,
 } from './sudoku.js';

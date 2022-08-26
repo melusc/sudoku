@@ -139,7 +139,7 @@ export class Sudoku {
 		return sudoku;
 	};
 
-	readonly #subscriptions: Set<SubscriptionCallback> = new Set();
+	readonly #subscriptions = new Set<SubscriptionCallback>();
 
 	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
 
