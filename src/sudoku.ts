@@ -9,9 +9,11 @@ export type ReadonlyCells = readonly Cell[];
 
 export type Structure = ReadonlyCells & {elements: Record<number, number>};
 
-type PrefilledSudoku = ReadonlyArray<
+export type PrefilledSudoku = ReadonlyArray<
 	undefined | ReadonlyArray<string | number | readonly number[] | undefined>
 >;
+
+export type JsonSudoku = ReadonlyArray<number | readonly number[]>;
 
 type DispatchType = 'change' | 'error' | 'finish';
 export type SubscriptionCallback = (sudoku: Sudoku, type: DispatchType) => void;
@@ -133,6 +135,24 @@ export class Sudoku {
 			const char = input.charAt(i);
 			if (char !== ' ') {
 				sudoku.setElement(i, input.charAt(i));
+			}
+		}
+
+		return sudoku;
+	};
+
+	static fromJson = (input: JsonSudoku, size: number): Sudoku => {
+		const sudoku = new Sudoku(size);
+
+		for (const [index, item] of input.entries()) {
+			if (isReadonlyArray(item)) {
+				for (const candidate of item) {
+					inRangeIncl(0, size - 1, candidate);
+				}
+
+				sudoku.overrideCandidates(index, new Set(item));
+			} else {
+				sudoku.setElement(index, item);
 			}
 		}
 
@@ -582,4 +602,7 @@ export class Sudoku {
 			console.error(message, ...data);
 		}
 	};
+
+	toJson = (): JsonSudoku =>
+		this.getCells().map(({candidates, element}) => element ?? [...candidates]);
 }

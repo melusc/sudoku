@@ -790,6 +790,64 @@ test('Sudoku#toString should produce a valid string', t => {
 	);
 });
 
+test('Sudoku#toJson', t => {
+	const s = new Sudoku(9);
+	const wantedJson = [1, 3, 6, [1, 3, 4, 5], [1, 5, 7, 8]];
+	for (const [index, item] of wantedJson.entries()) {
+		const cell = s.getCell(index);
+
+		if (Array.isArray(item)) {
+			cell.candidates = new Set(item);
+		} else {
+			cell.element = item;
+		}
+	}
+
+	const json = s.toJson();
+
+	t.deepEqual(json.slice(0, 5), wantedJson);
+	t.deepEqual(
+		json.slice(5),
+		Array.from({length: 81 - 5}, () => [0, 1, 2, 3, 4, 5, 6, 7, 8]),
+	);
+});
+
+test('Sudoku#fromJson valid input', t => {
+	const json = [2, 4, 7, [1, 2, 3, 4], [5, 6, 7], 8];
+
+	const s = Sudoku.fromJson(json, 9);
+
+	for (const [index, item] of json.entries()) {
+		if (typeof item === 'number') {
+			t.is(s.getElement(index), `${item + 1}`);
+		} else {
+			t.deepEqual(s.getCell(index).candidates, new Set(item));
+		}
+	}
+});
+
+test('Sudoku#fromJson invalid candidates', t => {
+	t.throws(
+		() => {
+			Sudoku.fromJson([[1, 3, 9]], 9);
+		},
+		{
+			message: '9 ∉ [0, 8].',
+		},
+	);
+});
+
+test('Sudoku#fromJson invalid element', t => {
+	t.throws(
+		() => {
+			Sudoku.fromJson([9], 9);
+		},
+		{
+			message: '9 ∉ [0, 8].',
+		},
+	);
+});
+
 test('inRangeIncl', t => {
 	t.throws(
 		() => {
