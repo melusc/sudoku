@@ -18,13 +18,17 @@ export type JsonSudoku = ReadonlyArray<number | readonly number[]>;
 type DispatchType = 'change' | 'error' | 'finish';
 export type SubscriptionCallback = (sudoku: Sudoku, type: DispatchType) => void;
 
-export const inRangeIncl = (low: number, high: number, n: number): void => {
-	if (!Number.isInteger(n)) {
-		throw new TypeError(`${n} was not an integer.`);
-	}
-
-	if (n < low || n > high) {
-		throw new RangeError(`${n} ∉ [${low}, ${high}].`);
+export const inRangeIncl = (
+	n: number,
+	low: number,
+	high: number,
+	format?: (n: number, low: number, high: number) => string,
+): void => {
+	if (!Number.isInteger(n) || n < low || n > high) {
+		throw new TypeError(
+			format?.(n, low, high)
+				?? `Received "${n}", expected an integer ${low} <= n <= ${high}.`,
+		);
 	}
 };
 
@@ -48,7 +52,7 @@ const makeElementsRecord = (): Record<number, number> =>
 			},
 			set(target, key: string, value): boolean {
 				if (value < 0) {
-					throw new Error(`${key} , value < 0`);
+					throw new Error(`${key}, value < 0`);
 				}
 
 				if (value === 0) {
@@ -100,21 +104,39 @@ export class Sudoku {
 		for (const [rowIndex, row] of cells.entries()) {
 			// Even though it would also throw in s.getCell
 			// this throws a more useful error
-			inRangeIncl(0, size - 1, rowIndex);
+			inRangeIncl(
+				rowIndex,
+				0,
+				size - 1,
+				(n, low, high) =>
+					`Unexpected row #${n}, expected ${low} <= n <= ${high}.`,
+			);
 
 			if (!row) {
 				continue;
 			}
 
 			for (const [colIndex, element] of row.entries()) {
-				inRangeIncl(0, size - 1, colIndex);
+				inRangeIncl(
+					colIndex,
+					0,
+					size - 1,
+					(n, low, high) =>
+						`Unxpected col #${n}, expected ${low} <= n <= ${high}.`,
+				);
 
 				// prettier-ignore
 				const cellIndex = (rowIndex * size) + colIndex;
 				const cell = s.getCell(cellIndex);
 				if (isReadonlyArray(element)) {
 					for (const candidate of element) {
-						inRangeIncl(0, size - 1, candidate);
+						inRangeIncl(
+							candidate,
+							0,
+							size - 1,
+							(n, low, high) =>
+								`Unxpected candidate ${n} at cell #${cellIndex}, expected an integer ${low} <= n <= ${high}.`,
+						);
 					}
 
 					cell.candidates = new Set(element);
@@ -147,7 +169,13 @@ export class Sudoku {
 		for (const [index, item] of input.entries()) {
 			if (isReadonlyArray(item)) {
 				for (const candidate of item) {
-					inRangeIncl(0, size - 1, candidate);
+					inRangeIncl(
+						candidate,
+						0,
+						size - 1,
+						(n, low, high) =>
+							`Expected candidate "${n}" at cell #${index} to be ${low} <= n <= ${high}.`,
+					);
 				}
 
 				sudoku.overrideCandidates(index, new Set(item));
@@ -206,37 +234,45 @@ export class Sudoku {
 
 		if (typeof element === 'string') {
 			const index = Sudoku.alphabet.indexOf(element.toUpperCase());
-			if (index === -1) {
-				throw new Error(`element was not in alphabet: "${element}"`);
-			}
+
+			// Throw on not found
+			// Throw on invalid for this size
+			inRangeIncl(
+				index,
+				0,
+				this.size - 1,
+				() => `Unexpected element "${element.toUpperCase()}".`,
+			);
 
 			return this.setElement(cell, index);
 		}
 
-		if (Number.isInteger(element)) {
-			inRangeIncl(0, this.size - 1, element);
+		inRangeIncl(
+			element,
+			0,
+			this.size - 1,
+			(n, low, high) =>
+				`Unexpected element "${n}", expected an integer ${low} <= n <= ${high}.`,
+		);
 
-			const previousElement = cell.element;
+		const previousElement = cell.element;
 
-			cell.candidates.clear();
+		cell.candidates.clear();
 
-			for (const {elements} of this.getStructuresOfCell(cell)) {
-				++elements[element];
+		for (const {elements} of this.getStructuresOfCell(cell)) {
+			++elements[element];
 
-				if (previousElement !== undefined) {
-					--elements[previousElement];
-				}
+			if (previousElement !== undefined) {
+				--elements[previousElement];
 			}
-
-			// If the structure is uninitialised elements will be updated there
-			// if it is initialised it won't be updated there
-			// Therefore always update it after getStructuresOfCell
-			cell.element = element;
-
-			return this.emit('change');
 		}
 
-		throw new TypeError(`element was not an integer: ${element}`);
+		// If the structure is uninitialised elements will be updated there
+		// if it is initialised it won't be updated there
+		// Therefore always update it after getStructuresOfCell
+		cell.element = element;
+
+		return this.emit('change');
 	};
 
 	getElement = (cellOrIndex: number | Cell): string | undefined => {
@@ -275,7 +311,7 @@ export class Sudoku {
 
 	// eslint-disable-next-line @typescript-eslint/member-ordering
 	getCol = makeStructureCacher((col: number): ReadonlyCells => {
-		inRangeIncl(0, this.size - 1, col);
+		inRangeIncl(col, 0, this.size - 1);
 
 		const result: Cell[] = [];
 
@@ -288,7 +324,7 @@ export class Sudoku {
 
 	// eslint-disable-next-line @typescript-eslint/member-ordering
 	getRow = makeStructureCacher((row: number): ReadonlyCells => {
-		inRangeIncl(0, this.size - 1, row);
+		inRangeIncl(row, 0, this.size - 1);
 
 		return this.#cells.slice(row * this.size, (1 + row) * this.size);
 	});
@@ -297,7 +333,7 @@ export class Sudoku {
 	getBlock = makeStructureCacher((index: number): ReadonlyCells => {
 		const {size, blockWidth} = this;
 
-		inRangeIncl(0, size - 1, index);
+		inRangeIncl(index, 0, size - 1);
 
 		const colOffset = (index % blockWidth) * blockWidth;
 		const rowOffset = Math.floor(index / blockWidth) * blockWidth;
@@ -317,7 +353,7 @@ export class Sudoku {
 
 	getCell = (index: number | Cell): Cell => {
 		if (typeof index === 'number') {
-			inRangeIncl(0, this.amountCells - 1, index);
+			inRangeIncl(index, 0, this.amountCells - 1);
 
 			return this.#cells[index]!;
 		}

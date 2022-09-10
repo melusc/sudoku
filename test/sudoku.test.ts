@@ -28,7 +28,7 @@ test('Sudoku#setElement invalid element', t => {
 		() => {
 			s.setElement(0, '.');
 		},
-		{message: /not in alphabet: "\."$/},
+		{message: 'Unexpected element ".".'},
 	);
 
 	t.throws(
@@ -832,7 +832,7 @@ test('Sudoku#fromJson invalid candidates', t => {
 			Sudoku.fromJson([[1, 3, 9]], 9);
 		},
 		{
-			message: '9 ∉ [0, 8].',
+			message: 'Expected candidate "9" at cell #0 to be 0 <= n <= 8.',
 		},
 	);
 });
@@ -843,7 +843,7 @@ test('Sudoku#fromJson invalid element', t => {
 			Sudoku.fromJson([9], 9);
 		},
 		{
-			message: '9 ∉ [0, 8].',
+			message: 'Unexpected element "9", expected an integer 0 <= n <= 8.',
 		},
 	);
 });
@@ -851,26 +851,46 @@ test('Sudoku#fromJson invalid element', t => {
 test('inRangeIncl', t => {
 	t.throws(
 		() => {
-			inRangeIncl(0, 80, -1);
+			inRangeIncl(-1, 0, 80);
 		},
-		{message: '-1 ∉ [0, 80].'},
+		{message: /-1.+0.+80/},
 	);
 
 	t.throws(
 		() => {
-			inRangeIncl(0, 80, 81);
+			inRangeIncl(81, 0, 80);
 		},
-		{message: '81 ∉ [0, 80].'},
+		{message: /81.+0.+80/},
 	);
 
 	t.throws(
 		() => {
-			inRangeIncl(0, 80, 5.5);
+			inRangeIncl(5.5, 0, 80);
 		},
-		{message: '5.5 was not an integer.'},
+		{message: /5\.5.+0.+80/},
 	);
 
 	t.notThrows(() => {
-		inRangeIncl(0, 80, 4);
+		inRangeIncl(4, 0, 80);
 	});
+
+	t.throws(
+		() => {
+			// @ts-expect-error Testing case
+			inRangeIncl('abc', 0, 80);
+		},
+		{
+			message: /abc.+0.+80/,
+		},
+	);
+
+	t.throws(
+		() => {
+			inRangeIncl(0, 1, 10, (...args) => args.join(', '));
+		},
+		{
+			message: '0, 1, 10',
+			instanceOf: Error,
+		},
+	);
 });
