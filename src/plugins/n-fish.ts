@@ -49,12 +49,12 @@ const nFishByStructure = (
 		for (const [inStructureIndex, cell] of structure.entries()) {
 			if (cell.element === undefined) {
 				for (const candidate of eachCandidate(structure, cell)) {
-					const candidateSummary = summary.defaultGet(
+					const candidateSummary = summary.getWithDefault(
 						candidate,
 						() => new BetterMap(),
 					);
 
-					const item = candidateSummary.defaultGet(structureIndex, () => ({
+					const item = candidateSummary.getWithDefault(structureIndex, () => ({
 						key: 0n,
 						inStructureIndices: [],
 					}));

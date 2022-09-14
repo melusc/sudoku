@@ -21,7 +21,7 @@ export function * eachCandidate(
 }
 
 export class BetterMap<K, V> extends Map<K, V> {
-	defaultGet(key: K, defaultFactory: () => V): V {
+	getWithDefault(key: K, defaultFactory: () => V): V {
 		if (!this.has(key)) {
 			this.set(key, defaultFactory());
 		}

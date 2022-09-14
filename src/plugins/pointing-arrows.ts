@@ -42,7 +42,7 @@ export const pointingArrows = (sudoku: Sudoku): void => {
 
 			if (cell.element === undefined) {
 				for (const candidate of eachCandidate(block, cell)) {
-					const item = summary.defaultGet(candidate, () => ({
+					const item = summary.getWithDefault(candidate, () => ({
 						row: new Set(),
 						col: new Set(),
 					}));

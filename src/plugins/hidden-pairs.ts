@@ -43,7 +43,7 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 
 		if (cell.element === undefined) {
 			for (const candidate of eachCandidate(structure, cell)) {
-				const item = summary.defaultGet(candidate, () => ({
+				const item = summary.getWithDefault(candidate, () => ({
 					indicesKey: 0n,
 					indices: [],
 				}));
