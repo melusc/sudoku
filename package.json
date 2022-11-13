@@ -37,8 +37,7 @@
 		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && xo --fix",
 		"build": "rimraf dist && tsc",
-		"pretest": "yarn build",
-		"test": "yarn ava"
+		"test": "yarn build && yarn ava"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^3.0.1",
