@@ -187,13 +187,13 @@ export class Sudoku {
 		return sudoku;
 	};
 
-	readonly #subscriptions = new Set<SubscriptionCallback>();
-
-	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
-
 	/** @internal */
 	anyChanged = false;
 	rounds = 0;
+
+	shouldLogErrors
+		// eslint-disable-next-line n/prefer-global/process
+		= typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
 
 	/** @internal */
 	readonly amountCells: number;
@@ -201,11 +201,11 @@ export class Sudoku {
 	/** @internal */
 	readonly blockWidth: number;
 
-	readonly #cells: ReadonlyCells;
+	readonly #subscriptions = new Set<SubscriptionCallback>();
 
-	shouldLogErrors
-		// eslint-disable-next-line n/prefer-global/process
-		= typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
+	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
+
+	readonly #cells: ReadonlyCells;
 
 	constructor(readonly size: number) {
 		const blockWidth = Math.sqrt(size);
@@ -364,31 +364,6 @@ export class Sudoku {
 	getCells = (): ReadonlyCells => this.#cells;
 
 	/** @internal */
-	#checkCellCandidates = (cellOrIndex: number | Cell): this => {
-		const cell = this.getCell(cellOrIndex);
-
-		if (cell.element !== undefined) {
-			return this;
-		}
-
-		if (cell.candidates.size === 0) {
-			throw new Error(
-				`Unexpected empty cell candidates in cell #${this.#cells.indexOf(
-					cell,
-				)}`,
-			);
-		}
-
-		if (cell.candidates.size === 1) {
-			this.setElement(cell, [...cell.candidates][0]!);
-			this.anyChanged ||= true;
-			this.emit('change');
-		}
-
-		return this;
-	};
-
-	/** @internal */
 	removeCandidate = (cellOrIndex: number | Cell, toRemove: number): this => {
 		const {candidates} = this.getCell(cellOrIndex);
 
@@ -423,22 +398,6 @@ export class Sudoku {
 		}
 
 		return this;
-	};
-
-	#singleSolve = (): SolveTypes => {
-		this.anyChanged = false;
-
-		for (const plugin of this.#plugins) {
-			try {
-				plugin(this);
-			} catch (error: unknown) {
-				this.logError(error, this.#cells);
-
-				return SolveTypes.error;
-			}
-		}
-
-		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
 	};
 
 	solve = (): DispatchType => {
@@ -641,4 +600,45 @@ export class Sudoku {
 
 	toJson = (): JsonSudoku =>
 		this.getCells().map(({candidates, element}) => element ?? [...candidates]);
+
+	#singleSolve = (): SolveTypes => {
+		this.anyChanged = false;
+
+		for (const plugin of this.#plugins) {
+			try {
+				plugin(this);
+			} catch (error: unknown) {
+				this.logError(error, this.#cells);
+
+				return SolveTypes.error;
+			}
+		}
+
+		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
+	};
+
+	/** @internal */
+	#checkCellCandidates = (cellOrIndex: number | Cell): this => {
+		const cell = this.getCell(cellOrIndex);
+
+		if (cell.element !== undefined) {
+			return this;
+		}
+
+		if (cell.candidates.size === 0) {
+			throw new Error(
+				`Unexpected empty cell candidates in cell #${this.#cells.indexOf(
+					cell,
+				)}`,
+			);
+		}
+
+		if (cell.candidates.size === 1) {
+			this.setElement(cell, [...cell.candidates][0]!);
+			this.anyChanged ||= true;
+			this.emit('change');
+		}
+
+		return this;
+	};
 }
