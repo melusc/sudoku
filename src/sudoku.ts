@@ -634,7 +634,8 @@ export class Sudoku {
 		}
 
 		if (cell.candidates.size === 1) {
-			this.setElement(cell, [...cell.candidates][0]!);
+			const [element] = cell.candidates;
+			this.setElement(cell, element!);
 			this.anyChanged ||= true;
 			this.emit('change');
 		}
