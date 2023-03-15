@@ -4,10 +4,7 @@
 
 import {eachCandidate, makeVisitor, type VisitorFn} from './shared.js';
 
-const throwSmallerThanAllowed = (
-	elements: number[],
-	indices: number[],
-): void => {
+function throwSmallerThanAllowed(elements: number[], indices: number[]): void {
 	if (elements.length < indices.length) {
 		throw new Error(
 			`Less elements than indices: elements={${elements.join(
@@ -15,7 +12,7 @@ const throwSmallerThanAllowed = (
 			)}}, indices=${indices.join(',')} (naked pairs)`,
 		);
 	}
-};
+}
 
 const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
 	const summary = new Map<number, {key: bigint; elements: number[]}>();

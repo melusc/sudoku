@@ -1,13 +1,13 @@
 import type {Sudoku, Structure, Cell} from '../sudoku.js';
 
 export type VisitorFn = (structure: Structure, sudoku: Sudoku) => void;
-export const makeVisitor
-	= (cb: VisitorFn): ((sudoku: Sudoku) => void) =>
-	(sudoku: Sudoku): void => {
+export function makeVisitor(cb: VisitorFn): (sudoku: Sudoku) => void {
+	return (sudoku: Sudoku): void => {
 		for (const structure of sudoku.eachStructure()) {
 			cb(structure, sudoku);
 		}
 	};
+}
 
 export function * eachCandidate(
 	structure: Structure,

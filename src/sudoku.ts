@@ -18,19 +18,19 @@ export type JsonSudoku = ReadonlyArray<number | readonly number[]>;
 type DispatchType = 'change' | 'error' | 'finish';
 export type SubscriptionCallback = (sudoku: Sudoku, type: DispatchType) => void;
 
-export const inRangeIncl = (
+export function inRangeIncl(
 	n: number,
 	low: number,
 	high: number,
 	format?: (n: number, low: number, high: number) => string,
-): void => {
+): void {
 	if (!Number.isInteger(n) || n < low || n > high) {
 		throw new TypeError(
 			format?.(n, low, high)
 				?? `Received "${n}", expected an integer ${low} <= n <= ${high}.`,
 		);
 	}
-};
+}
 
 enum SolveTypes {
 	changed,
@@ -38,13 +38,14 @@ enum SolveTypes {
 	error,
 }
 
-const generateEmptyCellCandidates = (size: number): Set<number> =>
-	new Set(Array.from({length: size}, (_v, index) => index));
+function generateEmptyCellCandidates(size: number): Set<number> {
+	return new Set(Array.from({length: size}, (_v, index) => index));
+}
 
 // Using a proxy means there's no need to check for undefined every single time, only check it once here
 // It also allows to simply do `elements[number]++` without checking for undefined
-const makeElementsRecord = (): Record<number, number> =>
-	new Proxy<Record<number, number>>(
+function makeElementsRecord(): Record<number, number> {
+	return new Proxy<Record<number, number>>(
 		{},
 		{
 			get(target, key): number {
@@ -63,6 +64,7 @@ const makeElementsRecord = (): Record<number, number> =>
 			},
 		},
 	);
+}
 
 const makeStructureCacher = (
 	fn: (index: number) => ReadonlyCells,
@@ -98,7 +100,7 @@ export class Sudoku {
 		...'1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 	];
 
-	static fromPrefilled = (cells: PrefilledSudoku, size: number): Sudoku => {
+	static fromPrefilled(cells: PrefilledSudoku, size: number): Sudoku {
 		const s = new Sudoku(size);
 
 		for (const [rowIndex, row] of cells.entries()) {
@@ -148,9 +150,9 @@ export class Sudoku {
 
 		s.anyChanged = false;
 		return s;
-	};
+	}
 
-	static fromString = (input: string, size: number): Sudoku => {
+	static fromString(input: string, size: number): Sudoku {
 		const sudoku = new Sudoku(size);
 
 		for (let i = 0; i < input.length; ++i) {
@@ -161,9 +163,9 @@ export class Sudoku {
 		}
 
 		return sudoku;
-	};
+	}
 
-	static fromJson = (input: JsonSudoku, size: number): Sudoku => {
+	static fromJson(input: JsonSudoku, size: number): Sudoku {
 		const sudoku = new Sudoku(size);
 
 		for (const [index, item] of input.entries()) {
@@ -185,7 +187,7 @@ export class Sudoku {
 		}
 
 		return sudoku;
-	};
+	}
 
 	/** @internal */
 	anyChanged = false;
@@ -229,7 +231,7 @@ export class Sudoku {
 		}));
 	}
 
-	setElement = (cellOrIndex: number | Cell, element: string | number): this => {
+	setElement(cellOrIndex: number | Cell, element: string | number): this {
 		const cell = this.getCell(cellOrIndex);
 
 		if (typeof element === 'string') {
@@ -273,9 +275,9 @@ export class Sudoku {
 		cell.element = element;
 
 		return this.emit('change');
-	};
+	}
 
-	getElement = (cellOrIndex: number | Cell): string | undefined => {
+	getElement(cellOrIndex: number | Cell): string | undefined {
 		const {element} = this.getCell(cellOrIndex);
 
 		if (element === undefined) {
@@ -283,9 +285,9 @@ export class Sudoku {
 		}
 
 		return Sudoku.alphabet[element];
-	};
+	}
 
-	clearCell = (index: number | Cell): this => {
+	clearCell(index: number | Cell): this {
 		const cell = this.getCell(index);
 		const {element} = cell;
 
@@ -299,15 +301,15 @@ export class Sudoku {
 		cell.candidates = generateEmptyCellCandidates(this.size);
 
 		return this.emit('change');
-	};
+	}
 
-	clearAllCells = (): this => {
+	clearAllCells(): this {
 		for (const cell of this.#cells) {
 			this.clearCell(cell);
 		}
 
 		return this.emit('change');
-	};
+	}
 
 	// eslint-disable-next-line @typescript-eslint/member-ordering
 	getCol = makeStructureCacher((col: number): ReadonlyCells => {
@@ -351,7 +353,7 @@ export class Sudoku {
 		return result;
 	});
 
-	getCell = (index: number | Cell): Cell => {
+	getCell(index: number | Cell): Cell {
 		if (typeof index === 'number') {
 			inRangeIncl(index, 0, this.amountCells - 1);
 
@@ -359,12 +361,14 @@ export class Sudoku {
 		}
 
 		return index;
-	};
+	}
 
-	getCells = (): ReadonlyCells => this.#cells;
+	getCells(): ReadonlyCells {
+		return this.#cells;
+	}
 
 	/** @internal */
-	removeCandidate = (cellOrIndex: number | Cell, toRemove: number): this => {
+	removeCandidate(cellOrIndex: number | Cell, toRemove: number): this {
 		const {candidates} = this.getCell(cellOrIndex);
 
 		if (candidates.has(toRemove)) {
@@ -375,13 +379,13 @@ export class Sudoku {
 		}
 
 		return this;
-	};
+	}
 
 	/** @internal */
-	overrideCandidates = (
+	overrideCandidates(
 		cellOrIndex: number | Cell,
 		candidates: Set<number>,
-	): this => {
+	): this {
 		const cell = this.getCell(cellOrIndex);
 
 		let anyChanged = false;
@@ -398,9 +402,9 @@ export class Sudoku {
 		}
 
 		return this;
-	};
+	}
 
-	solve = (): DispatchType => {
+	solve(): DispatchType {
 		this.rounds = 0;
 
 		if (!this.isValid()) {
@@ -431,28 +435,28 @@ export class Sudoku {
 
 		this.emit(dispatchType);
 		return dispatchType;
-	};
+	}
 
-	subscribe = (callback: SubscriptionCallback): this => {
+	subscribe(callback: SubscriptionCallback): this {
 		this.#subscriptions.add(callback);
 
 		return this;
-	};
+	}
 
-	unsubscribe = (callback: SubscriptionCallback): this => {
+	unsubscribe(callback: SubscriptionCallback): this {
 		this.#subscriptions.delete(callback);
 
 		return this;
-	};
+	}
 
 	/** @internal */
-	emit = (type: DispatchType): this => {
+	emit(type: DispatchType): this {
 		for (const callback of this.#subscriptions) {
 			callback(this, type);
 		}
 
 		return this;
-	};
+	}
 
 	* eachStructure(): Iterable<Structure> {
 		for (const structureGetter of [this.getCol, this.getRow, this.getBlock]) {
@@ -463,7 +467,7 @@ export class Sudoku {
 	}
 
 	/** @internal */
-	cellsIndividuallyValid = (): boolean => {
+	cellsIndividuallyValid(): boolean {
 		for (const cell of this.#cells) {
 			if (!this.isCellValid(cell)) {
 				this.logError('cell was not valid', [cell]);
@@ -473,7 +477,7 @@ export class Sudoku {
 		}
 
 		return true;
-	};
+	}
 
 	/** @internal */
 	* getStructuresOfCell(cellOrIndex: number | Cell): Iterable<Structure> {
@@ -493,7 +497,7 @@ export class Sudoku {
 		yield this.getBlock(blockIndex);
 	}
 
-	isCellValid = (cellOrIndex: number | Cell): boolean => {
+	isCellValid(cellOrIndex: number | Cell): boolean {
 		const cell = this.getCell(cellOrIndex);
 
 		// Invalid cases:
@@ -516,9 +520,9 @@ export class Sudoku {
 		}
 
 		return true;
-	};
+	}
 
-	isValid = (): boolean => {
+	isValid(): boolean {
 		for (const structure of this.eachStructure()) {
 			const requiredNumbers = generateEmptyCellCandidates(this.size);
 
@@ -540,9 +544,9 @@ export class Sudoku {
 		}
 
 		return this.cellsIndividuallyValid();
-	};
+	}
 
-	isSolved = (): boolean => {
+	isSolved(): boolean {
 		if (!this.isValid()) {
 			return false;
 		}
@@ -554,9 +558,9 @@ export class Sudoku {
 		}
 
 		return true;
-	};
+	}
 
-	toPrefilledSudoku = (): PrefilledSudoku => {
+	toPrefilledSudoku(): PrefilledSudoku {
 		const rows: Array<Array<number | number[]>> = [];
 
 		for (let i = 0; i < this.size; ++i) {
@@ -574,9 +578,9 @@ export class Sudoku {
 		}
 
 		return rows;
-	};
+	}
 
-	toString = (): string => {
+	toString(): string {
 		const result: string[] = [];
 
 		for (const cell of this.getCells()) {
@@ -584,24 +588,27 @@ export class Sudoku {
 		}
 
 		return result.join('');
-	};
+	}
 
-	clone = (): Sudoku => {
+	clone(): Sudoku {
 		const newSudoku = Sudoku.fromPrefilled(this.toPrefilledSudoku(), this.size);
 		newSudoku.shouldLogErrors = this.shouldLogErrors;
 		return newSudoku;
-	};
+	}
 
-	logError = (message: any, ...data: any[]): void => {
+	logError(message: any, ...data: any[]): void {
 		if (this.shouldLogErrors) {
 			console.error(message, ...data);
 		}
-	};
+	}
 
-	toJson = (): JsonSudoku =>
-		this.getCells().map(({candidates, element}) => element ?? [...candidates]);
+	toJson(): JsonSudoku {
+		return this.getCells().map(
+			({candidates, element}) => element ?? [...candidates],
+		);
+	}
 
-	#singleSolve = (): SolveTypes => {
+	#singleSolve(): SolveTypes {
 		this.anyChanged = false;
 
 		for (const plugin of this.#plugins) {
@@ -615,10 +622,10 @@ export class Sudoku {
 		}
 
 		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
-	};
+	}
 
 	/** @internal */
-	#checkCellCandidates = (cellOrIndex: number | Cell): this => {
+	#checkCellCandidates(cellOrIndex: number | Cell): this {
 		const cell = this.getCell(cellOrIndex);
 
 		if (cell.element !== undefined) {
@@ -641,5 +648,5 @@ export class Sudoku {
 		}
 
 		return this;
-	};
+	}
 }

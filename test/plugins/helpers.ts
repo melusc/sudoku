@@ -5,7 +5,8 @@ export type ComparableCell = {
 	element: number | undefined;
 };
 
-export const getComparableCells = (sudoku: Sudoku): ComparableCell[] =>
-	sudoku
+export function getComparableCells(sudoku: Sudoku): ComparableCell[] {
+	return sudoku
 		.getCells()
 		.map(cell => ({element: cell.element, candidates: cell.candidates}));
+}

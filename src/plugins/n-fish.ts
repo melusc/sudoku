@@ -1,7 +1,7 @@
 import type {Sudoku} from '../sudoku.js';
 import {BetterMap, eachCandidate} from './shared.js';
 
-const throwIfInvalid = (structIndices: number[], indices: number[]): void => {
+function throwIfInvalid(structIndices: number[], indices: number[]): void {
 	/*
 		[
 			[1, 1, 1, ...],
@@ -13,7 +13,6 @@ const throwIfInvalid = (structIndices: number[], indices: number[]): void => {
 		There's no way to place all 1s
 		without duplicates
 	*/
-
 	if (structIndices.length > indices.length) {
 		throw new Error(
 			`Less structIndices than indices: structIndices={${structIndices.join(
@@ -21,14 +20,14 @@ const throwIfInvalid = (structIndices: number[], indices: number[]): void => {
 			)}}, indices={${indices.join(',')}} (n fish)`,
 		);
 	}
-};
+}
 
 /* https://www.sudokuonline.io/tips/sudoku-swordfish-strategy */
 
-const nFishByStructure = (
+function nFishByStructure(
 	sudoku: Sudoku,
 	getterName: 'getRow' | 'getCol',
-): void => {
+): void {
 	const summary = new BetterMap<
 		/* element: */ number,
 		BetterMap<
@@ -38,10 +37,10 @@ const nFishByStructure = (
 	>();
 
 	/*
-		Index all cell candidates
-		For each row / col and each number
-		add the index of the number:
-		number[`cell candidate`][`row-index`] |= `index in row`
+			Index all cell candidates
+			For each row / col and each number
+			add the index of the number:
+			number[`cell candidate`][`row-index`] |= `index in row`
 	*/
 	for (let structureIndex = 0; structureIndex < sudoku.size; ++structureIndex) {
 		const structure = sudoku[getterName](structureIndex);
@@ -101,9 +100,9 @@ const nFishByStructure = (
 			sudoku.emit('change');
 		}
 	}
-};
+}
 
-export const nFish = (sudoku: Sudoku): void => {
+export function nFish(sudoku: Sudoku): void {
 	nFishByStructure(sudoku, 'getRow');
 	nFishByStructure(sudoku, 'getCol');
-};
+}

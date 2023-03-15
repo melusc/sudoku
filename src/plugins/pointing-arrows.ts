@@ -1,12 +1,12 @@
 import type {Sudoku, Structure} from '../sudoku.js';
 import {BetterMap, eachCandidate} from './shared.js';
 
-const clearSection = (
+function clearSection(
 	structure: Structure,
 	sudoku: Sudoku,
 	blockIndex: number,
 	numberToRemove: number,
-): void => {
+): void {
 	const {blockWidth} = sudoku;
 
 	for (const [index, cell] of structure.entries()) {
@@ -18,9 +18,9 @@ const clearSection = (
 	}
 
 	sudoku.emit('change');
-};
+}
 
-export const pointingArrows = (sudoku: Sudoku): void => {
+export function pointingArrows(sudoku: Sudoku): void {
 	const {size, blockWidth} = sudoku;
 
 	for (let blockIndex = 0; blockIndex < size; ++blockIndex) {
@@ -77,4 +77,4 @@ export const pointingArrows = (sudoku: Sudoku): void => {
 			}
 		}
 	}
-};
+}

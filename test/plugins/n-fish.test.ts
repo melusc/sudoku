@@ -2,9 +2,8 @@ import test, {type ExecutionContext} from 'ava';
 import {nFish} from '../../src/plugins/n-fish.js';
 import {Sudoku} from '../../src/sudoku.js';
 
-const makeCheck
-	= (s: Sudoku, t: ExecutionContext) =>
-	(index: number, expected: number[] | number): void => {
+function makeCheck(s: Sudoku, t: ExecutionContext) {
+	return (index: number, expected: number[] | number): void => {
 		const cell = s.getCell(index);
 
 		if (Array.isArray(expected)) {
@@ -14,6 +13,7 @@ const makeCheck
 			t.is(cell.candidates.size, 0);
 		}
 	};
+}
 
 test('regular n-fish #1', t => {
 	// ^ for the participating numbers

@@ -9,7 +9,7 @@ import {
 	type VisitorFn,
 } from './shared.js';
 
-const throwIfSmaller = (indices: number[], numbers: number[]): void => {
+function throwIfSmaller(indices: number[], numbers: number[]): void {
 	if (indices.length < numbers.length) {
 		throw new Error(
 			`Less indices than numbers: indices={${indices.join(
@@ -17,7 +17,7 @@ const throwIfSmaller = (indices: number[], numbers: number[]): void => {
 			)}}, numbers={${numbers.join(',')}} (hidden pairs)`,
 		);
 	}
-};
+}
 
 const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 	// Getting all the indexes of a number
