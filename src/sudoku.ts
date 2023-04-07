@@ -598,6 +598,7 @@ export class Sudoku {
 
 	logError(message: any, ...data: any[]): void {
 		if (this.shouldLogErrors) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			console.error(message, ...data);
 		}
 	}
