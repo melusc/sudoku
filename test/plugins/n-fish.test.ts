@@ -1,4 +1,5 @@
 import test, {type ExecutionContext} from 'ava';
+
 import {nFish} from '../../src/plugins/n-fish.js';
 import {Sudoku} from '../../src/sudoku.js';
 

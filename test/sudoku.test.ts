@@ -3,6 +3,7 @@ import {randomInt} from 'node:crypto';
 import test from 'ava';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
+
 import {getComparableCells} from './plugins/helpers.js';
 import {transformChunkedArray, transformFlatArray} from './util.js';
 

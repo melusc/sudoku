@@ -1,4 +1,5 @@
 import type {Sudoku, Structure} from '../sudoku.js';
+
 import {BetterMap, eachCandidate} from './shared.js';
 
 function clearSection(
