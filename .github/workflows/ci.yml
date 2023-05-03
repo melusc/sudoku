@@ -15,6 +15,7 @@ jobs:
           - ^16.9
           - 18
           - 20
+    name: Node ${{ matrix.node-version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
