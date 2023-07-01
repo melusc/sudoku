@@ -49,5 +49,5 @@
 		"xo": "^0.54.2"
 	},
 	"sideEffects": false,
-	"packageManager": "yarn@3.6.0"
+	"packageManager": "yarn@3.6.1"
 }
