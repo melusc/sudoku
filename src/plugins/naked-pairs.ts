@@ -2,7 +2,7 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import {eachCandidate, makeVisitor, type VisitorFn} from './shared.js';
+import {eachCandidate, makeVisitor, type VisitorFunction} from './shared.js';
 
 function throwSmallerThanAllowed(elements: number[], indices: number[]): void {
 	if (elements.length < indices.length) {
@@ -14,7 +14,7 @@ function throwSmallerThanAllowed(elements: number[], indices: number[]): void {
 	}
 }
 
-const genericNakedPairsSolver: VisitorFn = (structure, sudoku) => {
+const genericNakedPairsSolver: VisitorFunction = (structure, sudoku) => {
 	const summary = new Map<number, {key: bigint; elements: number[]}>();
 
 	for (const [index, cell] of structure.entries()) {
