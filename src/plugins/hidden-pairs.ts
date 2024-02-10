@@ -6,7 +6,7 @@ import {
 	BetterMap,
 	eachCandidate,
 	makeVisitor,
-	type VisitorFn,
+	type VisitorFunction,
 } from './shared.js';
 
 function throwIfSmaller(indices: number[], numbers: number[]): void {
@@ -19,7 +19,7 @@ function throwIfSmaller(indices: number[], numbers: number[]): void {
 	}
 }
 
-const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
+const genericHiddenPairsSolver: VisitorFunction = (structure, sudoku) => {
 	// Getting all the indexes of a number
 	// works like this:
 	// If 7 is in cells (0, 4, 6)
@@ -53,7 +53,7 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 		}
 	}
 
-	for (const {indicesKey: indicesKeyRef, indices} of summary.values()) {
+	for (const {indicesKey: indicesKeyReference, indices} of summary.values()) {
 		if (indices.length === sudoku.size) {
 			continue;
 		}
@@ -61,7 +61,7 @@ const genericHiddenPairsSolver: VisitorFn = (structure, sudoku) => {
 		const numbers: number[] = [];
 
 		for (const [elementI, {indicesKey}] of summary) {
-			if ((indicesKeyRef & indicesKey) === indicesKey) {
+			if ((indicesKeyReference & indicesKey) === indicesKey) {
 				numbers.push(elementI);
 			}
 		}

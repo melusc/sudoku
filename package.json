@@ -41,12 +41,12 @@
 	"devDependencies": {
 		"@ava/typescript": "^4.1.0",
 		"@lusc/tsconfig": "^4.0.0",
-		"@types/node": "^20.11.16",
+		"@types/node": "^20.11.17",
 		"ava": "^6.1.1",
 		"prettier": "^3.2.5",
 		"rimraf": "^5.0.5",
 		"typescript": "^5.3.3",
-		"xo": "^0.56.0"
+		"xo": "^0.57.0"
 	},
 	"sideEffects": false,
 	"packageManager": "yarn@4.1.0"

@@ -887,7 +887,7 @@ test('inRangeIncl', t => {
 
 	t.throws(
 		() => {
-			inRangeIncl(0, 1, 10, (...args) => args.join(', '));
+			inRangeIncl(0, 1, 10, (...arguments_) => arguments_.join(', '));
 		},
 		{
 			message: '0, 1, 10',

@@ -67,7 +67,7 @@ function makeElementsRecord(): Record<number, number> {
 }
 
 const makeStructureCacher = (
-	fn: (index: number) => ReadonlyCells,
+	function_: (index: number) => ReadonlyCells,
 ): ((index: number) => Structure) => {
 	const cache = new Map<number, Structure>();
 	return (index: number): Structure => {
@@ -75,7 +75,7 @@ const makeStructureCacher = (
 			return cache.get(index)!;
 		}
 
-		const result = fn(index);
+		const result = function_(index);
 
 		const elements = makeElementsRecord();
 
@@ -93,7 +93,8 @@ const makeStructureCacher = (
 };
 
 // Because Array.isArray on its own won't narrow it down otherwise
-const isReadonlyArray: (arg0: any) => arg0 is readonly any[] = Array.isArray;
+const isReadonlyArray: (argument0: any) => argument0 is readonly any[]
+	= Array.isArray;
 
 export class Sudoku {
 	static readonly alphabet: readonly string[] = [
