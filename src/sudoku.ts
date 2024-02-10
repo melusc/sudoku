@@ -93,7 +93,8 @@ const makeStructureCacher = (
 };
 
 // Because Array.isArray on its own won't narrow it down otherwise
-const isReadonlyArray: (argument0: any) => argument0 is readonly any[] = Array.isArray;
+const isReadonlyArray: (argument0: any) => argument0 is readonly any[]
+	= Array.isArray;
 
 export class Sudoku {
 	static readonly alphabet: readonly string[] = [

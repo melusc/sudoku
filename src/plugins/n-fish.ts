@@ -67,7 +67,10 @@ function nFishByStructure(
 	}
 
 	for (const [element, elementSummary] of summary) {
-		for (const {key: keyReference, inStructureIndices} of elementSummary.values()) {
+		for (const {
+			key: keyReference,
+			inStructureIndices,
+		} of elementSummary.values()) {
 			if (inStructureIndices.length === sudoku.size) {
 				continue;
 			}

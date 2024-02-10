@@ -1,7 +1,9 @@
 import type {Sudoku, Structure, Cell} from '../sudoku.js';
 
 export type VisitorFunction = (structure: Structure, sudoku: Sudoku) => void;
-export function makeVisitor(callback: VisitorFunction): (sudoku: Sudoku) => void {
+export function makeVisitor(
+	callback: VisitorFunction,
+): (sudoku: Sudoku) => void {
 	return (sudoku: Sudoku): void => {
 		for (const structure of sudoku.eachStructure()) {
 			callback(structure, sudoku);
