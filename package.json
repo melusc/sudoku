@@ -39,7 +39,7 @@
 		"test": "yarn build && yarn ava"
 	},
 	"devDependencies": {
-		"@ava/typescript": "^4.1.0",
+		"@ava/typescript": "^5.0.0",
 		"@lusc/tsconfig": "^4.0.0",
 		"@types/node": "^20.11.25",
 		"ava": "^6.1.2",
