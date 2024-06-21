@@ -81,7 +81,7 @@ const makeStructureCacher = (
 
 		for (const {element} of result) {
 			if (element !== undefined) {
-				++elements[element];
+				++elements[element]!;
 			}
 		}
 
@@ -263,10 +263,10 @@ export class Sudoku {
 		cell.candidates.clear();
 
 		for (const {elements} of this.getStructuresOfCell(cell)) {
-			++elements[element];
+			++elements[element]!;
 
 			if (previousElement !== undefined) {
-				--elements[previousElement];
+				--elements[previousElement]!;
 			}
 		}
 
@@ -294,7 +294,7 @@ export class Sudoku {
 
 		if (element !== undefined) {
 			for (const structure of this.getStructuresOfCell(cell)) {
-				--structure.elements[element];
+				--structure.elements[element]!;
 			}
 		}
 
