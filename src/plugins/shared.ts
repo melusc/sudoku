@@ -11,7 +11,7 @@ export function makeVisitor(
 	};
 }
 
-export function * eachCandidate(
+export function* eachCandidate(
 	structure: Structure,
 	cell: Cell,
 ): Iterable<number> {

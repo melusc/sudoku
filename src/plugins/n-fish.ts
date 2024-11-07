@@ -89,8 +89,8 @@ function nFishByStructure(
 			}
 
 			for (const inStructureIndex of inStructureIndices) {
-				const structure
-					= sudoku[getterName === 'getCol' ? 'getRow' : 'getCol'](
+				const structure =
+					sudoku[getterName === 'getCol' ? 'getRow' : 'getCol'](
 						inStructureIndex,
 					);
 

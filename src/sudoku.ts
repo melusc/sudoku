@@ -26,8 +26,8 @@ export function inRangeIncl(
 ): void {
 	if (!Number.isInteger(n) || n < low || n > high) {
 		throw new TypeError(
-			format?.(n, low, high)
-				?? `Received "${n}", expected an integer ${low} <= n <= ${high}.`,
+			format?.(n, low, high) ??
+				`Received "${n}", expected an integer ${low} <= n <= ${high}.`,
 		);
 	}
 }
@@ -93,8 +93,8 @@ const makeStructureCacher = (
 };
 
 // Because Array.isArray on its own won't narrow it down otherwise
-const isReadonlyArray: (argument0: any) => argument0 is readonly any[]
-	= Array.isArray;
+const isReadonlyArray: (argument0: unknown) => argument0 is readonly unknown[] =
+	Array.isArray;
 
 export class Sudoku {
 	static readonly alphabet: readonly string[] = [
@@ -156,10 +156,10 @@ export class Sudoku {
 	static fromString(input: string, size: number): Sudoku {
 		const sudoku = new Sudoku(size);
 
-		for (let i = 0; i < input.length; ++i) {
-			const char = input.charAt(i);
+		for (let index = 0; index < input.length; ++index) {
+			const char = input.charAt(index);
 			if (char !== ' ') {
-				sudoku.setElement(i, input.charAt(i));
+				sudoku.setElement(index, char);
 			}
 		}
 
@@ -194,9 +194,8 @@ export class Sudoku {
 	anyChanged = false;
 	rounds = 0;
 
-	shouldLogErrors
-		// eslint-disable-next-line n/prefer-global/process
-		= typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
+	shouldLogErrors =
+		typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
 
 	/** @internal */
 	readonly amountCells: number;
@@ -312,7 +311,7 @@ export class Sudoku {
 		return this.emit('change');
 	}
 
-	// eslint-disable-next-line @typescript-eslint/member-ordering
+	// eslint-disable-next-line unicorn/consistent-function-scoping
 	getCol = makeStructureCacher((col: number): ReadonlyCells => {
 		inRangeIncl(col, 0, this.size - 1);
 
@@ -325,14 +324,14 @@ export class Sudoku {
 		return result;
 	});
 
-	// eslint-disable-next-line @typescript-eslint/member-ordering
+	// eslint-disable-next-line unicorn/consistent-function-scoping
 	getRow = makeStructureCacher((row: number): ReadonlyCells => {
 		inRangeIncl(row, 0, this.size - 1);
 
 		return this.#cells.slice(row * this.size, (1 + row) * this.size);
 	});
 
-	// eslint-disable-next-line @typescript-eslint/member-ordering
+	// eslint-disable-next-line unicorn/consistent-function-scoping
 	getBlock = makeStructureCacher((index: number): ReadonlyCells => {
 		const {size, blockWidth} = this;
 
@@ -459,10 +458,10 @@ export class Sudoku {
 		return this;
 	}
 
-	* eachStructure(): Iterable<Structure> {
+	*eachStructure(): Iterable<Structure> {
 		for (const structureGetter of [this.getCol, this.getRow, this.getBlock]) {
-			for (let i = 0; i < this.size; ++i) {
-				yield structureGetter(i);
+			for (let index = 0; index < this.size; ++index) {
+				yield structureGetter(index);
 			}
 		}
 	}
@@ -481,7 +480,7 @@ export class Sudoku {
 	}
 
 	/** @internal */
-	* getStructuresOfCell(cellOrIndex: number | Cell): Iterable<Structure> {
+	*getStructuresOfCell(cellOrIndex: number | Cell): Iterable<Structure> {
 		const cell = this.getCell(cellOrIndex);
 
 		const {index} = cell;
@@ -564,8 +563,8 @@ export class Sudoku {
 	toPrefilledSudoku(): PrefilledSudoku {
 		const rows: Array<Array<number | number[]>> = [];
 
-		for (let i = 0; i < this.size; ++i) {
-			const row = this.getRow(i);
+		for (let index = 0; index < this.size; ++index) {
+			const row = this.getRow(index);
 			const resultingRow: Array<number | number[]> = [];
 			rows.push(resultingRow);
 
@@ -597,9 +596,8 @@ export class Sudoku {
 		return newSudoku;
 	}
 
-	logError(message: any, ...data: any[]): void {
+	logError(message: unknown, ...data: unknown[]): void {
 		if (this.shouldLogErrors) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			console.error(message, ...data);
 		}
 	}
@@ -623,6 +621,7 @@ export class Sudoku {
 			}
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
 	}
 

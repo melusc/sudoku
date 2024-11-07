@@ -693,8 +693,8 @@ test('Sudoku.fromPrefilled valid sudoku', t => {
 		4,
 	);
 
-	for (let i = 0; i < s.size; ++i) {
-		const row = s.getRow(i);
+	for (let index = 0; index < s.size; ++index) {
+		const row = s.getRow(index);
 		t.deepEqual(
 			row.map(cell => cell.element),
 			[0, 1, 2, 3],
@@ -743,8 +743,8 @@ test('Sudoku.fromPrefilled too many rows', t => {
 test('Sudoku.fromString valid sudoku', t => {
 	const s = Sudoku.fromString('1234'.repeat(4), 4);
 
-	for (let i = 0; i < s.size; ++i) {
-		const row = s.getRow(i);
+	for (let index = 0; index < s.size; ++index) {
+		const row = s.getRow(index);
 		t.deepEqual(
 			row.map(cell => cell.element),
 			[0, 1, 2, 3],
@@ -779,8 +779,8 @@ test('Sudoku#toString should produce a valid string', t => {
 
 	// Only fill every second cell to also test
 	// stringifying empty cells
-	for (let i = 0; i < s.size ** 2; i += 2) {
-		s.setElement(i, randomInt(s.size));
+	for (let index = 0; index < s.size ** 2; index += 2) {
+		s.setElement(index, randomInt(s.size));
 	}
 
 	// Test by passing it to Sudoku.fromString
