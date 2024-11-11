@@ -1,7 +1,7 @@
 import test from 'ava';
 
-import {Sudoku} from '../../src/sudoku.js';
 import {removeByElements} from '../../src/plugins/remove-by-elements.js';
+import {Sudoku} from '../../src/sudoku.js';
 
 import {getComparableCells} from './helpers.js';
 

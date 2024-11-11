@@ -1,7 +1,7 @@
 import test from 'ava';
 
-import {Sudoku} from '../../src/sudoku.js';
 import {hiddenPairs} from '../../src/plugins/hidden-pairs.js';
+import {Sudoku} from '../../src/sudoku.js';
 
 import {getComparableCells} from './helpers.js';
 

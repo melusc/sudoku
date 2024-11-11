@@ -195,6 +195,7 @@ export class Sudoku {
 	rounds = 0;
 
 	shouldLogErrors =
+		// eslint-disable-next-line n/prefer-global/process
 		typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
 
 	/** @internal */
