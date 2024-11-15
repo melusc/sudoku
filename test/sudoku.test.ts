@@ -1,3 +1,4 @@
+/* eslint regexp/no-super-linear-backtracking: off */
 import {randomInt} from 'node:crypto';
 
 import test from 'ava';

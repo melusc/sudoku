@@ -114,7 +114,7 @@ test('Detect invalid sudoku', t => {
 			nFish(s);
 		},
 		{
-			message: /{0,1,2}.+{0,1\}/,
+			message: /\{0,1,2\}.+\{0,1\}/,
 		},
 	);
 });
