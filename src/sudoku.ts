@@ -98,6 +98,7 @@ const isReadonlyArray: (argument0: unknown) => argument0 is readonly unknown[] =
 
 export class Sudoku {
 	static readonly alphabet: readonly string[] = [
+		// eslint-disable-next-line @typescript-eslint/no-misused-spread
 		...'1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 	];
 
