@@ -194,9 +194,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lusc/eslint-config@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@lusc/eslint-config@npm:6.0.0"
+"@lusc/eslint-config@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "@lusc/eslint-config@npm:6.1.0"
   dependencies:
     "@eslint-community/eslint-plugin-eslint-comments": "npm:^4.4.1"
     "@eslint/js": "npm:^9.20.0"
@@ -213,7 +213,7 @@ __metadata:
     typescript-eslint: "npm:^8.24.1"
   peerDependencies:
     eslint: ^9.20.1
-  checksum: 10c0/11bce84d88a324492cf9e243c25e4eea00adcfa5ca6e4ae799365a23ade2e38a6c6941bb28f1fb20b22c6f99285c518ac5234c16f738898cd98f65796f0d1ae7
+  checksum: 10c0/73eaff285ce22f5dda62c7bed6e30bb14cb63b19ec877f13ec785bd2098af2711e0d08cbfb31681e8eb56734189028b3b7dda37f8c93a6aa10c6425bcbd47ad0
   languageName: node
   linkType: hard
 
@@ -222,7 +222,7 @@ __metadata:
   resolution: "@lusc/sudoku@workspace:."
   dependencies:
     "@ava/typescript": "npm:^5.0.0"
-    "@lusc/eslint-config": "npm:^6.0.0"
+    "@lusc/eslint-config": "npm:^6.1.0"
     "@lusc/tsconfig": "npm:^6.0.2"
     "@types/node": "npm:^22.13.4"
     ava: "npm:^6.2.0"
