@@ -6,7 +6,7 @@ import test from 'ava';
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
 
 import {getComparableCells} from './plugins/helpers.js';
-import {transformChunkedArray, transformFlatArray} from './util.js';
+import {transformChunkedArray, transformFlatArray} from './utilities.js';
 
 const _ = undefined;
 
