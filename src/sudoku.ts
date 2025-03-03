@@ -32,11 +32,7 @@ export function inRangeIncl(
 	}
 }
 
-enum SolveTypes {
-	changed,
-	unchanged,
-	error,
-}
+type SolveTypes = 'CHANGED' | 'UNCHANGED' | 'ERROR';
 
 function generateEmptyCellCandidates(size: number): Set<number> {
 	return new Set(Array.from({length: size}, (_v, index) => index));
@@ -205,13 +201,15 @@ export class Sudoku {
 	/** @internal */
 	readonly blockWidth: number;
 
+	readonly size: number;
+
 	readonly #subscriptions = new Set<SubscriptionCallback>();
 
 	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
 
 	readonly #cells: ReadonlyCells;
 
-	constructor(readonly size: number) {
+	constructor(size: number) {
 		const blockWidth = Math.sqrt(size);
 
 		if (!Number.isInteger(blockWidth)) {
@@ -222,6 +220,7 @@ export class Sudoku {
 			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
 		}
 
+		this.size = size;
 		this.blockWidth = blockWidth;
 
 		const amountCells = size ** 2;
@@ -424,10 +423,10 @@ export class Sudoku {
 		do {
 			++this.rounds;
 			shouldContinue = this.#singleSolve();
-		} while (shouldContinue === SolveTypes.changed);
+		} while (shouldContinue === 'CHANGED');
 
 		let dispatchType: DispatchType;
-		if (shouldContinue === SolveTypes.error) {
+		if (shouldContinue === 'ERROR') {
 			dispatchType = 'error';
 		} else if (this.isSolved()) {
 			dispatchType = 'finish';
@@ -619,12 +618,12 @@ export class Sudoku {
 			} catch (error: unknown) {
 				this.logError(error, this.#cells);
 
-				return SolveTypes.error;
+				return 'ERROR';
 			}
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
+		return this.anyChanged ? 'CHANGED' : 'UNCHANGED';
 	}
 
 	/** @internal */

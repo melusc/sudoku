@@ -35,7 +35,7 @@
 	"scripts": {
 		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && eslint --fix",
-		"build": "rimraf dist && tsc",
+		"build": "rimraf dist && tsc -p tsconfig.build.json",
 		"test": "yarn build && yarn ava"
 	},
 	"devDependencies": {
@@ -47,7 +47,7 @@
 		"eslint": "^9.20.1",
 		"prettier": "^3.5.1",
 		"rimraf": "^6.0.1",
-		"typescript": "^5.7.3"
+		"typescript": "^5.8.2"
 	},
 	"sideEffects": false,
 	"packageManager": "yarn@4.6.0"

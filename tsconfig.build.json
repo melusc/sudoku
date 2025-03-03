@@ -1,0 +1,4 @@
+{
+	"extends": "@lusc/tsconfig",
+	"include": ["src/**/*"]
+}
