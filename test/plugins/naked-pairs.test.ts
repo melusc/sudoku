@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import test, {type TestContext} from 'node:test';
+import test from 'node:test';
 
 import {nakedPairs} from '../../src/plugins/naked-pairs.js';
 import {Sudoku} from '../../src/sudoku.js';
@@ -8,20 +9,20 @@ import {getComparableCells} from './helpers.js';
 
 const _ = undefined;
 
-await test('nakedPairs should not change an empty sudoku.', (t: TestContext) => {
+await test('nakedPairs should not change an empty sudoku.', () => {
 	const originalSudoku = new Sudoku(9);
 	const modifiedSudoku = new Sudoku(9);
 
 	nakedPairs(modifiedSudoku);
-	t.assert.ok(!modifiedSudoku.anyChanged);
+	assert.ok(!modifiedSudoku.anyChanged);
 
-	t.assert.deepEqual(
+	assert.deepEqual(
 		getComparableCells(modifiedSudoku),
 		getComparableCells(originalSudoku),
 	);
 });
 
-await test('nakedPairs should correctly find the pairs of "1" and "6".', (t: TestContext) => {
+await test('nakedPairs should correctly find the pairs of "1" and "6".', () => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[4, [1, 6], [1, 6], [7, 8], 3, 2, [1, 7, 8], 0, 5],
@@ -31,12 +32,12 @@ await test('nakedPairs should correctly find the pairs of "1" and "6".', (t: Tes
 	);
 
 	nakedPairs(s);
-	t.assert.ok(s.anyChanged);
+	assert.ok(s.anyChanged);
 
-	t.assert.deepEqual([...s.getCell(6).candidates], [7, 8]);
+	assert.deepEqual([...s.getCell(6).candidates], [7, 8]);
 });
 
-await test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', (t: TestContext) => {
+await test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', () => {
 	const candidates = [
 		[1, 2, 5], // #1
 		[3, 6, 7, 8],
@@ -54,14 +55,14 @@ await test('nakedPairs should not change anything upon finding ("1", "2", "5") a
 	const row = s.getRow(3);
 
 	nakedPairs(s);
-	t.assert.ok(!s.anyChanged);
+	assert.ok(!s.anyChanged);
 
 	for (let index = 0; index < 9; ++index) {
-		t.assert.deepEqual([...row[index]!.candidates], candidates[index]!);
+		assert.deepEqual([...row[index]!.candidates], candidates[index]!);
 	}
 });
 
-await test('nakedPairs should find an incomplete naked pair', (t: TestContext) => {
+await test('nakedPairs should find an incomplete naked pair', () => {
 	// The naked pair is [1, 2, 4]
 
 	const s = Sudoku.fromPrefilled(
@@ -83,7 +84,7 @@ await test('nakedPairs should find an incomplete naked pair', (t: TestContext) =
 
 	nakedPairs(s);
 
-	t.assert.deepEqual(
+	assert.deepEqual(
 		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 2, 4], // #1
@@ -99,7 +100,7 @@ await test('nakedPairs should find an incomplete naked pair', (t: TestContext) =
 	);
 });
 
-await test('nakedPairs should find an incomplete naked pair with incomplete cell as first', (t: TestContext) => {
+await test('nakedPairs should find an incomplete naked pair with incomplete cell as first', () => {
 	// The naked pair is [1, 2, 4]
 
 	const s = Sudoku.fromPrefilled(
@@ -121,7 +122,7 @@ await test('nakedPairs should find an incomplete naked pair with incomplete cell
 
 	nakedPairs(s);
 
-	t.assert.deepEqual(
+	assert.deepEqual(
 		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 4], // #1
