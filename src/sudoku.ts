@@ -1,4 +1,4 @@
-import * as plugins from './plugins/index.js';
+import * as plugins from './plugins/index.ts';
 
 export type Cell = {
 	element: number | undefined;

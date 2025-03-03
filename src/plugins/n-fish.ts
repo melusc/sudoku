@@ -1,6 +1,6 @@
-import type {Sudoku} from '../sudoku.js';
+import type {Sudoku} from '../sudoku.ts';
 
-import {BetterMap, eachCandidate} from './shared.js';
+import {BetterMap, eachCandidate} from './shared.ts';
 
 function throwIfInvalid(structIndices: number[], indices: number[]): void {
 	/*

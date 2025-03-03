@@ -1,10 +1,10 @@
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import test, {TestContext} from 'node:test';
+import test, {type TestContext} from 'node:test';
 
-import {nakedPairs} from '../../src/plugins/naked-pairs.js';
-import {Sudoku} from '../../src/sudoku.js';
+import {nakedPairs} from '../../src/plugins/naked-pairs.ts';
+import {Sudoku} from '../../src/sudoku.ts';
 
-import {getComparableCells} from './helpers.js';
+import {getComparableCells} from './helpers.ts';
 
 const _ = undefined;
 

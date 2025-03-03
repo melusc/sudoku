@@ -1,4 +1,4 @@
-import type {Sudoku, Structure, Cell} from '../sudoku.js';
+import type {Sudoku, Structure, Cell} from '../sudoku.ts';
 
 export type VisitorFunction = (structure: Structure, sudoku: Sudoku) => void;
 export function makeVisitor(

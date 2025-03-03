@@ -5,4 +5,4 @@ export {
 	type ReadonlyCells,
 	type Structure,
 	type JsonSudoku,
-} from './sudoku.js';
+} from './sudoku.ts';

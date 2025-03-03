@@ -1,4 +1,7 @@
 {
 	"extends": "@lusc/tsconfig",
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+	"compilerOptions": {
+		"rewriteRelativeImportExtensions": true
+	}
 }

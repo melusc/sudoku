@@ -2,7 +2,7 @@
  * See https://web.archive.org/web/20210331174704/https://bestofsudoku.com/sudoku-strategy
  */
 
-import {eachCandidate, makeVisitor, type VisitorFunction} from './shared.js';
+import {eachCandidate, makeVisitor, type VisitorFunction} from './shared.ts';
 
 function throwSmallerThanAllowed(elements: number[], indices: number[]): void {
 	if (elements.length < indices.length) {

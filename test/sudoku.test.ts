@@ -1,12 +1,12 @@
 /* eslint regexp/no-super-linear-backtracking: off */
 import {randomInt} from 'node:crypto';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import test, {TestContext} from 'node:test';
+import test, {type TestContext} from 'node:test';
 
-import {Sudoku, inRangeIncl} from '../src/sudoku.js';
+import {Sudoku, inRangeIncl} from '../src/sudoku.ts';
 
-import {getComparableCells} from './plugins/helpers.js';
-import {transformChunkedArray, transformFlatArray} from './utilities.js';
+import {getComparableCells} from './plugins/helpers.ts';
+import {transformChunkedArray, transformFlatArray} from './utilities.ts';
 
 const _ = undefined;
 

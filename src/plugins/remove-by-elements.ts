@@ -1,4 +1,4 @@
-import {makeVisitor} from './shared.js';
+import {makeVisitor} from './shared.ts';
 
 export const removeByElements = makeVisitor((structure, sudoku) => {
 	const elements = Object.keys(structure.elements);
