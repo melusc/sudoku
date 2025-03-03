@@ -1,4 +1,4 @@
-import type {Sudoku} from '../../src/sudoku.ts';
+import type {Sudoku} from '../../src/sudoku.js';
 
 export type ComparableCell = {
 	candidates: Set<number>;

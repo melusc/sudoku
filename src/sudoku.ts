@@ -1,4 +1,4 @@
-import * as plugins from './plugins/index.ts';
+import * as plugins from './plugins/index.js';
 
 export type Cell = {
 	element: number | undefined;
@@ -32,7 +32,11 @@ export function inRangeIncl(
 	}
 }
 
-type SolveTypes = 'CHANGED' | 'UNCHANGED' | 'ERROR';
+enum SolveTypes {
+	changed,
+	unchanged,
+	error,
+}
 
 function generateEmptyCellCandidates(size: number): Set<number> {
 	return new Set(Array.from({length: size}, (_v, index) => index));
@@ -426,10 +430,10 @@ export class Sudoku {
 		do {
 			++this.rounds;
 			shouldContinue = this.#singleSolve();
-		} while (shouldContinue === 'CHANGED');
+		} while (shouldContinue === SolveTypes.changed);
 
 		let dispatchType: DispatchType;
-		if (shouldContinue === 'ERROR') {
+		if (shouldContinue === SolveTypes.error) {
 			dispatchType = 'error';
 		} else if (this.isSolved()) {
 			dispatchType = 'finish';
@@ -621,12 +625,12 @@ export class Sudoku {
 			} catch (error: unknown) {
 				this.logError(error, this.#cells);
 
-				return 'ERROR';
+				return SolveTypes.error;
 			}
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		return this.anyChanged ? 'CHANGED' : 'UNCHANGED';
+		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
 	}
 
 	/** @internal */

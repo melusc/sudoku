@@ -1,10 +1,10 @@
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
 import test, {type TestContext} from 'node:test';
 
-import {removeByElements} from '../../src/plugins/remove-by-elements.ts';
-import {Sudoku} from '../../src/sudoku.ts';
+import {removeByElements} from '../../src/plugins/remove-by-elements.js';
+import {Sudoku} from '../../src/sudoku.js';
 
-import {getComparableCells} from './helpers.ts';
+import {getComparableCells} from './helpers.js';
 
 const _ = undefined;
 

@@ -7,7 +7,7 @@ import {
 	eachCandidate,
 	makeVisitor,
 	type VisitorFunction,
-} from './shared.ts';
+} from './shared.js';
 
 function throwIfSmaller(indices: number[], numbers: number[]): void {
 	if (indices.length < numbers.length) {

@@ -3,10 +3,10 @@ import {randomInt} from 'node:crypto';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
 import test, {type TestContext} from 'node:test';
 
-import {Sudoku, inRangeIncl} from '../src/sudoku.ts';
+import {Sudoku, inRangeIncl} from '../src/sudoku.js';
 
-import {getComparableCells} from './plugins/helpers.ts';
-import {transformChunkedArray, transformFlatArray} from './utilities.ts';
+import {getComparableCells} from './plugins/helpers.js';
+import {transformChunkedArray, transformFlatArray} from './utilities.js';
 
 const _ = undefined;
 

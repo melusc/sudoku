@@ -1,6 +1,6 @@
-import type {Sudoku, Structure} from '../sudoku.ts';
+import type {Sudoku, Structure} from '../sudoku.js';
 
-import {BetterMap, eachCandidate} from './shared.ts';
+import {BetterMap, eachCandidate} from './shared.js';
 
 function clearSection(
 	structure: Structure,

@@ -1,10 +1,10 @@
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
 import test, {type TestContext} from 'node:test';
 
-import {pointingArrows} from '../../src/plugins/pointing-arrows.ts';
-import {Sudoku} from '../../src/sudoku.ts';
+import {pointingArrows} from '../../src/plugins/pointing-arrows.js';
+import {Sudoku} from '../../src/sudoku.js';
 
-import {getComparableCells} from './helpers.ts';
+import {getComparableCells} from './helpers.js';
 
 await test('pointingArrows should not change an empty sudoku.', (t: TestContext) => {
 	const s = new Sudoku(9);

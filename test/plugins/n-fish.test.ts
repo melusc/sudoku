@@ -1,8 +1,8 @@
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
 import test, {type TestContext} from 'node:test';
 
-import {nFish} from '../../src/plugins/n-fish.ts';
-import {Sudoku} from '../../src/sudoku.ts';
+import {nFish} from '../../src/plugins/n-fish.js';
+import {Sudoku} from '../../src/sudoku.js';
 
 function makeCheck(s: Sudoku, t: TestContext) {
 	return (index: number, expected: number[] | number): void => {
