@@ -191,13 +191,12 @@ export class Sudoku {
 	anyChanged = false;
 	rounds = 0;
 
+	// Don't log errors in tests
 	shouldLogErrors =
 		// eslint-disable-next-line n/prefer-global/process
 		typeof process === 'undefined' ||
 		// eslint-disable-next-line n/prefer-global/process
-		process.env['NODE_ENV'] !== 'test' ||
-		// eslint-disable-next-line n/prefer-global/process
-		Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
+		!Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
 
 	/** @internal */
 	readonly amountCells: number;
