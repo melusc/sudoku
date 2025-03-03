@@ -193,7 +193,11 @@ export class Sudoku {
 
 	shouldLogErrors =
 		// eslint-disable-next-line n/prefer-global/process
-		typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
+		typeof process === 'undefined' ||
+		// eslint-disable-next-line n/prefer-global/process
+		process.env['NODE_ENV'] !== 'test' ||
+		// eslint-disable-next-line n/prefer-global/process
+		Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
 
 	/** @internal */
 	readonly amountCells: number;
