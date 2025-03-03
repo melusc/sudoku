@@ -18,33 +18,17 @@
 		"./plugins": "./dist/src/plugins/index.js"
 	},
 	"type": "module",
-	"ava": {
-		"files": [
-			"test/**/*.test.ts"
-		],
-		"environmentVariables": {
-			"NODE_ENV": "test"
-		},
-		"typescript": {
-			"compile": false,
-			"rewritePaths": {
-				"test/": "dist/test/"
-			}
-		}
-	},
 	"scripts": {
 		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && eslint --fix",
 		"build": "rimraf dist && tsc -p tsconfig.build.json",
-		"test": "yarn build && yarn ava"
+		"test": "yarn build && node --test"
 	},
 	"devDependencies": {
-		"@ava/typescript": "^5.0.0",
 		"@lusc/eslint-config": "^6.1.0",
 		"@lusc/tsconfig": "^6.0.2",
 		"@types/node": "^22.13.4",
 		"@typescript-eslint/parser": "^8.25.0",
-		"ava": "^6.2.0",
 		"eslint": "^9.20.1",
 		"prettier": "^3.5.1",
 		"rimraf": "^6.0.1",
