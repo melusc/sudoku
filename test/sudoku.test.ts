@@ -1,7 +1,7 @@
 /* eslint regexp/no-super-linear-backtracking: off */
 import {randomInt} from 'node:crypto';
-
-import test from 'ava';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test, {TestContext} from 'node:test';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
 
@@ -10,11 +10,11 @@ import {transformChunkedArray, transformFlatArray} from './utilities.js';
 
 const _ = undefined;
 
-test('Sudoku should be a class', t => {
-	t.is(typeof new Sudoku(9), 'object');
+await test('Sudoku should be a class', (t: TestContext) => {
+	t.assert.equal(typeof new Sudoku(9), 'object');
 });
 
-test('Sudoku#setElement valid element', t => {
+await test('Sudoku#setElement valid element', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(0, '4');
 
@@ -24,9 +24,9 @@ test('Sudoku#setElement valid element', t => {
 	t.is(s.getElement(0), '5');
 });
 
-test('Sudoku#setElement invalid element', t => {
+await test('Sudoku#setElement invalid element', (t: TestContext) => {
 	const s = new Sudoku(9);
-	t.throws(
+	t.assert.throws(
 		() => {
 			s.setElement(0, '.');
 		},
@@ -41,7 +41,7 @@ test('Sudoku#setElement invalid element', t => {
 	);
 });
 
-test('Sudoku#getElement', t => {
+await test('Sudoku#getElement', (t: TestContext) => {
 	const s = new Sudoku(16);
 	t.is(s.getElement(8 * 9 + 8), undefined);
 
@@ -57,7 +57,7 @@ test('Sudoku#getElement', t => {
 	t.is(s.getCell(0).element, 0);
 });
 
-test('Sudoku#clearCell', t => {
+await test('Sudoku#clearCell', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(6 * 9 + 6, '4');
 	t.is(s.getElement(6 * 9 + 6), '4');
@@ -65,7 +65,7 @@ test('Sudoku#clearCell', t => {
 	t.is(s.getElement(6 * 9 + 6), undefined);
 });
 
-test('Sudoku#clearAllCells', t => {
+await test('Sudoku#clearAllCells', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(6 * 9 + 6, '4')
 		.setElement(1 * 9 + 1, '5')
@@ -82,7 +82,7 @@ test('Sudoku#clearAllCells', t => {
 	t.is(s.getElement(2 * 9 + 4), undefined);
 });
 
-test('Sudoku#getCol', t => {
+await test('Sudoku#getCol', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(2 * 9 + 8, '2').setElement(5 * 9 + 8, '4');
 
@@ -104,7 +104,7 @@ test('Sudoku#getCol', t => {
 	);
 });
 
-test('Sudoku#getRow', t => {
+await test('Sudoku#getRow', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(8 * 9 + 8, '3')
 		.setElement(8 * 9 + 2, '4')
@@ -118,7 +118,7 @@ test('Sudoku#getRow', t => {
 	);
 });
 
-test('Sudoku#getCell', t => {
+await test('Sudoku#getCell', (t: TestContext) => {
 	const s = new Sudoku(9);
 	t.is(s.getCell(0), s.getBlock(0)[0]!);
 
@@ -128,7 +128,7 @@ test('Sudoku#getCell', t => {
 	);
 });
 
-test('Sudoku#getCells', t => {
+await test('Sudoku#getCells', (t: TestContext) => {
 	let s = new Sudoku(9);
 
 	const cells1 = s.getCells();
@@ -164,7 +164,7 @@ test('Sudoku#getCells', t => {
 	t.deepEqual(cells2.map(cell => cell.element! + 1).slice(0, 9), firstRow);
 });
 
-test('Sudoku#getBlock', t => {
+await test('Sudoku#getBlock', (t: TestContext) => {
 	let s = new Sudoku(9);
 	const block1 = s.getBlock(0);
 
@@ -188,9 +188,8 @@ test('Sudoku#getBlock', t => {
 	}
 });
 
-test('Sudoku#solve easy', t => {
+await test('Sudoku#solve easy', (t: TestContext) => {
 	t.plan(3);
-
 	const s = Sudoku.fromPrefilled(
 		[
 			[_, '1', _, '3', '8', _, _, '5', '2'],
@@ -226,7 +225,7 @@ test('Sudoku#solve easy', t => {
 	t.true(s.isSolved());
 });
 
-test('Sudoku#solve evil', t => {
+await test('Sudoku#solve evil', (t: TestContext) => {
 	t.plan(3);
 
 	const s = Sudoku.fromPrefilled(
@@ -264,7 +263,7 @@ test('Sudoku#solve evil', t => {
 	t.true(s.isSolved());
 });
 
-test('Sudoku#solve expert', t => {
+await test('Sudoku#solve expert', (t: TestContext) => {
 	t.plan(3);
 
 	const s = Sudoku.fromPrefilled(
@@ -302,7 +301,7 @@ test('Sudoku#solve expert', t => {
 	t.true(s.isSolved());
 });
 
-test('Sudoku#solve tough 16x16', t => {
+await test('Sudoku#solve tough 16x16', (t: TestContext) => {
 	t.plan(3);
 
 	// https://puzzlemadness.co.uk/16by16giantsudoku/tough/2022/1/7
@@ -358,7 +357,7 @@ test('Sudoku#solve tough 16x16', t => {
 	t.true(s.isSolved());
 });
 
-test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
+await test('Sudoku#solve: It should realise that invalid1 is invalid', (t: TestContext) => {
 	t.plan(2);
 
 	const s = Sudoku.fromPrefilled(
@@ -382,7 +381,7 @@ test('Sudoku#solve: It should realise that invalid1 is invalid', t => {
 	t.false(s.isSolved());
 });
 
-test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
+await test('Sudoku#solve: It should realise that invalid2 is invalid', (t: TestContext) => {
 	t.plan(2);
 
 	const s = Sudoku.fromPrefilled(
@@ -408,7 +407,7 @@ test('Sudoku#solve: It should realise that invalid2 is invalid', t => {
 	t.false(s.isSolved());
 });
 
-test('Sudoku#subscribe', t => {
+await test('Sudoku#subscribe', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	t.plan(2);
@@ -427,7 +426,7 @@ test('Sudoku#subscribe', t => {
 	s.setElement(4 * 9 + 1, '4');
 });
 
-test('Sudoku#unsubscribe', t => {
+await test('Sudoku#unsubscribe', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	t.plan(3);
@@ -452,7 +451,7 @@ test('Sudoku#unsubscribe', t => {
 	s.setElement(4 * 9 + 1, '4');
 });
 
-test('Sudoku#emit', t => {
+await test('Sudoku#emit', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	t.plan(1);
@@ -464,13 +463,13 @@ test('Sudoku#emit', t => {
 	s.emit('change');
 });
 
-test('Sudoku#cellsIndividuallyValid empty sudoku', t => {
+await test('Sudoku#cellsIndividuallyValid empty sudoku', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	t.true(s.cellsIndividuallyValid());
 });
 
-test('Sudoku#cellsIndividuallyValid duplicates', t => {
+await test('Sudoku#cellsIndividuallyValid duplicates', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	s.setElement(0, '1').setElement(1, '1');
@@ -478,54 +477,54 @@ test('Sudoku#cellsIndividuallyValid duplicates', t => {
 	t.false(s.cellsIndividuallyValid());
 });
 
-test('Sudoku#isCellValid valid cell', t => {
+await test('Sudoku#isCellValid valid cell', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	t.true(s.isCellValid(0));
 });
 
-test('Sudoku#isCellValid empty candidates no element', t => {
+await test('Sudoku#isCellValid empty candidates no element', (t: TestContext) => {
 	const s = new Sudoku(9);
 	const cell = s.getCell(0);
 	cell.candidates.clear();
 	t.false(s.isCellValid(cell));
 });
 
-test('Sudoku#isCellValid element and candidates', t => {
+await test('Sudoku#isCellValid element and candidates', (t: TestContext) => {
 	const s = new Sudoku(9);
 	const cell = s.getCell(0);
 	cell.element = 3;
 	t.false(s.isCellValid(cell));
 });
 
-test('Sudoku#isCellValid duplicate in row', t => {
+await test('Sudoku#isCellValid duplicate in row', (t: TestContext) => {
 	const s = new Sudoku(9);
 	// The cells only share the same row
 	s.setElement(0, 1).setElement(7, 1);
 	t.false(s.isCellValid(0));
 });
 
-test('Sudoku#isCellValid duplicate in col', t => {
+await test('Sudoku#isCellValid duplicate in col', (t: TestContext) => {
 	const s = new Sudoku(9);
 	// The cells only share the same col
 	s.setElement(0, 1).setElement(72, 1);
 	t.false(s.isCellValid(0));
 });
 
-test('Sudoku#isCellValid duplicate in block', t => {
+await test('Sudoku#isCellValid duplicate in block', (t: TestContext) => {
 	const s = new Sudoku(9);
 	// The cells only share the same block
 	s.setElement(0, 1).setElement(10, 1);
 	t.false(s.isCellValid(0));
 });
 
-test('Sudoku#isValid empty Sudoku', t => {
+await test('Sudoku#isValid empty Sudoku', (t: TestContext) => {
 	const s = new Sudoku(16);
 
 	t.true(s.isValid());
 });
 
-test('Sudoku#isValid First row has no "1" anywhere', t => {
+await test('Sudoku#isValid First row has no "1" anywhere', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	for (const c of s.getRow(0)) {
@@ -537,14 +536,14 @@ test('Sudoku#isValid First row has no "1" anywhere', t => {
 
 // Duplicate, because #isCellValid / #cellsIndividuallyValid already cover this
 // but just test to make sure #isValid always calls them
-test('Sudoku#isValid First row has duplicates', t => {
+await test('Sudoku#isValid First row has duplicates', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(0, 1).setElement(1, 1);
 
 	t.false(s.isValid());
 });
 
-test('Sudoku#overrideCandidates new set equal to old set', t => {
+await test('Sudoku#overrideCandidates new set equal to old set', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
@@ -553,7 +552,7 @@ test('Sudoku#overrideCandidates new set equal to old set', t => {
 	t.deepEqual(cell0.candidates, new Set([1, 2, 3]));
 });
 
-test('Sudoku#overrideCandidates old set is subset of new set', t => {
+await test('Sudoku#overrideCandidates old set is subset of new set', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
@@ -562,7 +561,7 @@ test('Sudoku#overrideCandidates old set is subset of new set', t => {
 	t.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
-test('Sudoku#overrideCandidates new set is subset of old set', t => {
+await test('Sudoku#overrideCandidates new set is subset of old set', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2]));
@@ -571,7 +570,7 @@ test('Sudoku#overrideCandidates new set is subset of old set', t => {
 	t.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
-test('Sudoku#removeCandidate toRemove is not in old set', t => {
+await test('Sudoku#removeCandidate toRemove is not in old set', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.removeCandidate(cell0, 4);
@@ -580,7 +579,7 @@ test('Sudoku#removeCandidate toRemove is not in old set', t => {
 	t.deepEqual(cell0.candidates, new Set([1, 2, 3]));
 });
 
-test('Sudoku#removeCandidate toRemove is in old set', t => {
+await test('Sudoku#removeCandidate toRemove is in old set', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2, 3]]], 9);
 	const cell0 = sudoku.getCell(0);
 	sudoku.removeCandidate(cell0, 3);
@@ -590,7 +589,7 @@ test('Sudoku#removeCandidate toRemove is in old set', t => {
 });
 
 // Using overrideCandidates would also be possible
-test('Sudoku#removeCandidate candidates is empty afterwards', t => {
+await test('Sudoku#removeCandidate candidates is empty afterwards', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1]]], 9);
 	const cell0 = sudoku.getCell(0);
 
@@ -599,7 +598,7 @@ test('Sudoku#removeCandidate candidates is empty afterwards', t => {
 	});
 });
 
-test('Sudoku#removeCandidate one candidate afterwards', t => {
+await test('Sudoku#removeCandidate one candidate afterwards', (t: TestContext) => {
 	const sudoku = Sudoku.fromPrefilled([[[1, 2]]], 9);
 	const cell0 = sudoku.getCell(0);
 
@@ -609,7 +608,7 @@ test('Sudoku#removeCandidate one candidate afterwards', t => {
 	t.is(cell0.candidates.size, 0);
 });
 
-test('Sudoku#isSolved', t => {
+await test('Sudoku#isSolved', (t: TestContext) => {
 	let s = new Sudoku(9);
 
 	t.false(s.isSolved(), 'An empty sudoku should return false');
@@ -632,7 +631,7 @@ test('Sudoku#isSolved', t => {
 	);
 });
 
-test('Sudoku#clone 9x9', t => {
+await test('Sudoku#clone 9x9', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[_, _, _, _, _, '4', _, _, '2'],
@@ -654,7 +653,7 @@ test('Sudoku#clone 9x9', t => {
 	t.not(cloned, s);
 });
 
-test('Sudoku#clone 16x16', t => {
+await test('Sudoku#clone 16x16', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		transformChunkedArray([
 			[2, 11, 12, 4, 7, 13, 5, 6, 1, 9, 3, 14, 15, 16, 8, 10],
@@ -683,7 +682,7 @@ test('Sudoku#clone 16x16', t => {
 	t.not(cloned, s);
 });
 
-test('Sudoku.fromPrefilled valid sudoku', t => {
+await test('Sudoku.fromPrefilled valid sudoku', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[0, 1, 2, 3],
@@ -703,7 +702,7 @@ test('Sudoku.fromPrefilled valid sudoku', t => {
 	}
 });
 
-test('Sudoku.fromPrefilled too many cols', t => {
+await test('Sudoku.fromPrefilled too many cols', (t: TestContext) => {
 	t.throws(
 		() => {
 			Sudoku.fromPrefilled(
@@ -721,7 +720,7 @@ test('Sudoku.fromPrefilled too many cols', t => {
 	);
 });
 
-test('Sudoku.fromPrefilled too many rows', t => {
+await test('Sudoku.fromPrefilled too many rows', (t: TestContext) => {
 	t.throws(
 		() => {
 			Sudoku.fromPrefilled(
@@ -741,7 +740,7 @@ test('Sudoku.fromPrefilled too many rows', t => {
 	);
 });
 
-test('Sudoku.fromString valid sudoku', t => {
+await test('Sudoku.fromString valid sudoku', (t: TestContext) => {
 	const s = Sudoku.fromString('1234'.repeat(4), 4);
 
 	for (let index = 0; index < s.size; ++index) {
@@ -753,7 +752,7 @@ test('Sudoku.fromString valid sudoku', t => {
 	}
 });
 
-test('Sudoku.fromString too long', t => {
+await test('Sudoku.fromString too long', (t: TestContext) => {
 	t.throws(
 		() => {
 			Sudoku.fromString('1234'.repeat(5), 4);
@@ -764,7 +763,7 @@ test('Sudoku.fromString too long', t => {
 	);
 });
 
-test('Sudoku.fromString invalid character', t => {
+await test('Sudoku.fromString invalid character', (t: TestContext) => {
 	t.throws(
 		() => {
 			Sudoku.fromString('1234ü', 4);
@@ -775,7 +774,7 @@ test('Sudoku.fromString invalid character', t => {
 	);
 });
 
-test('Sudoku#toString should produce a valid string', t => {
+await test('Sudoku#toString should produce a valid string', (t: TestContext) => {
 	const s = new Sudoku(16);
 
 	// Only fill every second cell to also test
@@ -792,7 +791,7 @@ test('Sudoku#toString should produce a valid string', t => {
 	);
 });
 
-test('Sudoku#toJson', t => {
+await test('Sudoku#toJson', (t: TestContext) => {
 	const s = new Sudoku(9);
 	const wantedJson = [1, 3, 6, [1, 3, 4, 5], [1, 5, 7, 8]];
 	for (const [index, item] of wantedJson.entries()) {
@@ -814,7 +813,7 @@ test('Sudoku#toJson', t => {
 	);
 });
 
-test('Sudoku#fromJson valid input', t => {
+await test('Sudoku#fromJson valid input', (t: TestContext) => {
 	const json = [2, 4, 7, [1, 2, 3, 4], [5, 6, 7], 8];
 
 	const s = Sudoku.fromJson(json, 9);
@@ -828,7 +827,7 @@ test('Sudoku#fromJson valid input', t => {
 	}
 });
 
-test('Sudoku#fromJson invalid candidates', t => {
+await test('Sudoku#fromJson invalid candidates', (t: TestContext) => {
 	t.throws(
 		() => {
 			Sudoku.fromJson([[1, 3, 9]], 9);
@@ -839,7 +838,7 @@ test('Sudoku#fromJson invalid candidates', t => {
 	);
 });
 
-test('Sudoku#fromJson invalid element', t => {
+await test('Sudoku#fromJson invalid element', (t: TestContext) => {
 	t.throws(
 		() => {
 			Sudoku.fromJson([9], 9);
@@ -850,7 +849,7 @@ test('Sudoku#fromJson invalid element', t => {
 	);
 });
 
-test('inRangeIncl', t => {
+await test('inRangeIncl', (t: TestContext) => {
 	t.throws(
 		() => {
 			inRangeIncl(-1, 0, 80);

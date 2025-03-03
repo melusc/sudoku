@@ -1,11 +1,12 @@
-import test from 'ava';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test, {TestContext} from 'node:test';
 
 import {pointingArrows} from '../../src/plugins/pointing-arrows.js';
 import {Sudoku} from '../../src/sudoku.js';
 
 import {getComparableCells} from './helpers.js';
 
-test('pointingArrows should not change an empty sudoku.', t => {
+await test('pointingArrows should not change an empty sudoku.', (t: TestContext) => {
 	const s = new Sudoku(9);
 
 	const unchanged = getComparableCells(s);
@@ -16,7 +17,7 @@ test('pointingArrows should not change an empty sudoku.', t => {
 	t.deepEqual(getComparableCells(s), unchanged);
 });
 
-test('pointingArrows should find a pointing arrow of 3s.', t => {
+await test('pointingArrows should find a pointing arrow of 3s.', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[[2, 4, 5, 8], 1, 7, 0, [2, 4, 5], 3, 6, [4, 8], [2, 4, 8]],
@@ -48,7 +49,7 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 	t.is(cell11.candidates.size, 0);
 });
 
-test('pointingArrows should find a pointing arrow of 2s.', t => {
+await test('pointingArrows should find a pointing arrow of 2s.', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[

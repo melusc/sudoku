@@ -1,4 +1,5 @@
-import test from 'ava';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test, {TestContext} from 'node:test';
 
 import {nakedPairs} from '../../src/plugins/naked-pairs.js';
 import {Sudoku} from '../../src/sudoku.js';
@@ -7,7 +8,7 @@ import {getComparableCells} from './helpers.js';
 
 const _ = undefined;
 
-test('nakedPairs should not change an empty sudoku.', t => {
+await test('nakedPairs should not change an empty sudoku.', (t: TestContext) => {
 	const originalSudoku = new Sudoku(9);
 	const modifiedSudoku = new Sudoku(9);
 
@@ -20,7 +21,7 @@ test('nakedPairs should not change an empty sudoku.', t => {
 	);
 });
 
-test('nakedPairs should correctly find the pairs of "1" and "6".', t => {
+await test('nakedPairs should correctly find the pairs of "1" and "6".', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[4, [1, 6], [1, 6], [7, 8], 3, 2, [1, 7, 8], 0, 5],
@@ -35,7 +36,7 @@ test('nakedPairs should correctly find the pairs of "1" and "6".', t => {
 	t.deepEqual([...s.getCell(6).candidates], [7, 8]);
 });
 
-test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', t => {
+await test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', (t: TestContext) => {
 	const candidates = [
 		[1, 2, 5], // #1
 		[3, 6, 7, 8],
@@ -60,7 +61,7 @@ test('nakedPairs should not change anything upon finding ("1", "2", "5") across 
 	}
 });
 
-test('nakedPairs should find an incomplete naked pair', t => {
+await test('nakedPairs should find an incomplete naked pair', (t: TestContext) => {
 	// The naked pair is [1, 2, 4]
 
 	const s = Sudoku.fromPrefilled(
@@ -98,7 +99,7 @@ test('nakedPairs should find an incomplete naked pair', t => {
 	);
 });
 
-test('nakedPairs should find an incomplete naked pair with incomplete cell as first', t => {
+await test('nakedPairs should find an incomplete naked pair with incomplete cell as first', (t: TestContext) => {
 	// The naked pair is [1, 2, 4]
 
 	const s = Sudoku.fromPrefilled(

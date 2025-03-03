@@ -1,9 +1,10 @@
-import test, {type ExecutionContext} from 'ava';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test, {TestContext} from 'node:test';
 
 import {nFish} from '../../src/plugins/n-fish.js';
 import {Sudoku} from '../../src/sudoku.js';
 
-function makeCheck(s: Sudoku, t: ExecutionContext) {
+function makeCheck(s: Sudoku, t: TestContext) {
 	return (index: number, expected: number[] | number): void => {
 		const cell = s.getCell(index);
 
@@ -16,7 +17,7 @@ function makeCheck(s: Sudoku, t: ExecutionContext) {
 	};
 }
 
-test('regular n-fish #1', t => {
+await test('regular n-fish #1', (t: TestContext) => {
 	// ^ for the participating numbers
 	// ^X for the numbers to be removed
 
@@ -56,7 +57,7 @@ test('regular n-fish #1', t => {
 	check(4 * 9 + 6, [1, 3]);
 });
 
-test('regular n-fish #2', t => {
+await test('regular n-fish #2', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[[5, 6], [3, 5, 6], 2, [3, 4], 8, 1, [4, 5], 0, 7],
@@ -100,7 +101,7 @@ test('regular n-fish #2', t => {
 	check(8 * 9 + 8, [3, 0]); // Remove 5
 });
 
-test('Detect invalid sudoku', t => {
+await test('Detect invalid sudoku', (t: TestContext) => {
 	const candidatesRest = Array.from({length: 7}, () => [
 		0, 2, 3, 4, 5, 6, 7, 8,
 	]);

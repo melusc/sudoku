@@ -1,4 +1,5 @@
-import test from 'ava';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test, {TestContext} from 'node:test';
 
 import {hiddenPairs} from '../../src/plugins/hidden-pairs.js';
 import {Sudoku} from '../../src/sudoku.js';
@@ -6,7 +7,7 @@ import {Sudoku} from '../../src/sudoku.js';
 import {getComparableCells} from './helpers.js';
 
 const _ = undefined;
-test('hiddenPairs should find the hidden pairs ("3", "4", "0").', t => {
+await test('hiddenPairs should find the hidden pairs ("3", "4", "0").', (t :TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			_,
@@ -39,7 +40,7 @@ test('hiddenPairs should find the hidden pairs ("3", "4", "0").', t => {
 	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
 });
 
-test('hiddenPairs should find the only cell that can have "1".', t => {
+await test('hiddenPairs should find the only cell that can have "1".', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[
@@ -64,7 +65,7 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 	t.is(cell.candidates.size, 0);
 });
 
-test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", t => {
+await test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", (t: TestContext) => {
 	// Two cells can have a "1"
 	const candidates = [
 		[2, 3, 5, 7, 0],
@@ -86,7 +87,7 @@ test("hiddenPairs should not modify any cells if there aren't any hidden pairs."
 	t.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
 });
 
-test('hiddenPairs should find an incomplete hidden pair', t => {
+await test('hiddenPairs should find an incomplete hidden pair', (t: TestContext) => {
 	// The hidden pair is [7, 8, 9]
 	const s = Sudoku.fromPrefilled(
 		[
@@ -124,7 +125,7 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	);
 });
 
-test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring "5".', t => {
+await test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring "5".', (t: TestContext) => {
 	/*
 	  It might see (3, 4, 5, 0) in #1..3, but it should know
 		that 5 already is a number in the structure and
