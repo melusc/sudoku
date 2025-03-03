@@ -7,7 +7,7 @@ import {Sudoku} from '../../src/sudoku.ts';
 import {getComparableCells} from './helpers.ts';
 
 const _ = undefined;
-await test('hiddenPairs should find the hidden pairs ("3", "4", "0").', (t :TestContext) => {
+await test('hiddenPairs should find the hidden pairs ("3", "4", "0").', (t: TestContext) => {
 	const s = Sudoku.fromPrefilled(
 		[
 			_,
@@ -84,7 +84,10 @@ await test("hiddenPairs should not modify any cells if there aren't any hidden p
 
 	hiddenPairs(s);
 
-	t.assert.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
+	t.assert.deepEqual(
+		getComparableCells(s),
+		getComparableCells(unmodifiedSudoku),
+	);
 });
 
 await test('hiddenPairs should find an incomplete hidden pair', (t: TestContext) => {

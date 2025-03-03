@@ -43,6 +43,7 @@
 		"@lusc/eslint-config": "^6.1.0",
 		"@lusc/tsconfig": "^6.0.2",
 		"@types/node": "^22.13.4",
+		"@typescript-eslint/parser": "^8.25.0",
 		"ava": "^6.2.0",
 		"eslint": "^9.20.1",
 		"prettier": "^3.5.1",

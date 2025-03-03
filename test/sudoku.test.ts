@@ -161,7 +161,10 @@ await test('Sudoku#getCells', (t: TestContext) => {
 
 	const cells2 = s.getCells();
 
-	t.assert.deepEqual(cells2.map(cell => cell.element! + 1).slice(0, 9), firstRow);
+	t.assert.deepEqual(
+		cells2.map(cell => cell.element! + 1).slice(0, 9),
+		firstRow,
+	);
 });
 
 await test('Sudoku#getBlock', (t: TestContext) => {
@@ -625,8 +628,8 @@ await test('Sudoku#isSolved', (t: TestContext) => {
 		Array.from({length: 9}, () => Array.from({length: 9}, () => '2')),
 		9,
 	);
-	t.assert.ok(!
-		s.isSolved(),
+	t.assert.ok(
+		!s.isSolved(),
 		'A completely filled sudoku should return false if it has an obvious mistake',
 	);
 });
@@ -850,48 +853,28 @@ await test('Sudoku#fromJson invalid element', (t: TestContext) => {
 });
 
 await test('inRangeIncl', (t: TestContext) => {
-	t.assert.throws(
-		() => {
-			inRangeIncl(-1, 0, 80);
-		},
-		{message: /-1.+0.+80/},
-	);
+	t.assert.throws(() => {
+		inRangeIncl(-1, 0, 80);
+	}, /-1.+0.+80/);
 
-	t.assert.throws(
-		() => {
-			inRangeIncl(81, 0, 80);
-		},
-		{message: /81.+0.+80/},
-	);
+	t.assert.throws(() => {
+		inRangeIncl(81, 0, 80);
+	}, /81.+0.+80/);
 
-	t.assert.throws(
-		() => {
-			inRangeIncl(5.5, 0, 80);
-		},
-		{message: /5\.5.+0.+80/},
-	);
+	t.assert.throws(() => {
+		inRangeIncl(5.5, 0, 80);
+	}, /5\.5.+0.+80/);
 
 	t.assert.doesNotThrow(() => {
 		inRangeIncl(4, 0, 80);
 	});
 
-	t.assert.throws(
-		() => {
-			// @ts-expect-error Testing case
-			inRangeIncl('abc', 0, 80);
-		},
-		{
-			message: /abc.+0.+80/,
-		},
-	);
+	t.assert.throws(() => {
+		// @ts-expect-error Testing case
+		inRangeIncl('abc', 0, 80);
+	}, /abc.+0.+80/);
 
-	t.assert.throws(
-		() => {
-			inRangeIncl(0, 1, 10, (...arguments_) => arguments_.join(', '));
-		},
-		{
-			message: '0, 1, 10',
-			instanceOf: Error,
-		},
-	);
+	t.assert.throws(() => {
+		inRangeIncl(0, 1, 10, (...arguments_) => arguments_.join(', '));
+	}, new TypeError('0, 1, 10'));
 });
