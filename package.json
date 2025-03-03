@@ -4,9 +4,6 @@
 	"repository": "https://github.com/melusc/sudoku",
 	"author": "lusc",
 	"license": "MIT",
-	"publishConfig": {
-		"access": "public"
-	},
 	"files": [
 		"dist/src"
 	],
@@ -25,6 +22,7 @@
 		"test": "yarn build && node --test dist/test/**/*.test.js"
 	},
 	"devDependencies": {
+		"@lusc/clean-package": "^2.1.0",
 		"@lusc/eslint-config": "^6.1.0",
 		"@lusc/tsconfig": "^6.0.2",
 		"@types/node": "^22.13.4",

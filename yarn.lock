@@ -175,6 +175,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lusc/clean-package@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@lusc/clean-package@npm:2.1.0"
+  bin:
+    clean-package: dist/cli.js
+  checksum: 10c0/8eddc3d3c0e5c2dfc0d456b44d7a5e9337a073bd2a2949ae82d0ebdceb04e549b1005403c51e9b5895dd90967676a5eaf9af55bc138859563ad46648cdc0cf07
+  languageName: node
+  linkType: hard
+
 "@lusc/eslint-config@npm:^6.1.0":
   version: 6.1.0
   resolution: "@lusc/eslint-config@npm:6.1.0"
@@ -202,6 +211,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@lusc/sudoku@workspace:."
   dependencies:
+    "@lusc/clean-package": "npm:^2.1.0"
     "@lusc/eslint-config": "npm:^6.1.0"
     "@lusc/tsconfig": "npm:^6.0.2"
     "@types/node": "npm:^22.13.4"
