@@ -162,10 +162,7 @@ await test('Sudoku#getCells', () => {
 
 	const cells2 = s.getCells();
 
-	assert.deepEqual(
-		cells2.map(cell => cell.element! + 1).slice(0, 9),
-		firstRow,
-	);
+	assert.deepEqual(cells2.map(cell => cell.element! + 1).slice(0, 9), firstRow);
 });
 
 await test('Sudoku#getBlock', () => {

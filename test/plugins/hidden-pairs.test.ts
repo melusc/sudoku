@@ -85,10 +85,7 @@ await test("hiddenPairs should not modify any cells if there aren't any hidden p
 
 	hiddenPairs(s);
 
-	assert.deepEqual(
-		getComparableCells(s),
-		getComparableCells(unmodifiedSudoku),
-	);
+	assert.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
 });
 
 await test('hiddenPairs should find an incomplete hidden pair', () => {
