@@ -22,7 +22,7 @@
 		"prepublishOnly": "yarn run build",
 		"fmt": "prettier -w . && eslint --fix",
 		"build": "rimraf dist && tsc -p tsconfig.build.json",
-		"test": "yarn build && node --test"
+		"test": "tsc && node --experimental-strip-types --test"
 	},
 	"devDependencies": {
 		"@lusc/eslint-config": "^6.1.0",
