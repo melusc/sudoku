@@ -1,4 +1,6 @@
-import test from 'ava';
+import assert from 'node:assert/strict';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test from 'node:test';
 
 import {hiddenPairs} from '../../src/plugins/hidden-pairs.js';
 import {Sudoku} from '../../src/sudoku.js';
@@ -6,7 +8,7 @@ import {Sudoku} from '../../src/sudoku.js';
 import {getComparableCells} from './helpers.js';
 
 const _ = undefined;
-test('hiddenPairs should find the hidden pairs ("3", "4", "0").', t => {
+await test('hiddenPairs should find the hidden pairs ("3", "4", "0").', () => {
 	const s = Sudoku.fromPrefilled(
 		[
 			_,
@@ -32,14 +34,14 @@ test('hiddenPairs should find the hidden pairs ("3", "4", "0").', t => {
 
 	const wantedSet = new Set([3, 4, 0]);
 
-	t.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
+	assert.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
+	assert.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
+	assert.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
 });
 
-test('hiddenPairs should find the only cell that can have "1".', t => {
+await test('hiddenPairs should find the only cell that can have "1".', () => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[
@@ -60,11 +62,11 @@ test('hiddenPairs should find the only cell that can have "1".', t => {
 	hiddenPairs(s);
 
 	const cell = s.getCell(3);
-	t.is(cell.element, 1);
-	t.is(cell.candidates.size, 0);
+	assert.equal(cell.element, 1);
+	assert.equal(cell.candidates.size, 0);
 });
 
-test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", t => {
+await test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", () => {
 	// Two cells can have a "1"
 	const candidates = [
 		[2, 3, 5, 7, 0],
@@ -83,10 +85,10 @@ test("hiddenPairs should not modify any cells if there aren't any hidden pairs."
 
 	hiddenPairs(s);
 
-	t.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
+	assert.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
 });
 
-test('hiddenPairs should find an incomplete hidden pair', t => {
+await test('hiddenPairs should find an incomplete hidden pair', () => {
 	// The hidden pair is [7, 8, 9]
 	const s = Sudoku.fromPrefilled(
 		[
@@ -106,9 +108,9 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	);
 
 	hiddenPairs(s);
-	t.true(s.anyChanged);
+	assert.ok(s.anyChanged);
 
-	t.deepEqual(
+	assert.deepEqual(
 		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[7, 8],
@@ -124,7 +126,7 @@ test('hiddenPairs should find an incomplete hidden pair', t => {
 	);
 });
 
-test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring "5".', t => {
+await test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring "5".', () => {
 	/*
 	  It might see (3, 4, 5, 0) in #1..3, but it should know
 		that 5 already is a number in the structure and
@@ -156,9 +158,9 @@ test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring "5".'
 
 	const wantedSet = new Set([3, 4, 0]);
 
-	t.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
+	assert.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
+	assert.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
+	assert.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
 });

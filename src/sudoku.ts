@@ -195,9 +195,12 @@ export class Sudoku {
 	anyChanged = false;
 	rounds = 0;
 
+	// Don't log errors in tests
 	shouldLogErrors =
 		// eslint-disable-next-line n/prefer-global/process
-		typeof process === 'undefined' || process.env['NODE_ENV'] !== 'test';
+		typeof process === 'undefined' ||
+		// eslint-disable-next-line n/prefer-global/process
+		!Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
 
 	/** @internal */
 	readonly amountCells: number;
@@ -205,13 +208,15 @@ export class Sudoku {
 	/** @internal */
 	readonly blockWidth: number;
 
+	readonly size: number;
+
 	readonly #subscriptions = new Set<SubscriptionCallback>();
 
 	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
 
 	readonly #cells: ReadonlyCells;
 
-	constructor(readonly size: number) {
+	constructor(size: number) {
 		const blockWidth = Math.sqrt(size);
 
 		if (!Number.isInteger(blockWidth)) {
@@ -222,6 +227,7 @@ export class Sudoku {
 			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
 		}
 
+		this.size = size;
 		this.blockWidth = blockWidth;
 
 		const amountCells = size ** 2;

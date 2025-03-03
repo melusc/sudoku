@@ -1,22 +1,24 @@
-import test from 'ava';
+import assert from 'node:assert/strict';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+import test from 'node:test';
 
 import {pointingArrows} from '../../src/plugins/pointing-arrows.js';
 import {Sudoku} from '../../src/sudoku.js';
 
 import {getComparableCells} from './helpers.js';
 
-test('pointingArrows should not change an empty sudoku.', t => {
+await test('pointingArrows should not change an empty sudoku.', () => {
 	const s = new Sudoku(9);
 
 	const unchanged = getComparableCells(s);
 
 	pointingArrows(s);
-	t.false(s.anyChanged);
+	assert.ok(!s.anyChanged);
 
-	t.deepEqual(getComparableCells(s), unchanged);
+	assert.deepEqual(getComparableCells(s), unchanged);
 });
 
-test('pointingArrows should find a pointing arrow of 3s.', t => {
+await test('pointingArrows should find a pointing arrow of 3s.', () => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[[2, 4, 5, 8], 1, 7, 0, [2, 4, 5], 3, 6, [4, 8], [2, 4, 8]],
@@ -37,18 +39,18 @@ test('pointingArrows should find a pointing arrow of 3s.', t => {
 	);
 
 	pointingArrows(s);
-	t.true(s.anyChanged);
+	assert.ok(s.anyChanged);
 
-	t.deepEqual([...s.getCell(9).candidates], [2, 4, 5, 6]);
+	assert.deepEqual([...s.getCell(9).candidates], [2, 4, 5, 6]);
 
-	t.deepEqual([...s.getCell(10).candidates], [2, 4, 5]);
+	assert.deepEqual([...s.getCell(10).candidates], [2, 4, 5]);
 
 	const cell11 = s.getCell(11);
-	t.is(cell11.element, 6);
-	t.is(cell11.candidates.size, 0);
+	assert.equal(cell11.element, 6);
+	assert.equal(cell11.candidates.size, 0);
 });
 
-test('pointingArrows should find a pointing arrow of 2s.', t => {
+await test('pointingArrows should find a pointing arrow of 2s.', () => {
 	const s = Sudoku.fromPrefilled(
 		[
 			[
@@ -79,7 +81,7 @@ test('pointingArrows should find a pointing arrow of 2s.', t => {
 	);
 
 	pointingArrows(s);
-	t.true(s.anyChanged);
+	assert.ok(s.anyChanged);
 
-	t.deepEqual([...s.getCell(1).candidates], [3, 4, 8, 0]);
+	assert.deepEqual([...s.getCell(1).candidates], [3, 4, 8, 0]);
 });
