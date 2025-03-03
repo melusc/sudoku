@@ -14,8 +14,8 @@
 		"node": "^18.17.1 || ^20.6.1 || ^22.0.0"
 	},
 	"exports": {
-		".": "./dist/src/index.js",
-		"./plugins": "./dist/src/plugins/index.js"
+		".": "./dist/index.js",
+		"./plugins": "./dist/plugins/index.js"
 	},
 	"type": "module",
 	"scripts": {
