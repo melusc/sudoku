@@ -13,9 +13,9 @@ await test('nakedPairs should not change an empty sudoku.', (t: TestContext) => 
 	const modifiedSudoku = new Sudoku(9);
 
 	nakedPairs(modifiedSudoku);
-	t.false(modifiedSudoku.anyChanged);
+	t.assert.ok(!modifiedSudoku.anyChanged);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		getComparableCells(modifiedSudoku),
 		getComparableCells(originalSudoku),
 	);
@@ -31,9 +31,9 @@ await test('nakedPairs should correctly find the pairs of "1" and "6".', (t: Tes
 	);
 
 	nakedPairs(s);
-	t.true(s.anyChanged);
+	t.assert.ok(s.anyChanged);
 
-	t.deepEqual([...s.getCell(6).candidates], [7, 8]);
+	t.assert.deepEqual([...s.getCell(6).candidates], [7, 8]);
 });
 
 await test('nakedPairs should not change anything upon finding ("1", "2", "5") across two cells', (t: TestContext) => {
@@ -54,10 +54,10 @@ await test('nakedPairs should not change anything upon finding ("1", "2", "5") a
 	const row = s.getRow(3);
 
 	nakedPairs(s);
-	t.false(s.anyChanged);
+	t.assert.ok(!s.anyChanged);
 
 	for (let index = 0; index < 9; ++index) {
-		t.deepEqual([...row[index]!.candidates], candidates[index]!);
+		t.assert.deepEqual([...row[index]!.candidates], candidates[index]!);
 	}
 });
 
@@ -83,7 +83,7 @@ await test('nakedPairs should find an incomplete naked pair', (t: TestContext) =
 
 	nakedPairs(s);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 2, 4], // #1
@@ -121,7 +121,7 @@ await test('nakedPairs should find an incomplete naked pair with incomplete cell
 
 	nakedPairs(s);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[1, 4], // #1

@@ -18,10 +18,10 @@ await test('Sudoku#setElement valid element', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(0, '4');
 
-	t.is(s.getElement(0), '4');
+	t.assert.equal(s.getElement(0), '4');
 
 	s.setElement(0, 4); // because '1' is 0, '2' is 1 ...
-	t.is(s.getElement(0), '5');
+	t.assert.equal(s.getElement(0), '5');
 });
 
 await test('Sudoku#setElement invalid element', (t: TestContext) => {
@@ -33,7 +33,7 @@ await test('Sudoku#setElement invalid element', (t: TestContext) => {
 		{message: 'Unexpected element ".".'},
 	);
 
-	t.throws(
+	t.assert.throws(
 		() => {
 			s.setElement(0, 9);
 		},
@@ -43,26 +43,26 @@ await test('Sudoku#setElement invalid element', (t: TestContext) => {
 
 await test('Sudoku#getElement', (t: TestContext) => {
 	const s = new Sudoku(16);
-	t.is(s.getElement(8 * 9 + 8), undefined);
+	t.assert.equal(s.getElement(8 * 9 + 8), undefined);
 
 	s.setElement(8 * 9 + 8, '4');
-	t.is(s.getElement(8 * 9 + 8), '4');
+	t.assert.equal(s.getElement(8 * 9 + 8), '4');
 
 	s.setElement(0, 'A');
-	t.is(s.getElement(0), 'A');
-	t.is(s.getCell(0).element, 10);
+	t.assert.equal(s.getElement(0), 'A');
+	t.assert.equal(s.getCell(0).element, 10);
 
 	s.setElement(0, 0);
-	t.is(s.getElement(0), '1');
-	t.is(s.getCell(0).element, 0);
+	t.assert.equal(s.getElement(0), '1');
+	t.assert.equal(s.getCell(0).element, 0);
 });
 
 await test('Sudoku#clearCell', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(6 * 9 + 6, '4');
-	t.is(s.getElement(6 * 9 + 6), '4');
+	t.assert.equal(s.getElement(6 * 9 + 6), '4');
 	s.clearCell(6 * 9 + 6);
-	t.is(s.getElement(6 * 9 + 6), undefined);
+	t.assert.equal(s.getElement(6 * 9 + 6), undefined);
 });
 
 await test('Sudoku#clearAllCells', (t: TestContext) => {
@@ -71,15 +71,15 @@ await test('Sudoku#clearAllCells', (t: TestContext) => {
 		.setElement(1 * 9 + 1, '5')
 		.setElement(2 * 9 + 4, '3');
 
-	t.is(s.getElement(6 * 9 + 6), '4');
-	t.is(s.getElement(1 * 9 + 1), '5');
-	t.is(s.getElement(2 * 9 + 4), '3');
+	t.assert.equal(s.getElement(6 * 9 + 6), '4');
+	t.assert.equal(s.getElement(1 * 9 + 1), '5');
+	t.assert.equal(s.getElement(2 * 9 + 4), '3');
 
 	s.clearAllCells();
 
-	t.is(s.getElement(6 * 9 + 6), undefined);
-	t.is(s.getElement(1 * 9 + 1), undefined);
-	t.is(s.getElement(2 * 9 + 4), undefined);
+	t.assert.equal(s.getElement(6 * 9 + 6), undefined);
+	t.assert.equal(s.getElement(1 * 9 + 1), undefined);
+	t.assert.equal(s.getElement(2 * 9 + 4), undefined);
 });
 
 await test('Sudoku#getCol', (t: TestContext) => {
@@ -88,7 +88,7 @@ await test('Sudoku#getCol', (t: TestContext) => {
 
 	const col = s.getCol(8);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		col.map(cell => cell.element),
 		[
 			undefined,
@@ -112,7 +112,7 @@ await test('Sudoku#getRow', (t: TestContext) => {
 
 	const row = s.getRow(8);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		row.map(cell => cell.element),
 		[undefined, undefined, 3, undefined, undefined, undefined, undefined, 6, 2],
 	);
@@ -120,9 +120,9 @@ await test('Sudoku#getRow', (t: TestContext) => {
 
 await test('Sudoku#getCell', (t: TestContext) => {
 	const s = new Sudoku(9);
-	t.is(s.getCell(0), s.getBlock(0)[0]!);
+	t.assert.equal(s.getCell(0), s.getBlock(0)[0]!);
 
-	t.is(
+	t.assert.equal(
 		s.getCell(4 * 9 + 6),
 		s.getCells()[4 * 9 + 6]!, // This is what it does, but there's not a lot to test here anyway.
 	);
@@ -133,12 +133,12 @@ await test('Sudoku#getCells', (t: TestContext) => {
 
 	const cells1 = s.getCells();
 
-	t.is(cells1.length, 81);
+	t.assert.equal(cells1.length, 81);
 
 	for (const cell of cells1) {
-		t.is(cell.element, undefined);
+		t.assert.equal(cell.element, undefined);
 
-		t.is(cell.candidates.size, 9);
+		t.assert.equal(cell.candidates.size, 9);
 	}
 
 	// ====
@@ -150,9 +150,9 @@ await test('Sudoku#getCells', (t: TestContext) => {
 		.setElement(1 * 9 + 1, '4')
 		.setElement(5 * 9 + 7, '2');
 
-	t.is(sudoku.getCell(0).element, 1);
-	t.is(sudoku.getCell(1 * 9 + 1).element, 3);
-	t.is(sudoku.getCell(5 * 9 + 7).element, 1);
+	t.assert.equal(sudoku.getCell(0).element, 1);
+	t.assert.equal(sudoku.getCell(1 * 9 + 1).element, 3);
+	t.assert.equal(sudoku.getCell(5 * 9 + 7).element, 1);
 
 	// ====
 
@@ -161,15 +161,15 @@ await test('Sudoku#getCells', (t: TestContext) => {
 
 	const cells2 = s.getCells();
 
-	t.deepEqual(cells2.map(cell => cell.element! + 1).slice(0, 9), firstRow);
+	t.assert.deepEqual(cells2.map(cell => cell.element! + 1).slice(0, 9), firstRow);
 });
 
 await test('Sudoku#getBlock', (t: TestContext) => {
 	let s = new Sudoku(9);
 	const block1 = s.getBlock(0);
 
-	t.true(Array.isArray(block1));
-	t.is(block1.length, 9);
+	t.assert.ok(Array.isArray(block1));
+	t.assert.equal(block1.length, 9);
 
 	// ====
 
@@ -184,7 +184,7 @@ await test('Sudoku#getBlock', (t: TestContext) => {
 	const block2 = s.getBlock(0);
 
 	for (const [index, element] of block2.entries()) {
-		t.is(element.element, index);
+		t.assert.equal(element.element, index);
 	}
 });
 
@@ -205,9 +205,9 @@ await test('Sudoku#solve easy', (t: TestContext) => {
 		9,
 	);
 
-	t.is(s.solve(), 'finish');
+	t.assert.equal(s.solve(), 'finish');
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[9, 1, 4, 3, 8, 6, 7, 5, 2],
@@ -222,7 +222,7 @@ await test('Sudoku#solve easy', (t: TestContext) => {
 		]),
 	);
 
-	t.true(s.isSolved());
+	t.assert.ok(s.isSolved());
 });
 
 await test('Sudoku#solve evil', (t: TestContext) => {
@@ -243,9 +243,9 @@ await test('Sudoku#solve evil', (t: TestContext) => {
 		9,
 	);
 
-	t.is(s.solve(), 'finish');
+	t.assert.equal(s.solve(), 'finish');
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[6, 7, 4, 9, 2, 8, 1, 5, 3],
@@ -260,7 +260,7 @@ await test('Sudoku#solve evil', (t: TestContext) => {
 		]),
 	);
 
-	t.true(s.isSolved());
+	t.assert.ok(s.isSolved());
 });
 
 await test('Sudoku#solve expert', (t: TestContext) => {
@@ -281,9 +281,9 @@ await test('Sudoku#solve expert', (t: TestContext) => {
 		9,
 	);
 
-	t.is(s.solve(), 'finish');
+	t.assert.equal(s.solve(), 'finish');
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[3, 5, 1, 9, 8, 4, 6, 7, 2],
@@ -298,7 +298,7 @@ await test('Sudoku#solve expert', (t: TestContext) => {
 		]),
 	);
 
-	t.true(s.isSolved());
+	t.assert.ok(s.isSolved());
 });
 
 await test('Sudoku#solve tough 16x16', (t: TestContext) => {
@@ -330,9 +330,9 @@ await test('Sudoku#solve tough 16x16', (t: TestContext) => {
 
 	s.shouldLogErrors = true;
 
-	t.is(s.solve(), 'finish');
+	t.assert.equal(s.solve(), 'finish');
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getCells().map(cell => cell.element),
 		transformFlatArray([
 			[2, 11, 12, 4, 7, 13, 5, 6, 1, 9, 3, 14, 15, 16, 8, 10],
@@ -354,7 +354,7 @@ await test('Sudoku#solve tough 16x16', (t: TestContext) => {
 		]),
 	);
 
-	t.true(s.isSolved());
+	t.assert.ok(s.isSolved());
 });
 
 await test('Sudoku#solve: It should realise that invalid1 is invalid', (t: TestContext) => {
@@ -376,9 +376,9 @@ await test('Sudoku#solve: It should realise that invalid1 is invalid', (t: TestC
 		9,
 	);
 
-	t.is(s.solve(), 'error');
+	t.assert.equal(s.solve(), 'error');
 
-	t.false(s.isSolved());
+	t.assert.ok(!s.isSolved());
 });
 
 await test('Sudoku#solve: It should realise that invalid2 is invalid', (t: TestContext) => {
@@ -402,9 +402,9 @@ await test('Sudoku#solve: It should realise that invalid2 is invalid', (t: TestC
 		9,
 	);
 
-	t.is(s.solve(), 'error');
+	t.assert.equal(s.solve(), 'error');
 
-	t.false(s.isSolved());
+	t.assert.ok(!s.isSolved());
 });
 
 await test('Sudoku#subscribe', (t: TestContext) => {
@@ -413,8 +413,8 @@ await test('Sudoku#subscribe', (t: TestContext) => {
 	t.plan(2);
 
 	const callback = (sudoku: Sudoku): void => {
-		t.is(sudoku.getCell(3 * 9 + 2).element, 1);
-		t.is(sudoku.getCell(4 * 9 + 1).element, 3);
+		t.assert.equal(sudoku.getCell(3 * 9 + 2).element, 1);
+		t.assert.equal(sudoku.getCell(4 * 9 + 1).element, 3);
 	};
 
 	// Callback shouldn't (can't) fire
@@ -435,11 +435,11 @@ await test('Sudoku#unsubscribe', (t: TestContext) => {
 	// Callback2 will not and as such fire twice times
 
 	const callback1 = (): void => {
-		t.is(s.getElement(3 * 9 + 2), '2');
+		t.assert.equal(s.getElement(3 * 9 + 2), '2');
 	};
 
 	const callback2 = (): void => {
-		t.is(s.getElement(3 * 9 + 2), '2');
+		t.assert.equal(s.getElement(3 * 9 + 2), '2');
 	};
 
 	s.subscribe(callback1).subscribe(callback2);
@@ -457,7 +457,7 @@ await test('Sudoku#emit', (t: TestContext) => {
 	t.plan(1);
 
 	s.subscribe((_s, type) => {
-		t.is(type, 'change');
+		t.assert.equal(type, 'change');
 	});
 
 	s.emit('change');
@@ -466,7 +466,7 @@ await test('Sudoku#emit', (t: TestContext) => {
 await test('Sudoku#cellsIndividuallyValid empty sudoku', (t: TestContext) => {
 	const s = new Sudoku(9);
 
-	t.true(s.cellsIndividuallyValid());
+	t.assert.ok(s.cellsIndividuallyValid());
 });
 
 await test('Sudoku#cellsIndividuallyValid duplicates', (t: TestContext) => {
@@ -474,54 +474,54 @@ await test('Sudoku#cellsIndividuallyValid duplicates', (t: TestContext) => {
 
 	s.setElement(0, '1').setElement(1, '1');
 
-	t.false(s.cellsIndividuallyValid());
+	t.assert.ok(!s.cellsIndividuallyValid());
 });
 
 await test('Sudoku#isCellValid valid cell', (t: TestContext) => {
 	const s = new Sudoku(9);
 
-	t.true(s.isCellValid(0));
+	t.assert.ok(s.isCellValid(0));
 });
 
 await test('Sudoku#isCellValid empty candidates no element', (t: TestContext) => {
 	const s = new Sudoku(9);
 	const cell = s.getCell(0);
 	cell.candidates.clear();
-	t.false(s.isCellValid(cell));
+	t.assert.ok(!s.isCellValid(cell));
 });
 
 await test('Sudoku#isCellValid element and candidates', (t: TestContext) => {
 	const s = new Sudoku(9);
 	const cell = s.getCell(0);
 	cell.element = 3;
-	t.false(s.isCellValid(cell));
+	t.assert.ok(!s.isCellValid(cell));
 });
 
 await test('Sudoku#isCellValid duplicate in row', (t: TestContext) => {
 	const s = new Sudoku(9);
 	// The cells only share the same row
 	s.setElement(0, 1).setElement(7, 1);
-	t.false(s.isCellValid(0));
+	t.assert.ok(!s.isCellValid(0));
 });
 
 await test('Sudoku#isCellValid duplicate in col', (t: TestContext) => {
 	const s = new Sudoku(9);
 	// The cells only share the same col
 	s.setElement(0, 1).setElement(72, 1);
-	t.false(s.isCellValid(0));
+	t.assert.ok(!s.isCellValid(0));
 });
 
 await test('Sudoku#isCellValid duplicate in block', (t: TestContext) => {
 	const s = new Sudoku(9);
 	// The cells only share the same block
 	s.setElement(0, 1).setElement(10, 1);
-	t.false(s.isCellValid(0));
+	t.assert.ok(!s.isCellValid(0));
 });
 
 await test('Sudoku#isValid empty Sudoku', (t: TestContext) => {
 	const s = new Sudoku(16);
 
-	t.true(s.isValid());
+	t.assert.ok(s.isValid());
 });
 
 await test('Sudoku#isValid First row has no "1" anywhere', (t: TestContext) => {
@@ -531,7 +531,7 @@ await test('Sudoku#isValid First row has no "1" anywhere', (t: TestContext) => {
 		c.candidates.delete(0);
 	}
 
-	t.false(s.isValid());
+	t.assert.ok(!s.isValid());
 });
 
 // Duplicate, because #isCellValid / #cellsIndividuallyValid already cover this
@@ -540,7 +540,7 @@ await test('Sudoku#isValid First row has duplicates', (t: TestContext) => {
 	const s = new Sudoku(9);
 	s.setElement(0, 1).setElement(1, 1);
 
-	t.false(s.isValid());
+	t.assert.ok(!s.isValid());
 });
 
 await test('Sudoku#overrideCandidates new set equal to old set', (t: TestContext) => {
@@ -548,8 +548,8 @@ await test('Sudoku#overrideCandidates new set equal to old set', (t: TestContext
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
 
-	t.false(sudoku.anyChanged);
-	t.deepEqual(cell0.candidates, new Set([1, 2, 3]));
+	t.assert.ok(!sudoku.anyChanged);
+	t.assert.deepEqual(cell0.candidates, new Set([1, 2, 3]));
 });
 
 await test('Sudoku#overrideCandidates old set is subset of new set', (t: TestContext) => {
@@ -557,8 +557,8 @@ await test('Sudoku#overrideCandidates old set is subset of new set', (t: TestCon
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2, 3]));
 
-	t.false(sudoku.anyChanged);
-	t.deepEqual(cell0.candidates, new Set([1, 2]));
+	t.assert.ok(!sudoku.anyChanged);
+	t.assert.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
 await test('Sudoku#overrideCandidates new set is subset of old set', (t: TestContext) => {
@@ -566,8 +566,8 @@ await test('Sudoku#overrideCandidates new set is subset of old set', (t: TestCon
 	const cell0 = sudoku.getCell(0);
 	sudoku.overrideCandidates(cell0, new Set([1, 2]));
 
-	t.true(sudoku.anyChanged);
-	t.deepEqual(cell0.candidates, new Set([1, 2]));
+	t.assert.ok(sudoku.anyChanged);
+	t.assert.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
 await test('Sudoku#removeCandidate toRemove is not in old set', (t: TestContext) => {
@@ -575,8 +575,8 @@ await test('Sudoku#removeCandidate toRemove is not in old set', (t: TestContext)
 	const cell0 = sudoku.getCell(0);
 	sudoku.removeCandidate(cell0, 4);
 
-	t.false(sudoku.anyChanged);
-	t.deepEqual(cell0.candidates, new Set([1, 2, 3]));
+	t.assert.ok(!sudoku.anyChanged);
+	t.assert.deepEqual(cell0.candidates, new Set([1, 2, 3]));
 });
 
 await test('Sudoku#removeCandidate toRemove is in old set', (t: TestContext) => {
@@ -584,8 +584,8 @@ await test('Sudoku#removeCandidate toRemove is in old set', (t: TestContext) => 
 	const cell0 = sudoku.getCell(0);
 	sudoku.removeCandidate(cell0, 3);
 
-	t.true(sudoku.anyChanged);
-	t.deepEqual(cell0.candidates, new Set([1, 2]));
+	t.assert.ok(sudoku.anyChanged);
+	t.assert.deepEqual(cell0.candidates, new Set([1, 2]));
 });
 
 // Using overrideCandidates would also be possible
@@ -593,7 +593,7 @@ await test('Sudoku#removeCandidate candidates is empty afterwards', (t: TestCont
 	const sudoku = Sudoku.fromPrefilled([[[1]]], 9);
 	const cell0 = sudoku.getCell(0);
 
-	t.throws(() => {
+	t.assert.throws(() => {
 		sudoku.removeCandidate(cell0, 1);
 	});
 });
@@ -603,21 +603,21 @@ await test('Sudoku#removeCandidate one candidate afterwards', (t: TestContext) =
 	const cell0 = sudoku.getCell(0);
 
 	sudoku.removeCandidate(cell0, 1);
-	t.true(sudoku.anyChanged);
-	t.is(cell0.element, 2);
-	t.is(cell0.candidates.size, 0);
+	t.assert.ok(sudoku.anyChanged);
+	t.assert.equal(cell0.element, 2);
+	t.assert.equal(cell0.candidates.size, 0);
 });
 
 await test('Sudoku#isSolved', (t: TestContext) => {
 	let s = new Sudoku(9);
 
-	t.false(s.isSolved(), 'An empty sudoku should return false');
+	t.assert.ok(!s.isSolved(), 'An empty sudoku should return false');
 
 	// ====
 
 	s = new Sudoku(9);
 	s.setElement(3, '2').setElement(4, '4');
-	t.false(s.isSolved(), 'A partially empty sudoku should return false');
+	t.assert.ok(!s.isSolved(), 'A partially empty sudoku should return false');
 
 	// ====
 
@@ -625,7 +625,7 @@ await test('Sudoku#isSolved', (t: TestContext) => {
 		Array.from({length: 9}, () => Array.from({length: 9}, () => '2')),
 		9,
 	);
-	t.false(
+	t.assert.ok(!
 		s.isSolved(),
 		'A completely filled sudoku should return false if it has an obvious mistake',
 	);
@@ -649,8 +649,8 @@ await test('Sudoku#clone 9x9', (t: TestContext) => {
 
 	const cloned = s.clone();
 
-	t.deepEqual(getComparableCells(cloned), getComparableCells(s));
-	t.not(cloned, s);
+	t.assert.deepEqual(getComparableCells(cloned), getComparableCells(s));
+	t.assert.notEqual(cloned, s);
 });
 
 await test('Sudoku#clone 16x16', (t: TestContext) => {
@@ -678,8 +678,8 @@ await test('Sudoku#clone 16x16', (t: TestContext) => {
 
 	const cloned = s.clone();
 
-	t.deepEqual(getComparableCells(cloned), getComparableCells(s));
-	t.not(cloned, s);
+	t.assert.deepEqual(getComparableCells(cloned), getComparableCells(s));
+	t.assert.notEqual(cloned, s);
 });
 
 await test('Sudoku.fromPrefilled valid sudoku', (t: TestContext) => {
@@ -695,7 +695,7 @@ await test('Sudoku.fromPrefilled valid sudoku', (t: TestContext) => {
 
 	for (let index = 0; index < s.size; ++index) {
 		const row = s.getRow(index);
-		t.deepEqual(
+		t.assert.deepEqual(
 			row.map(cell => cell.element),
 			[0, 1, 2, 3],
 		);
@@ -703,7 +703,7 @@ await test('Sudoku.fromPrefilled valid sudoku', (t: TestContext) => {
 });
 
 await test('Sudoku.fromPrefilled too many cols', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			Sudoku.fromPrefilled(
 				[
@@ -721,7 +721,7 @@ await test('Sudoku.fromPrefilled too many cols', (t: TestContext) => {
 });
 
 await test('Sudoku.fromPrefilled too many rows', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			Sudoku.fromPrefilled(
 				[
@@ -745,7 +745,7 @@ await test('Sudoku.fromString valid sudoku', (t: TestContext) => {
 
 	for (let index = 0; index < s.size; ++index) {
 		const row = s.getRow(index);
-		t.deepEqual(
+		t.assert.deepEqual(
 			row.map(cell => cell.element),
 			[0, 1, 2, 3],
 		);
@@ -753,7 +753,7 @@ await test('Sudoku.fromString valid sudoku', (t: TestContext) => {
 });
 
 await test('Sudoku.fromString too long', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			Sudoku.fromString('1234'.repeat(5), 4);
 		},
@@ -764,7 +764,7 @@ await test('Sudoku.fromString too long', (t: TestContext) => {
 });
 
 await test('Sudoku.fromString invalid character', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			Sudoku.fromString('1234ü', 4);
 		},
@@ -785,7 +785,7 @@ await test('Sudoku#toString should produce a valid string', (t: TestContext) => 
 
 	// Test by passing it to Sudoku.fromString
 	// and making sure that the two sudokus are equal
-	t.deepEqual(
+	t.assert.deepEqual(
 		getComparableCells(Sudoku.fromString(s.toString(), 16)),
 		getComparableCells(s),
 	);
@@ -806,8 +806,8 @@ await test('Sudoku#toJson', (t: TestContext) => {
 
 	const json = s.toJson();
 
-	t.deepEqual(json.slice(0, 5), wantedJson);
-	t.deepEqual(
+	t.assert.deepEqual(json.slice(0, 5), wantedJson);
+	t.assert.deepEqual(
 		json.slice(5),
 		Array.from({length: 81 - 5}, () => [0, 1, 2, 3, 4, 5, 6, 7, 8]),
 	);
@@ -820,15 +820,15 @@ await test('Sudoku#fromJson valid input', (t: TestContext) => {
 
 	for (const [index, item] of json.entries()) {
 		if (typeof item === 'number') {
-			t.is(s.getElement(index), `${item + 1}`);
+			t.assert.equal(s.getElement(index), `${item + 1}`);
 		} else {
-			t.deepEqual(s.getCell(index).candidates, new Set(item));
+			t.assert.deepEqual(s.getCell(index).candidates, new Set(item));
 		}
 	}
 });
 
 await test('Sudoku#fromJson invalid candidates', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			Sudoku.fromJson([[1, 3, 9]], 9);
 		},
@@ -839,7 +839,7 @@ await test('Sudoku#fromJson invalid candidates', (t: TestContext) => {
 });
 
 await test('Sudoku#fromJson invalid element', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			Sudoku.fromJson([9], 9);
 		},
@@ -850,32 +850,32 @@ await test('Sudoku#fromJson invalid element', (t: TestContext) => {
 });
 
 await test('inRangeIncl', (t: TestContext) => {
-	t.throws(
+	t.assert.throws(
 		() => {
 			inRangeIncl(-1, 0, 80);
 		},
 		{message: /-1.+0.+80/},
 	);
 
-	t.throws(
+	t.assert.throws(
 		() => {
 			inRangeIncl(81, 0, 80);
 		},
 		{message: /81.+0.+80/},
 	);
 
-	t.throws(
+	t.assert.throws(
 		() => {
 			inRangeIncl(5.5, 0, 80);
 		},
 		{message: /5\.5.+0.+80/},
 	);
 
-	t.notThrows(() => {
+	t.assert.doesNotThrow(() => {
 		inRangeIncl(4, 0, 80);
 	});
 
-	t.throws(
+	t.assert.throws(
 		() => {
 			// @ts-expect-error Testing case
 			inRangeIncl('abc', 0, 80);
@@ -885,7 +885,7 @@ await test('inRangeIncl', (t: TestContext) => {
 		},
 	);
 
-	t.throws(
+	t.assert.throws(
 		() => {
 			inRangeIncl(0, 1, 10, (...arguments_) => arguments_.join(', '));
 		},

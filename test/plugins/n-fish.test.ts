@@ -9,10 +9,10 @@ function makeCheck(s: Sudoku, t: TestContext) {
 		const cell = s.getCell(index);
 
 		if (Array.isArray(expected)) {
-			t.deepEqual(s.getCell(index).candidates, new Set(expected));
+			t.assert.deepEqual(s.getCell(index).candidates, new Set(expected));
 		} else {
-			t.is(cell.element, expected);
-			t.is(cell.candidates.size, 0);
+			t.assert.equal(cell.element, expected);
+			t.assert.equal(cell.candidates.size, 0);
 		}
 	};
 }
@@ -42,7 +42,7 @@ await test('regular n-fish #1', (t: TestContext) => {
 	const check = makeCheck(s, t);
 
 	nFish(s);
-	t.true(s.anyChanged);
+	t.assert.ok(s.anyChanged);
 
 	check(1 * 9 + 0, [1, 7]);
 	check(2 * 9 + 0, [6, 7]); // Remove 1
@@ -80,7 +80,7 @@ await test('regular n-fish #2', (t: TestContext) => {
 	const check = makeCheck(s, t);
 
 	nFish(s);
-	t.true(s.anyChanged);
+	t.assert.ok(s.anyChanged);
 
 	check(0 * 9 + 1, [3, 6]); // Remove 5
 
@@ -110,7 +110,7 @@ await test('Detect invalid sudoku', (t: TestContext) => {
 
 	const s = Sudoku.fromPrefilled([row, row, row], 9);
 
-	t.throws(
+	t.assert.throws(
 		() => {
 			nFish(s);
 		},

@@ -33,11 +33,11 @@ await test('hiddenPairs should find the hidden pairs ("3", "4", "0").', (t :Test
 
 	const wantedSet = new Set([3, 4, 0]);
 
-	t.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
+	t.assert.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
+	t.assert.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
+	t.assert.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
 });
 
 await test('hiddenPairs should find the only cell that can have "1".', (t: TestContext) => {
@@ -61,8 +61,8 @@ await test('hiddenPairs should find the only cell that can have "1".', (t: TestC
 	hiddenPairs(s);
 
 	const cell = s.getCell(3);
-	t.is(cell.element, 1);
-	t.is(cell.candidates.size, 0);
+	t.assert.equal(cell.element, 1);
+	t.assert.equal(cell.candidates.size, 0);
 });
 
 await test("hiddenPairs should not modify any cells if there aren't any hidden pairs.", (t: TestContext) => {
@@ -84,7 +84,7 @@ await test("hiddenPairs should not modify any cells if there aren't any hidden p
 
 	hiddenPairs(s);
 
-	t.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
+	t.assert.deepEqual(getComparableCells(s), getComparableCells(unmodifiedSudoku));
 });
 
 await test('hiddenPairs should find an incomplete hidden pair', (t: TestContext) => {
@@ -107,9 +107,9 @@ await test('hiddenPairs should find an incomplete hidden pair', (t: TestContext)
 	);
 
 	hiddenPairs(s);
-	t.true(s.anyChanged);
+	t.assert.ok(s.anyChanged);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		s.getRow(0).map(({candidates}) => [...candidates]),
 		[
 			[7, 8],
@@ -157,9 +157,9 @@ await test('hiddenPairs should find the hidden pairs ("3", "4", "0") by ignoring
 
 	const wantedSet = new Set([3, 4, 0]);
 
-	t.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
+	t.assert.deepEqual(s.getCell(4 * 9).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
+	t.assert.deepEqual(s.getCell(4 * 9 + 3).candidates, wantedSet);
 
-	t.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
+	t.assert.deepEqual(s.getCell(4 * 9 + 5).candidates, wantedSet);
 });

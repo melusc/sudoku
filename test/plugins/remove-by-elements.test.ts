@@ -13,9 +13,9 @@ await test('removeByElements should not change an empty sudoku', (t: TestContext
 	const modifiedSudoku = new Sudoku(9);
 
 	removeByElements(modifiedSudoku);
-	t.false(modifiedSudoku.anyChanged);
+	t.assert.ok(!modifiedSudoku.anyChanged);
 
-	t.deepEqual(
+	t.assert.deepEqual(
 		getComparableCells(modifiedSudoku),
 		getComparableCells(originalSudoku),
 	);
@@ -34,8 +34,8 @@ await test('removeByElements should solve [[1, 2, 3], [4, 5, 6], [_, 8, 9] (bloc
 	removeByElements(s);
 
 	const cell = s.getCell(2 * 9);
-	t.is(cell.element, 7);
-	t.is(cell.candidates.size, 0);
+	t.assert.equal(cell.element, 7);
+	t.assert.equal(cell.candidates.size, 0);
 });
 
 await test('removeByElements should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9]] (block).', (t: TestContext) => {
@@ -53,9 +53,9 @@ await test('removeByElements should nearly solve [[1, 2, 3], [_, _, 6], [7, 8, 9
 	const cell1 = sudoku.getCell(1 * 9);
 	const cell2 = sudoku.getCell(1 * 9 + 1);
 
-	t.deepEqual(cell1.candidates, new Set([4, 5]));
+	t.assert.deepEqual(cell1.candidates, new Set([4, 5]));
 
-	t.deepEqual(cell2.candidates, new Set([4, 5]));
+	t.assert.deepEqual(cell2.candidates, new Set([4, 5]));
 });
 
 await test('removeByElements should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) correctly.', (t: TestContext) => {
@@ -67,8 +67,8 @@ await test('removeByElements should solve [_, 2, 5, 3, 8, 9, 4, 7, 6] (col) corr
 	removeByElements(sudoku);
 
 	const cell = sudoku.getCell(0);
-	t.is(cell.element, 1);
-	t.is(cell.candidates.size, 0);
+	t.assert.equal(cell.element, 1);
+	t.assert.equal(cell.candidates.size, 0);
 });
 
 await test('removeByElements should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (row).', (t: TestContext) => {
@@ -82,9 +82,9 @@ await test('removeByElements should nearly solve [_, 5, 4, 3, 2, 7, 1, 8, _] (ro
 	const cell1 = sudoku.getCell(0);
 	const cell2 = sudoku.getCell(8 * 9);
 
-	t.deepEqual(cell1.candidates, new Set([0, 6]));
+	t.assert.deepEqual(cell1.candidates, new Set([0, 6]));
 
-	t.deepEqual(cell2.candidates, new Set([0, 6]));
+	t.assert.deepEqual(cell2.candidates, new Set([0, 6]));
 });
 
 await test('removeByElements should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) correctly.', (t: TestContext) => {
@@ -94,8 +94,8 @@ await test('removeByElements should solve [1, 2, 3, _, 5, 6, 7, 8, 9] (row) corr
 
 	const cell = sudoku.getCell(3);
 
-	t.is(cell.element, 4);
-	t.is(cell.candidates.size, 0);
+	t.assert.equal(cell.element, 4);
+	t.assert.equal(cell.candidates.size, 0);
 });
 
 await test('removeByElements should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', (t: TestContext) => {
@@ -106,7 +106,7 @@ await test('removeByElements should nearly solve [5, 7, 8, 1, 2, _, 3, _, 6].', 
 	const cell1 = sudoku.getCell(5);
 	const cell2 = sudoku.getCell(7);
 
-	t.deepEqual(cell1.candidates, new Set([0, 4]));
+	t.assert.deepEqual(cell1.candidates, new Set([0, 4]));
 
-	t.deepEqual(cell2.candidates, new Set([0, 4]));
+	t.assert.deepEqual(cell2.candidates, new Set([0, 4]));
 });

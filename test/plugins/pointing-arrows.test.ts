@@ -12,9 +12,9 @@ await test('pointingArrows should not change an empty sudoku.', (t: TestContext)
 	const unchanged = getComparableCells(s);
 
 	pointingArrows(s);
-	t.false(s.anyChanged);
+	t.assert.ok(!s.anyChanged);
 
-	t.deepEqual(getComparableCells(s), unchanged);
+	t.assert.deepEqual(getComparableCells(s), unchanged);
 });
 
 await test('pointingArrows should find a pointing arrow of 3s.', (t: TestContext) => {
@@ -38,15 +38,15 @@ await test('pointingArrows should find a pointing arrow of 3s.', (t: TestContext
 	);
 
 	pointingArrows(s);
-	t.true(s.anyChanged);
+	t.assert.ok(s.anyChanged);
 
-	t.deepEqual([...s.getCell(9).candidates], [2, 4, 5, 6]);
+	t.assert.deepEqual([...s.getCell(9).candidates], [2, 4, 5, 6]);
 
-	t.deepEqual([...s.getCell(10).candidates], [2, 4, 5]);
+	t.assert.deepEqual([...s.getCell(10).candidates], [2, 4, 5]);
 
 	const cell11 = s.getCell(11);
-	t.is(cell11.element, 6);
-	t.is(cell11.candidates.size, 0);
+	t.assert.equal(cell11.element, 6);
+	t.assert.equal(cell11.candidates.size, 0);
 });
 
 await test('pointingArrows should find a pointing arrow of 2s.', (t: TestContext) => {
@@ -80,7 +80,7 @@ await test('pointingArrows should find a pointing arrow of 2s.', (t: TestContext
 	);
 
 	pointingArrows(s);
-	t.true(s.anyChanged);
+	t.assert.ok(s.anyChanged);
 
-	t.deepEqual([...s.getCell(1).candidates], [3, 4, 8, 0]);
+	t.assert.deepEqual([...s.getCell(1).candidates], [3, 4, 8, 0]);
 });
