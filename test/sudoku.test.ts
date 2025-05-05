@@ -1,7 +1,6 @@
 /* eslint regexp/no-super-linear-backtracking: off */
 import assert from 'node:assert/strict';
 import {randomInt} from 'node:crypto';
-// eslint-disable-next-line n/no-unsupported-features/node-builtins
 import test from 'node:test';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';

@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-// eslint-disable-next-line n/no-unsupported-features/node-builtins
 import test from 'node:test';
 
 import {removeByElements} from '../../src/plugins/remove-by-elements.js';
