@@ -23,15 +23,15 @@
 	},
 	"devDependencies": {
 		"@lusc/clean-package": "^2.1.1",
-		"@lusc/eslint-config": "^7.2.0",
+		"@lusc/eslint-config": "^7.4.0",
 		"@lusc/tsconfig": "^7.0.0",
-		"@types/node": "^22.15.3",
-		"@typescript-eslint/parser": "^8.31.1",
-		"eslint": "^9.26.0",
-		"prettier": "^3.5.3",
+		"@types/node": "^22.15.34",
+		"@typescript-eslint/parser": "^8.35.1",
+		"eslint": "^9.30.0",
+		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
 		"typescript": "^5.8.3"
 	},
 	"sideEffects": false,
-	"packageManager": "yarn@4.9.1"
+	"packageManager": "yarn@4.9.2"
 }
