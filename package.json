@@ -23,7 +23,7 @@
 	},
 	"devDependencies": {
 		"@lusc/clean-package": "^2.2.0",
-		"@lusc/eslint-config": "^7.4.2",
+		"@lusc/eslint-config": "^8.0.0",
 		"@lusc/tsconfig": "^7.1.0",
 		"@types/node": "^22.18.0",
 		"@typescript-eslint/parser": "^8.41.0",
