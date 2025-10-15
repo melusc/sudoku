@@ -21,7 +21,7 @@
 		"test": "pnpm build && node --test dist/test/**/*.test.js"
 	},
 	"devDependencies": {
-		"@lusc/clean-package": "^2.2.0",
+		"@lusc/clean-package": "^3.0.0",
 		"@lusc/eslint-config": "^8.0.0",
 		"@lusc/tsconfig": "^7.1.0",
 		"@types/node": "^22.18.0",

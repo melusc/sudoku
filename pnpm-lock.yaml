@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@lusc/clean-package':
-        specifier: ^2.2.0
-        version: 2.2.0
+        specifier: ^3.0.0
+        version: 3.0.0
       '@lusc/eslint-config':
         specifier: ^8.0.0
         version: 8.0.0(@typescript-eslint/utils@8.43.0(eslint@9.35.0)(typescript@5.9.2))(eslint@9.35.0)
@@ -123,9 +123,9 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@lusc/clean-package@2.2.0':
-    resolution: {integrity: sha512-4jte++nVViOB0j4ft7xqJ9+orkS3ZunHZODMIkNF4lhkELAA7TRu9LRWcmMnq3f+AhrnKwehlaFrPD+HgTRAXA==}
-    engines: {node: ^22.14.0 || ^23.8.0 || ^24.6.0}
+  '@lusc/clean-package@3.0.0':
+    resolution: {integrity: sha512-5f8cxnCn9AGl8a3qhHSAbCSpVmoLIRZFXI2qY31pNu0hqcsMRV0k01muZnUNtOTXrN/rbLjUnjqsGzz8E5zQLg==}
+    engines: {node: ^22.14.0 || ^24.6.0 || ^25.0.0}
     hasBin: true
 
   '@lusc/eslint-config@8.0.0':
@@ -1129,7 +1129,7 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@lusc/clean-package@2.2.0': {}
+  '@lusc/clean-package@3.0.0': {}
 
   '@lusc/eslint-config@8.0.0(@typescript-eslint/utils@8.43.0(eslint@9.35.0)(typescript@5.9.2))(eslint@9.35.0)':
     dependencies:
