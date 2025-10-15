@@ -18,7 +18,7 @@ jobs:
           check-latest: true
           registry-url: 'https://registry.npmjs.org'
       - run: corepack enable
-      - run: pnpm install --immutable
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm clean-package -- scripts devDependencies packageManager
       - run: npm install -g npm@latest
