@@ -24,13 +24,13 @@
 		"@lusc/clean-package": "^3.0.0",
 		"@lusc/eslint-config": "^9.0.0",
 		"@lusc/tsconfig": "^7.2.0",
-		"@types/node": "^24.10.9",
-		"@typescript-eslint/parser": "^8.53.0",
-		"eslint": "^10.0.0",
-		"prettier": "^3.8.0",
-		"rimraf": "^6.1.2",
+		"@types/node": "^24.10.14",
+		"@typescript-eslint/parser": "^8.56.1",
+		"eslint": "^10.0.2",
+		"prettier": "^3.8.1",
+		"rimraf": "^6.1.3",
 		"typescript": "^5.9.3"
 	},
 	"sideEffects": false,
-	"packageManager": "pnpm@10.28.0+sha512.05df71d1421f21399e053fde567cea34d446fa02c76571441bfc1c7956e98e363088982d940465fd34480d4d90a0668bc12362f8aa88000a64e83d0b0e47be48"
+	"packageManager": "pnpm@10.30.2+sha512.36cdc707e7b7940a988c9c1ecf88d084f8514b5c3f085f53a2e244c2921d3b2545bc20dd4ebe1fc245feec463bb298aecea7a63ed1f7680b877dc6379d8d0cb4"
 }
