@@ -319,7 +319,6 @@ export class Sudoku {
 		return this.emit('change');
 	}
 
-	// eslint-disable-next-line unicorn/consistent-function-scoping
 	getCol = makeStructureCacher((col: number): ReadonlyCells => {
 		inRangeIncl(col, 0, this.size - 1);
 
@@ -332,14 +331,12 @@ export class Sudoku {
 		return result;
 	});
 
-	// eslint-disable-next-line unicorn/consistent-function-scoping
 	getRow = makeStructureCacher((row: number): ReadonlyCells => {
 		inRangeIncl(row, 0, this.size - 1);
 
 		return this.#cells.slice(row * this.size, (1 + row) * this.size);
 	});
 
-	// eslint-disable-next-line unicorn/consistent-function-scoping
 	getBlock = makeStructureCacher((index: number): ReadonlyCells => {
 		const {size, blockWidth} = this;
 
