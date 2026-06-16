@@ -115,7 +115,6 @@ await test('Detect invalid sudoku', () => {
 			nFish(s);
 		},
 		{
-			// eslint-disable-next-line unicorn/better-regex
 			message: /\{0,1,2\}.+\{0,1\}/,
 		},
 	);
