@@ -60,6 +60,7 @@ const genericNakedPairsSolver: VisitorFunction = (structure, sudoku) => {
 
 		for (let index = 0; index < sudoku.size; ++index) {
 			if (indices.includes(index)) {
+				// eslint-disable-next-line unicorn/no-break-in-nested-loop
 				continue;
 			}
 

@@ -72,6 +72,7 @@ function nFishByStructure(
 			inStructureIndices,
 		} of elementSummary.values()) {
 			if (inStructureIndices.length === sudoku.size) {
+				// eslint-disable-next-line unicorn/no-break-in-nested-loop
 				continue;
 			}
 
@@ -85,6 +86,7 @@ function nFishByStructure(
 			throwIfInvalid(structureIndices, inStructureIndices);
 
 			if (inStructureIndices.length !== structureIndices.length) {
+				// eslint-disable-next-line unicorn/no-break-in-nested-loop
 				continue;
 			}
 

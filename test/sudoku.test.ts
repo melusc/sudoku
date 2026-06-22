@@ -177,7 +177,7 @@ await test('Sudoku#getBlock', () => {
 
 	for (let row = 0; row < 3; ++row) {
 		for (let col = 0; col < 3; ++col) {
-			s.setElement(row * 9 + col, `${row * 3 + col + 1}`);
+			s.setElement(row * 9 + col, String(row * 3 + col + 1));
 		}
 	}
 
@@ -766,10 +766,12 @@ await test('Sudoku#toString should produce a valid string', () => {
 		s.setElement(index, randomInt(s.size));
 	}
 
+	const stringifiedSudoku = s.toString();
+
 	// Test by passing it to Sudoku.fromString
 	// and making sure that the two sudokus are equal
 	assert.deepEqual(
-		getComparableCells(Sudoku.fromString(s.toString(), 16)),
+		getComparableCells(Sudoku.fromString(stringifiedSudoku, 16)),
 		getComparableCells(s),
 	);
 });
@@ -803,7 +805,7 @@ await test('Sudoku#fromJson valid input', () => {
 
 	for (const [index, item] of json.entries()) {
 		if (typeof item === 'number') {
-			assert.equal(s.getElement(index), `${item + 1}`);
+			assert.equal(s.getElement(index), String(item + 1));
 		} else {
 			assert.deepEqual(s.getCell(index).candidates, new Set(item));
 		}
