@@ -24,7 +24,7 @@ export function inRangeIncl(
 	high: number,
 	format?: (n: number, low: number, high: number) => string,
 ): void {
-	if (!Number.isInteger(n) || n < low || n > high) {
+	if (!Number.isSafeInteger(n) || n < low || n > high) {
 		throw new TypeError(
 			format?.(n, low, high) ??
 				`Received "${n}", expected an integer ${low} <= n <= ${high}.`,
@@ -48,9 +48,8 @@ function makeElementsRecord(): Record<number, number> {
 	return new Proxy<Record<number, number>>(
 		{},
 		{
-			get(target, key): number {
-				return (Reflect.get(target, key) as number | undefined) ?? 0;
-			},
+			get: (target, key): number =>
+				(Reflect.get(target, key) as number | undefined) ?? 0,
 			set(target, key: string, value): boolean {
 				if (value < 0) {
 					throw new Error(`${key}, value < 0`);
@@ -101,6 +100,54 @@ export class Sudoku {
 		// eslint-disable-next-line @typescript-eslint/no-misused-spread
 		...'1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 	];
+
+	readonly #subscriptions = new Set<SubscriptionCallback>();
+
+	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
+
+	readonly #cells: ReadonlyCells;
+
+	/** @internal */
+	anyChanged = false;
+	rounds = 0;
+
+	// Don't log errors in tests
+	shouldLogErrors =
+		// eslint-disable-next-line n/prefer-global/process
+		typeof process === 'undefined' ||
+		// eslint-disable-next-line n/prefer-global/process
+		!Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
+
+	/** @internal */
+	readonly amountCells: number;
+
+	/** @internal */
+	readonly blockWidth: number;
+
+	readonly size: number;
+
+	constructor(size: number) {
+		const blockWidth = Math.sqrt(size);
+
+		if (!Number.isSafeInteger(blockWidth)) {
+			throw new TypeError('Expected size to be a square of an integer.');
+		}
+
+		if (size <= 0) {
+			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
+		}
+
+		this.size = size;
+		this.blockWidth = blockWidth;
+
+		const amountCells = size ** 2;
+		this.amountCells = amountCells;
+		this.#cells = Array.from({length: amountCells}, (_v, index) => ({
+			element: undefined,
+			candidates: generateEmptyCellCandidates(size),
+			index,
+		}));
+	}
 
 	static fromPrefilled(cells: PrefilledSudoku, size: number): Sudoku {
 		const s = new Sudoku(size);
@@ -191,52 +238,47 @@ export class Sudoku {
 		return sudoku;
 	}
 
-	/** @internal */
-	anyChanged = false;
-	rounds = 0;
+	#singleSolve(): SolveTypes {
+		this.anyChanged = false;
 
-	// Don't log errors in tests
-	shouldLogErrors =
-		// eslint-disable-next-line n/prefer-global/process
-		typeof process === 'undefined' ||
-		// eslint-disable-next-line n/prefer-global/process
-		!Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
+		for (const plugin of this.#plugins) {
+			try {
+				plugin(this);
+			} catch (error: unknown) {
+				this.logError(error, this.#cells);
 
-	/** @internal */
-	readonly amountCells: number;
-
-	/** @internal */
-	readonly blockWidth: number;
-
-	readonly size: number;
-
-	readonly #subscriptions = new Set<SubscriptionCallback>();
-
-	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
-
-	readonly #cells: ReadonlyCells;
-
-	constructor(size: number) {
-		const blockWidth = Math.sqrt(size);
-
-		if (!Number.isInteger(blockWidth)) {
-			throw new TypeError('Expected size to be a square of an integer.');
+				return SolveTypes.error;
+			}
 		}
 
-		if (size <= 0) {
-			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, unicorn/prefer-minimal-ternary
+		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
+	}
+
+	/** @internal */
+	#checkCellCandidates(cellOrIndex: number | Cell): this {
+		const cell = this.getCell(cellOrIndex);
+
+		if (cell.element !== undefined) {
+			return this;
 		}
 
-		this.size = size;
-		this.blockWidth = blockWidth;
+		if (cell.candidates.size === 0) {
+			throw new Error(
+				`Unexpected empty cell candidates in cell #${this.#cells.indexOf(
+					cell,
+				)}`,
+			);
+		}
 
-		const amountCells = size ** 2;
-		this.amountCells = amountCells;
-		this.#cells = Array.from({length: amountCells}, (_v, index) => ({
-			element: undefined,
-			candidates: generateEmptyCellCandidates(size),
-			index,
-		}));
+		if (cell.candidates.size === 1) {
+			const [element] = cell.candidates;
+			this.setElement(cell, element!);
+			this.anyChanged ||= true;
+			this.emit('change');
+		}
+
+		return this;
 	}
 
 	setElement(cellOrIndex: number | Cell, element: string | number): this {
@@ -319,6 +361,7 @@ export class Sudoku {
 		return this.emit('change');
 	}
 
+	// eslint-disable-next-line unicorn/consistent-class-member-order
 	getCol = makeStructureCacher((col: number): ReadonlyCells => {
 		inRangeIncl(col, 0, this.size - 1);
 
@@ -331,12 +374,14 @@ export class Sudoku {
 		return result;
 	});
 
+	// eslint-disable-next-line unicorn/consistent-class-member-order
 	getRow = makeStructureCacher((row: number): ReadonlyCells => {
 		inRangeIncl(row, 0, this.size - 1);
 
 		return this.#cells.slice(row * this.size, (1 + row) * this.size);
 	});
 
+	// eslint-disable-next-line unicorn/consistent-class-member-order
 	getBlock = makeStructureCacher((index: number): ReadonlyCells => {
 		const {size, blockWidth} = this;
 
@@ -362,6 +407,7 @@ export class Sudoku {
 		if (typeof index === 'number') {
 			inRangeIncl(index, 0, this.amountCells - 1);
 
+			// eslint-disable-next-line unicorn/no-unsafe-property-key
 			return this.#cells[index]!;
 		}
 
@@ -586,11 +632,10 @@ export class Sudoku {
 	}
 
 	toString(): string {
-		const result: string[] = [];
-
-		for (const cell of this.getCells()) {
-			result.push(this.getElement(cell) ?? ' ');
-		}
+		const result: string[] = Array.from(
+			this.getCells(),
+			cell => this.getElement(cell) ?? ' ',
+		);
 
 		return result.join('');
 	}
@@ -611,48 +656,5 @@ export class Sudoku {
 		return this.getCells().map(
 			({candidates, element}) => element ?? [...candidates],
 		);
-	}
-
-	#singleSolve(): SolveTypes {
-		this.anyChanged = false;
-
-		for (const plugin of this.#plugins) {
-			try {
-				plugin(this);
-			} catch (error: unknown) {
-				this.logError(error, this.#cells);
-
-				return SolveTypes.error;
-			}
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
-	}
-
-	/** @internal */
-	#checkCellCandidates(cellOrIndex: number | Cell): this {
-		const cell = this.getCell(cellOrIndex);
-
-		if (cell.element !== undefined) {
-			return this;
-		}
-
-		if (cell.candidates.size === 0) {
-			throw new Error(
-				`Unexpected empty cell candidates in cell #${this.#cells.indexOf(
-					cell,
-				)}`,
-			);
-		}
-
-		if (cell.candidates.size === 1) {
-			const [element] = cell.candidates;
-			this.setElement(cell, element!);
-			this.anyChanged ||= true;
-			this.emit('change');
-		}
-
-		return this;
 	}
 }
