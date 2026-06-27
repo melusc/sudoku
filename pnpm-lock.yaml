@@ -21,7 +21,7 @@ importers:
         specifier: ^24.13.2
         version: 24.13.2
       '@typescript-eslint/parser':
-        specifier: ^8.61.1
+        specifier: ^8.62.0
         version: 8.62.0(eslint@10.5.0)(typescript@6.0.3)
       eslint:
         specifier: ^10.5.0
