@@ -82,7 +82,7 @@ await test('regular n-fish #2', () => {
 	nFish(s);
 	assert.ok(s.anyChanged);
 
-	check(0 * 9 + 1, [3, 6]); // Remove 5
+	check(1, [3, 6]); // Remove 5
 
 	check(1 * 9 + 1, [3, 5]);
 	check(1 * 9 + 7, [4, 5]);
