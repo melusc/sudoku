@@ -101,54 +101,6 @@ export class Sudoku {
 		...'1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 	];
 
-	readonly #subscriptions = new Set<SubscriptionCallback>();
-
-	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
-
-	readonly #cells: ReadonlyCells;
-
-	/** @internal */
-	anyChanged = false;
-	rounds = 0;
-
-	// Don't log errors in tests
-	shouldLogErrors =
-		// eslint-disable-next-line n/prefer-global/process
-		typeof process === 'undefined' ||
-		// eslint-disable-next-line n/prefer-global/process
-		!Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
-
-	/** @internal */
-	readonly amountCells: number;
-
-	/** @internal */
-	readonly blockWidth: number;
-
-	readonly size: number;
-
-	constructor(size: number) {
-		const blockWidth = Math.sqrt(size);
-
-		if (!Number.isSafeInteger(blockWidth)) {
-			throw new TypeError('Expected size to be a square of an integer.');
-		}
-
-		if (size <= 0) {
-			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
-		}
-
-		this.size = size;
-		this.blockWidth = blockWidth;
-
-		const amountCells = size ** 2;
-		this.amountCells = amountCells;
-		this.#cells = Array.from({length: amountCells}, (_v, index) => ({
-			element: undefined,
-			candidates: generateEmptyCellCandidates(size),
-			index,
-		}));
-	}
-
 	static fromPrefilled(cells: PrefilledSudoku, size: number): Sudoku {
 		const s = new Sudoku(size);
 
@@ -238,6 +190,54 @@ export class Sudoku {
 		return sudoku;
 	}
 
+	readonly #subscriptions = new Set<SubscriptionCallback>();
+
+	readonly #plugins: Array<(sudoku: Sudoku) => void> = Object.values(plugins);
+
+	readonly #cells: ReadonlyCells;
+
+	/** @internal */
+	anyChanged = false;
+	rounds = 0;
+
+	// Don't log errors in tests
+	shouldLogErrors =
+		// eslint-disable-next-line n/prefer-global/process
+		typeof process === 'undefined' ||
+		// eslint-disable-next-line n/prefer-global/process
+		!Object.hasOwn(process.env, 'NODE_TEST_CONTEXT');
+
+	/** @internal */
+	readonly amountCells: number;
+
+	/** @internal */
+	readonly blockWidth: number;
+
+	readonly size: number;
+
+	constructor(size: number) {
+		const blockWidth = Math.sqrt(size);
+
+		if (!Number.isSafeInteger(blockWidth)) {
+			throw new TypeError('Expected size to be a square of an integer.');
+		}
+
+		if (size <= 0) {
+			throw new TypeError(`Expected size (${size}) to be greater than 0.`);
+		}
+
+		this.size = size;
+		this.blockWidth = blockWidth;
+
+		const amountCells = size ** 2;
+		this.amountCells = amountCells;
+		this.#cells = Array.from({length: amountCells}, (_v, index) => ({
+			element: undefined,
+			candidates: generateEmptyCellCandidates(size),
+			index,
+		}));
+	}
+
 	#singleSolve(): SolveTypes {
 		this.anyChanged = false;
 
@@ -251,7 +251,7 @@ export class Sudoku {
 			}
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, unicorn/prefer-minimal-ternary
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		return this.anyChanged ? SolveTypes.changed : SolveTypes.unchanged;
 	}
 
@@ -374,14 +374,12 @@ export class Sudoku {
 		return result;
 	});
 
-	// eslint-disable-next-line unicorn/consistent-class-member-order
 	getRow = makeStructureCacher((row: number): ReadonlyCells => {
 		inRangeIncl(row, 0, this.size - 1);
 
 		return this.#cells.slice(row * this.size, (1 + row) * this.size);
 	});
 
-	// eslint-disable-next-line unicorn/consistent-class-member-order
 	getBlock = makeStructureCacher((index: number): ReadonlyCells => {
 		const {size, blockWidth} = this;
 
@@ -441,10 +439,12 @@ export class Sudoku {
 
 		let anyChanged = false;
 		for (const candidate of cell.candidates) {
-			if (!candidates.has(candidate)) {
-				cell.candidates.delete(candidate);
-				anyChanged ||= true;
+			if (candidates.has(candidate)) {
+				continue;
 			}
+
+			cell.candidates.delete(candidate);
+			anyChanged ||= true;
 		}
 
 		if (anyChanged) {
@@ -520,11 +520,13 @@ export class Sudoku {
 	/** @internal */
 	cellsIndividuallyValid(): boolean {
 		for (const cell of this.#cells) {
-			if (!this.isCellValid(cell)) {
-				this.logError('cell was not valid', [cell]);
-
-				return false;
+			if (this.isCellValid(cell)) {
+				continue;
 			}
+
+			this.logError('cell was not valid', [cell]);
+
+			return false;
 		}
 
 		return true;
