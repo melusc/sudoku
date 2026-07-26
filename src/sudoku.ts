@@ -423,7 +423,6 @@ export class Sudoku {
 		if (typeof index === 'number') {
 			inRangeIncl(index, 0, this.amountCells - 1);
 
-			// eslint-disable-next-line unicorn/no-unsafe-property-key
 			return this.#cells[index]!;
 		}
 

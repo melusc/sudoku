@@ -22,6 +22,7 @@ import test from 'node:test';
 import {nakedPairs} from '../../src/plugins/naked-pairs.js';
 import {Sudoku} from '../../src/sudoku.js';
 
+// eslint-disable-next-line node-test/no-import-test-files
 import {getComparableCells} from './helpers.js';
 
 const _ = undefined;
@@ -75,6 +76,7 @@ await test('nakedPairs should not change anything upon finding ("1", "2", "5") a
 	assert.ok(!s.anyChanged);
 
 	for (let index = 0; index < 9; ++index) {
+		// eslint-disable-next-line node-test/no-conditional-assertion
 		assert.deepEqual([...row[index]!.candidates], candidates[index]!);
 	}
 });

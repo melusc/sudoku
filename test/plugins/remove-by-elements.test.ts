@@ -22,6 +22,7 @@ import test from 'node:test';
 import {removeByElements} from '../../src/plugins/remove-by-elements.js';
 import {Sudoku} from '../../src/sudoku.js';
 
+// eslint-disable-next-line node-test/no-import-test-files
 import {getComparableCells} from './helpers.js';
 
 const _ = undefined;

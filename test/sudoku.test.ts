@@ -16,14 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint regexp/no-super-linear-backtracking: off */
 import assert from 'node:assert/strict';
 import {randomInt} from 'node:crypto';
 import test from 'node:test';
 
 import {Sudoku, inRangeIncl} from '../src/sudoku.js';
 
+// eslint-disable-next-line node-test/no-import-test-files
 import {getComparableCells} from './plugins/helpers.js';
+// eslint-disable-next-line node-test/no-import-test-files
 import {transformChunkedArray, transformFlatArray} from './utilities.js';
 
 const _ = undefined;
@@ -154,8 +155,10 @@ await test('Sudoku#getCells', () => {
 	assert.equal(cells1.length, 81);
 
 	for (const cell of cells1) {
+		// eslint-disable-next-line node-test/no-conditional-assertion
 		assert.equal(cell.element, undefined);
 
+		// eslint-disable-next-line node-test/no-conditional-assertion
 		assert.equal(cell.candidates.size, 9);
 	}
 
@@ -202,6 +205,7 @@ await test('Sudoku#getBlock', () => {
 	const block2 = s.getBlock(0);
 
 	for (const [index, element] of block2.entries()) {
+		// eslint-disable-next-line node-test/no-conditional-assertion
 		assert.equal(element.element, index);
 	}
 });
@@ -596,7 +600,7 @@ await test('Sudoku#removeCandidate candidates is empty afterwards', () => {
 
 	assert.throws(() => {
 		sudoku.removeCandidate(cell0, 1);
-	});
+	}, TypeError);
 });
 
 await test('Sudoku#removeCandidate one candidate afterwards', () => {
@@ -696,6 +700,7 @@ await test('Sudoku.fromPrefilled valid sudoku', () => {
 
 	for (let index = 0; index < s.size; ++index) {
 		const row = s.getRow(index);
+		// eslint-disable-next-line node-test/no-conditional-assertion
 		assert.deepEqual(
 			row.map(cell => cell.element),
 			[0, 1, 2, 3],
@@ -746,6 +751,7 @@ await test('Sudoku.fromString valid sudoku', () => {
 
 	for (let index = 0; index < s.size; ++index) {
 		const row = s.getRow(index);
+		// eslint-disable-next-line node-test/no-conditional-assertion
 		assert.deepEqual(
 			row.map(cell => cell.element),
 			[0, 1, 2, 3],
@@ -823,8 +829,10 @@ await test('Sudoku#fromJson valid input', () => {
 
 	for (const [index, item] of json.entries()) {
 		if (typeof item === 'number') {
+			// eslint-disable-next-line node-test/no-conditional-assertion
 			assert.equal(s.getElement(index), String(item + 1));
 		} else {
+			// eslint-disable-next-line node-test/no-conditional-assertion
 			assert.deepEqual(s.getCell(index).candidates, new Set(item));
 		}
 	}
@@ -855,23 +863,26 @@ await test('Sudoku#fromJson invalid element', () => {
 await test('inRangeIncl', () => {
 	assert.throws(() => {
 		inRangeIncl(-1, 0, 80);
+		// eslint-disable-next-line regexp/no-super-linear-backtracking
 	}, /-1.+0.+80/);
 
 	assert.throws(() => {
 		inRangeIncl(81, 0, 80);
+		// eslint-disable-next-line regexp/no-super-linear-backtracking
 	}, /81.+0.+80/);
 
 	assert.throws(() => {
 		inRangeIncl(5.5, 0, 80);
+		// eslint-disable-next-line regexp/no-super-linear-backtracking
 	}, /5\.5.+0.+80/);
 
-	assert.doesNotThrow(() => {
-		inRangeIncl(4, 0, 80);
-	});
+	// Shouldn't throw
+	inRangeIncl(4, 0, 80);
 
 	assert.throws(() => {
 		// @ts-expect-error Testing case
 		inRangeIncl('abc', 0, 80);
+		// eslint-disable-next-line regexp/no-super-linear-backtracking
 	}, /abc.+0.+80/);
 
 	assert.throws(() => {

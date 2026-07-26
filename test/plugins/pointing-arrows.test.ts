@@ -22,6 +22,7 @@ import test from 'node:test';
 import {pointingArrows} from '../../src/plugins/pointing-arrows.js';
 import {Sudoku} from '../../src/sudoku.js';
 
+// eslint-disable-next-line node-test/no-import-test-files
 import {getComparableCells} from './helpers.js';
 
 await test('pointingArrows should not change an empty sudoku.', () => {
