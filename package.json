@@ -3,7 +3,7 @@
 	"version": "7.0.1",
 	"repository": "https://github.com/melusc/sudoku",
 	"author": "lusc",
-	"license": "MIT",
+	"license": "GPL-3.0-or-later",
 	"files": [
 		"dist/src"
 	],
